@@ -114,10 +114,10 @@ def l1r4(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   if nr*(nr-1)/2==0:
+   if nr*(nr-1)//2==0:
       print('error: mpo_consw.l1r4')
       exit()
-   tmp = numpy.zeros((nr*(nr-1)/2,2**nc,2**nc))
+   tmp = numpy.zeros((nr*(nr-1)//2,2**nc,2**nc))
    for idxr,orbr in enumerate(sc):
       op_r = sqC(sc,idxr,0)
       for idxs,orbs in enumerate(sc):
@@ -137,10 +137,10 @@ def l1r5(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   if nr*(nr-1)/2==0:
+   if nr*(nr-1)//2==0:
       print('error: mpo_consw.l1r5')
       exit()
-   tmp = numpy.zeros((nr*(nr-1)/2,2**nc,2**nc))
+   tmp = numpy.zeros((nr*(nr-1)//2,2**nc,2**nc))
    for idxr,orbr in enumerate(sc):
       op_r = sqC(sc,idxr,1)
       for idxs,orbs in enumerate(sc):
@@ -293,10 +293,10 @@ def l6r16(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   if nc*(nc-1)/2==0:
+   if nc*(nc-1)//2==0:
       print('error: mpo_consw.l6r16')
       exit()
-   tmp = numpy.zeros((nc*(nc-1)/2,1,2**nc,2**nc))
+   tmp = numpy.zeros((nc*(nc-1)//2,1,2**nc,2**nc))
    irs = 0
    for idxr,orbr in enumerate(sc):
       for idxs,orbs in enumerate(sc):
@@ -329,7 +329,7 @@ def l8r4(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   nr2 = nr*(nr-1)/2
+   nr2 = nr*(nr-1)//2
    if nr2==0:
       print('error: mpo_consw.l8r4')
       exit()
@@ -347,10 +347,10 @@ def l9r16(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   if nc*(nc-1)/2==0:
+   if nc*(nc-1)//2==0:
       print('error: mpo_consw.l9r16')
       exit()
-   tmp = numpy.zeros((nc*(nc-1)/2,1,2**nc,2**nc))
+   tmp = numpy.zeros((nc*(nc-1)//2,1,2**nc,2**nc))
    irs = 0
    for idxr,orbr in enumerate(sc):
       for idxs,orbs in enumerate(sc):
@@ -383,7 +383,7 @@ def l11r5(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   nr2 = nr*(nr-1)/2
+   nr2 = nr*(nr-1)//2
    if nr2==0:
       print('error: mpo_consw.l11r5')
       exit()
@@ -533,10 +533,10 @@ def l14r5(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   if nr*(nr-1)/2==0:
+   if nr*(nr-1)//2==0:
       print('error: mpo_consw.l14r5')
       exit()
-   tmp = numpy.zeros((nl,nr*(nr-1)/2,2**nc,2**nc))
+   tmp = numpy.zeros((nl,nr*(nr-1)//2,2**nc,2**nc))
    for idxq,orbq in enumerate(sc):
       op_q = sqC(sc,idxq,1)
       for idxp,orbp in enumerate(sl):
@@ -638,10 +638,10 @@ def l15r4(h1e,h2e,sl,sc,sr):
    nl = len(sl)
    nc = len(sc)
    nr = len(sr)
-   if nr*(nr-1)/2==0:
+   if nr*(nr-1)//2==0:
       print('error: mpo_consw.l15r4')
       exit()
-   tmp = numpy.zeros((nl,nr*(nr-1)/2,2**nc,2**nc))
+   tmp = numpy.zeros((nl,nr*(nr-1)//2,2**nc,2**nc))
    for idxs,orbs in enumerate(sc):
       op_s = sqC(sc,idxs,0)
       for idxr,orbr in enumerate(sl):

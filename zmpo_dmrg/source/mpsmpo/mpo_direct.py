@@ -18,7 +18,7 @@ def genHmpo(h1e,h2e,e0=0.0,partition=None,isym=0):
    print('\n[mpo_direct.genHmpo]')
    if partition is None:
       dimSpinOrb = h1e.shape[0]
-      partition = [[2*i,2*i+1] for i in range(dimSpinOrb/2)]
+      partition = [[2*i,2*i+1] for i in range(dimSpinOrb//2)]
    aeri = antisymmetrizeTwoBodyOpers(h2e)
    result = directHmpo(h1e,aeri,e0,partition,isym=isym)
    return result
@@ -79,9 +79,9 @@ def genTablesLCR(partition,debug=False):
 
 def genTablesDim12(tabdim,igroup):
    lg,cg,rg = tabdim[igroup]
-   lg2 = lg*(lg-1)/2
-   cg2 = cg*(cg-1)/2
-   rg2 = rg*(rg-1)/2
+   lg2 = lg*(lg-1)//2
+   cg2 = cg*(cg-1)//2
+   rg2 = rg*(rg-1)//2
    dims1l = [1,cg,rg,cg,rg,cg2,cg*rg,rg2,cg2,cg*rg,rg2,lg,lg**2,lg,lg,1]
    dims1s = [1,cg+rg,cg+rg,cg2+cg*rg+rg2,cg2+cg*rg+rg2,lg,lg**2,lg,lg,1]
    dims2l = [1,rg,rg,rg2,rg2,lg,cg,lg**2,lg*cg,lg*cg,cg**2,lg,cg,lg,cg,1]
@@ -117,7 +117,7 @@ def genTablesWdims(tabdim,debug=False):
 
 def sortPcr(cg,rg):
    def id(i,j,n):
-      return i*(2*n-i-3)/2+j-1
+      return i*(2*n-i-3)//2+j-1
    n = cg+rg
    ijcc = [id(i,j,n) for i in range(cg) for j in range(cg) if i<j]
    ijcr = [id(i,j+cg,n) for i in range(cg) for j in range(rg)]
@@ -731,7 +731,7 @@ def testMPOkSites(k):
 def Dg(k):
    print('\n[Dg] bond dimension')
    print(' mean (k-1)/2=',float(k-1)/2)
-   return [(i,((2*i-(k-1))**2+(k+1)*(k+3))/2) for i in range(1,k)]
+   return [(i,((2*i-(k-1))**2+(k+1)*(k+3))//2) for i in range(1,k)]
 
 def testMOL():
    print('*********')

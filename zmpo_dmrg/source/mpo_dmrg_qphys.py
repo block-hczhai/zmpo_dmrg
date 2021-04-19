@@ -33,7 +33,7 @@ def initSpinOrb(norb,isym=1):
       lst = [[[0.],[1.]]]*norb
    elif isym == 2:
       assert norb%2 == 0           
-      lst = [[[0.,0.],[1.,0.5]],[[0.,0.],[1.,-0.5]]]*(norb/2)
+      lst = [[[0.,0.],[1.,0.5]],[[0.,0.],[1.,-0.5]]]*(norb//2)
    else:
       print('error in mpo_dmrg_qphys.initSpinOrb: no such isym=',isym)
       exit(1)

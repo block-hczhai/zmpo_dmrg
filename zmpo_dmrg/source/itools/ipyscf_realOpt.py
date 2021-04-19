@@ -21,8 +21,8 @@ class iface:
       self.mf   = mf
       self.nelec= mol.nelectron
       self.spin = mol.spin
-      self.nalpha = (mol.nelectron+mol.spin)/2
-      self.nbeta  = (mol.nelectron-mol.spin)/2
+      self.nalpha = (mol.nelectron+mol.spin)//2
+      self.nbeta  = (mol.nelectron-mol.spin)//2
       try: 
          self.nbas = mf.mo_coeff[0].shape[0]
       except:

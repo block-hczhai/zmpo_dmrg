@@ -59,7 +59,7 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
     if shells is None: shells=list(range(mol.nbas))
     nshl = len(shells)
     if ifsym:
-       npair = nshl*(nshl+1)/2     
+       npair = nshl*(nshl+1)//2     
     else:
        npair = nshl*nshl
     if debug:
@@ -208,7 +208,7 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
     print("\nCholesky Decomposition:")
     print('nblk =',nblk)
     print("NBAS =",nbas)
-    print("NPAIR=",nbas*(nbas+1)/2) # NOT EXACTLY IN SYM-CASE
+    print("NPAIR=",nbas*(nbas+1)//2) # NOT EXACTLY IN SYM-CASE
     for name in f:
         print(name,'shape =',f[name].shape)
     # CLOSE

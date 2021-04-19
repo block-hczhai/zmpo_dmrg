@@ -40,7 +40,7 @@ dmrg = mpo_dmrg_class.mpo_dmrg()
 dmrg.occun = numpy.array(conf)
 dmrg.const = mol.ecor
 dmrg.path = mol.path
-dmrg.nsite = mol.sbas/2
+dmrg.nsite = mol.sbas//2
 dmrg.sbas  = mol.sbas
 dmrg.isym = 2
 dmrg.build()

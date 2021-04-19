@@ -37,7 +37,7 @@ sz = 0.0
 dmrg = mpo_dmrg_class.mpo_dmrg()
 dmrg.occun = numpy.array([1.,0.]*5+[0.,1.]*5) # AFM initial guess
 dmrg.path = mol.path
-dmrg.nsite = mol.sbas/2
+dmrg.nsite = mol.sbas//2
 dmrg.sbas  = mol.sbas
 dmrg.isym = 2
 dmrg.build()

@@ -37,7 +37,7 @@ conf = [1,1]+[1,0,]*8+[0,0]
 flmps1 = h5py.File('./lmpsQ0','r')
 dmrg2 = mpo_dmrg_class.mpo_dmrg()
 dmrg2.const = mol.ecor
-dmrg2.nsite = mol.sbas/2
+dmrg2.nsite = mol.sbas//2
 dmrg2.sbas  = mol.sbas
 dmrg2.isym = 2
 dmrg2.build()

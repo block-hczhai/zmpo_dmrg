@@ -38,8 +38,8 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
    # UHF-alpha/beta
    ma = mo_coeff[0]
    mb = mo_coeff[1]
-   nalpha = (mol.nelectron+mol.spin)/2
-   nbeta  = (mol.nelectron-mol.spin)/2
+   nalpha = (mol.nelectron+mol.spin)//2
+   nbeta  = (mol.nelectron-mol.spin)//2
    print(' nalpha/nbeta = ',(nalpha,nbeta))
    # Spin-averaged DM
    ma_occ = ma[:,:nalpha]

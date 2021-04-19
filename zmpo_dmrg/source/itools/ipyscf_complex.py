@@ -173,7 +173,7 @@ class iface:
       print(' initial occun for',len(occun),' spin orbitals:\n',occun)
       occun = occun[order].copy()
       orbsym = numpy.array([0]*nact) 
-      spinsym = numpy.array([[0,1] for i in range(nact/2)]).flatten()
+      spinsym = numpy.array([[0,1] for i in range(nact//2)]).flatten()
       print(" final occun:\n",occun)
       print(" orbsym :",orbsym)
       print(" spinsym:",spinsym)

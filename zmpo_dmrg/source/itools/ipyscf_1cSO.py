@@ -17,8 +17,8 @@ class iface:
       self.mf   = mf
       self.nelec= mol.nelectron
       self.spin = mol.spin
-      self.nalpha = (mol.nelectron+mol.spin)/2
-      self.nbeta  = (mol.nelectron-mol.spin)/2
+      self.nalpha = (mol.nelectron+mol.spin)//2
+      self.nbeta  = (mol.nelectron-mol.spin)//2
       try: 
          self.nbas = mf.mo_coeff[0].shape[0]
       except:
@@ -34,8 +34,8 @@ class iface:
       from pyscf import mcscf,fci
       ehf = self.mf.energy_tot(self.mf.make_rdm1())
       if nelecs is None:
-         na = (self.mol.nelectron + self.mol.spin)/2
-         nb = (self.mol.nelectron - self.mol.spin)/2
+         na = (self.mol.nelectron + self.mol.spin)//2
+         nb = (self.mol.nelectron - self.mol.spin)//2
       else:
          na,nb = nelecs  
       if na == nb:
@@ -81,8 +81,8 @@ class iface:
          from pyscf.future.lo import pmloc
          if self.nalpha == self.nbeta:
             print('Closed-Virtual Separation: RHF orbitals')
-            cOrbs = self.mo_coeff[:,self.nfrozen:self.nelec/2]
-            vOrbs = self.mo_coeff[:,self.nelec/2:]
+            cOrbs = self.mo_coeff[:,self.nfrozen:self.nelec//2]
+            vOrbs = self.mo_coeff[:,self.nelec//2:]
             ierr,uc = pmloc.loc(self.mol,cOrbs)
             ierr,uv = pmloc.loc(self.mol,vOrbs)
             clmo = numpy.dot(cOrbs,uc)
@@ -296,7 +296,7 @@ class iface:
       hmo = reduce(numpy.dot,(b.T,h,b))
       # INT2e:
       from pyscf import ao2mo
-      nb = abas/2 
+      nb = abas//2 
       eri = ao2mo.general(self.mol,(b,b,b,b),compact=0).reshape(nb,nb,nb,nb)
       # Frozen core case:
       # fpq = hpq + [pq|rr]*nr - 0.5*[pr|rq]*nr

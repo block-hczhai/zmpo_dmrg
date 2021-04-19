@@ -34,7 +34,7 @@ ifs2proj = True #False
 
 flmps1 = h5py.File('./lmps0','r')
 dmrg2 = mpo_dmrg_class.mpo_dmrg()
-dmrg2.nsite = mol.sbas/2
+dmrg2.nsite = mol.sbas//2
 dmrg2.sbas  = mol.sbas
 dmrg2.isym = 2
 dmrg2.build()

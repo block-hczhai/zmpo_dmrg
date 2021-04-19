@@ -55,7 +55,7 @@ nelec = 5
 dmrg = mpo_dmrg_class.mpo_dmrg()
 dmrg.occun = numpy.array([1.,0.,0.,1.]*2+[1.,0.,0.,0.]) # AFM initial guess
 dmrg.path = mol.path
-dmrg.nsite = mol.sbas/2
+dmrg.nsite = mol.sbas//2
 dmrg.sbas  = mol.sbas
 dmrg.isym = 2
 dmrg.build()
@@ -78,7 +78,7 @@ dmrg.final()
 ################################
 flmps1 = h5py.File(dmrg.path+'/lmps','r')
 dmrg2 = mpo_dmrg_class.mpo_dmrg()
-dmrg2.nsite = mol.sbas/2
+dmrg2.nsite = mol.sbas//2
 dmrg2.sbas  = mol.sbas
 dmrg2.isym = 2
 dmrg2.build()
