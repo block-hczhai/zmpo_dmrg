@@ -99,20 +99,20 @@ def cgtensor_fast2(j1,j2,j3):
    return ift,cgt
 
 if __name__ == '__main__':
-   print cgcoeff(1,0,1,0,1,0)
-   print cgcoeff(0.5,0.5,0.5,-0.5,1,0)
-   print cgcoeff(0.5,0.5,0.5,-0.5,0,0)
-   print cgcoeff(0.5,-0.5,0.5,0.5,1,0)
-   print cgcoeff(0.5,-0.5,0.5,0.5,0,0)
-   print cgcoeff(2.5,2.5,1.5,0.5,4,3)
+   print(cgcoeff(1,0,1,0,1,0))
+   print(cgcoeff(0.5,0.5,0.5,-0.5,1,0))
+   print(cgcoeff(0.5,0.5,0.5,-0.5,0,0))
+   print(cgcoeff(0.5,-0.5,0.5,0.5,1,0))
+   print(cgcoeff(0.5,-0.5,0.5,0.5,0,0))
+   print(cgcoeff(2.5,2.5,1.5,0.5,4,3))
    import math
-   print math.sqrt(3.0/8.0)
+   print(math.sqrt(3.0/8.0))
 
-   print cgtensor(0.5,0.5,0.5)
-   print cgtensor(0.5,0.5,0)
-   print cgtensor(0.5,0.5,1)
+   print(cgtensor(0.5,0.5,0.5))
+   print(cgtensor(0.5,0.5,0))
+   print(cgtensor(0.5,0.5,1))
    
-   print
+   print()
    import time
    j1 = 50
    j2 = 50
@@ -124,8 +124,8 @@ if __name__ == '__main__':
    t2 = time.time()
    #ift,cgt3 = cgtensor_fast2(j1,j2,j3)
    #t3 = time.time()
-   print 'tA=',t1-t0
-   print 'tB=',t2-t1
+   print('tA=',t1-t0)
+   print('tB=',t2-t1)
    #print 'tC=',t3-t2
-   print numpy.sum(abs(cgt1)),numpy.sum(abs(cgt2)),numpy.linalg.norm(cgt1-cgt2)
+   print(numpy.sum(abs(cgt1)),numpy.sum(abs(cgt2)),numpy.linalg.norm(cgt1-cgt2))
    #print numpy.sum(abs(cgt1)),numpy.sum(abs(cgt3)),numpy.linalg.norm(cgt1-cgt3)

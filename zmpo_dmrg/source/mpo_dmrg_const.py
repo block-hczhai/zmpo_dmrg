@@ -7,7 +7,7 @@
 # Subroutines:
 #
 import numpy
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 sgn  = numpy.array([[ 1., 0.],[ 0.,-1.]],dtype=dmrg_dtype)
 idn  = numpy.array([[ 1., 0.],[ 0., 1.]],dtype=dmrg_dtype)
@@ -20,12 +20,12 @@ nii  = numpy.array([[ 0., 0.],[ 0., 1.]],dtype=dmrg_dtype)
 niit = numpy.array([[ 0., 0.],[ 0.,-1.]],dtype=dmrg_dtype)
 
 if __name__ == '__main__':
-   print sgn  
-   print idn  
-   print idnt 
-   print cre  
-   print cret 
-   print ann  
-   print annt 
-   print nii  
-   print niit 
+   print(sgn)  
+   print(idn)  
+   print(idnt) 
+   print(cre)  
+   print(cret) 
+   print(ann)  
+   print(annt) 
+   print(nii)  
+   print(niit) 

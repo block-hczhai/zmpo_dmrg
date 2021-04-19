@@ -10,11 +10,11 @@
 import os
 import numpy
 import shutil
-from util_spinsym import dpt_red,offs_red 
-from util_tensor import genQredDic
+from .util_spinsym import dpt_red,offs_red 
+from .util_tensor import genQredDic
 
 def compact_rotL(flmps1,path,ifaux=False):
-   print '\n[block_itrf.compact_rotL] path =',path
+   print('\n[block_itrf.compact_rotL] path =',path)
    try:
       shutil.rmtree(path)
    except:  
@@ -35,7 +35,7 @@ def compact_rotL(flmps1,path,ifaux=False):
   
    # Put auxilliary sites explicitly
    if ifaux:
-      print ' naux=',naux
+      print(' naux=',naux)
       for isite in range(naux):
          qnumISite = numpy.array([isite,isite*0.5,1,1])
          fp = numpy.memmap(path+'/quanta'+str(isite),dtype='float64',\
@@ -56,7 +56,7 @@ def compact_rotL(flmps1,path,ifaux=False):
    for isite in range(nsite):
       key0 = 'rotL'+str(isite)
       rotL = flmps1[key0].value
-      print ' * isite=',isite,' rotL=',rotL.shape
+      print(' * isite=',isite,' rotL=',rotL.shape)
       rdic = merged_rotL(rotL,qnums[isite],qnumsN,qnums[isite+1])
       # Qnums
       qnum = qnums[isite+1]
@@ -116,7 +116,7 @@ def merged_rotL(rotL,qr1,qr2,qr3,debug=False):
    	    or3 = off_red3[i3]
    	    # Reshaping the reduced-dense tensor <SaNaSbNb||ScNc>
    	    tmp = rotL[or12:or12+dr12,or3:or3+dr3].copy()
-	    if debug: print '(Sa,Sb,Sc),(na,nb,nc)=',(s1,s2,s3),(dr1,dr2,dr3)
+	    if debug: print('(Sa,Sb,Sc),(na,nb,nc)=',(s1,s2,s3),(dr1,dr2,dr3))
 	    # Only block diagonal
 	    if key not in tensorDic:
 	       tensorDic[key] = [tmp]
@@ -127,10 +127,10 @@ def merged_rotL(rotL,qr1,qr2,qr3,debug=False):
    idx = 0
    for key in sorted(tensorDic.keys()):
       rdic[key] = numpy.vstack(tensorDic[key])
-      print '   idx=',idx,' key=',key,' dim=',rdic[key].shape
+      print('   idx=',idx,' key=',key,' dim=',rdic[key].shape)
       idx += 1
       fnorm2b += numpy.linalg.norm(rdic[key])**2
-   print '   diffFnorm2=',fnorm2-fnorm2b
-   print
+   print('   diffFnorm2=',fnorm2-fnorm2b)
+   print()
    assert abs(fnorm2-fnorm2b)<1.e-10
    return rdic

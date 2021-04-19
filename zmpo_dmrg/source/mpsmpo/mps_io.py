@@ -3,7 +3,7 @@ import copy
 
 # Dump MPS into file: mps-rk3,qnum-(n+1)
 def dumpMPS(mps,qnum=None,fname='mps.h5'):
-   print '\n[mps_io.dumpMPS] fname = ',fname
+   print('\n[mps_io.dumpMPS] fname = ',fname)
    f = h5py.File(fname,'w')
    nsite = len(mps)
    f.create_dataset('nsite',data=nsite)
@@ -21,7 +21,7 @@ def dumpMPS(mps,qnum=None,fname='mps.h5'):
    return 0 
 
 def loadMPS(fname='mps.h5'):
-   print '\n[mps_io.loadMPS] fname = ',fname
+   print('\n[mps_io.loadMPS] fname = ',fname)
    f = h5py.File(fname,'r')
    nsite = f['nsite'].value
    mps = [0]*nsite
@@ -52,7 +52,7 @@ def qnumsItrf(nbond,qnums):
    elif len(final[0]) == 2:
       qnuml[0] = [[0.,0.]]
    else:
-      print 'error: no such situation! finalSym =',final[0]
+      print('error: no such situation! finalSym =',final[0])
       exit(1)
    for idx in range(nq):
       qnuml[idx+1] = copy.deepcopy(qnums[idx])

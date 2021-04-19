@@ -19,19 +19,19 @@ import os
 import h5py
 import time
 import numpy
-import mpo_dmrg_io
-import mpo_dmrg_prt
-import mpo_dmrg_kernel
-import mpo_dmrg_dot
-import mpo_dmrg_dotutil
-from qtensor import qtensor
+from . import mpo_dmrg_io
+from . import mpo_dmrg_prt
+from . import mpo_dmrg_kernel
+from . import mpo_dmrg_dot
+from . import mpo_dmrg_dotutil
+from .qtensor import qtensor
 
 # DMRG sweep optimization in one given direction
 # We assume LMPS/RMPS and QNUML/QNUMR (ifsym) are available 
 def sweep(dmrg,sitelst,ncsite,status,ifsym=False):
    ti = time.time()
    rank = dmrg.comm.rank
-   if rank == 0: print '\n[mpo_dmrg_opt.sweep]'
+   if rank == 0: print('\n[mpo_dmrg_opt.sweep]')
    assert ncsite == 1 or ncsite == 2
    nsite = dmrg.nsite
    # Check the existence of files
@@ -52,7 +52,7 @@ def sweep(dmrg,sitelst,ncsite,status,ifsym=False):
       t0 = time.time()
       result = solver(dmrg,isite,ncsite,actlst,flst,status,ifsym)
       t1 = time.time()
-      if rank ==0: print ' Time for CIsolver = %.2f s'%(t1-t0)
+      if rank ==0: print(' Time for CIsolver = %.2f s'%(t1-t0))
       # Save results
       nmvps,eigs,sigs,dwts,qred,site,srotR = result
       nmvp += nmvps
@@ -66,8 +66,8 @@ def sweep(dmrg,sitelst,ncsite,status,ifsym=False):
       mpo_dmrg_kernel.renorm(dmrg,isite,ncsite,flst,flstN,siteN,status)
       t2 = time.time()
       if rank ==0:
-         print ' Time for renormal = %.2f s'%(t2-t1)
-         print ' Time for allsteps = %.2f s'%(t2-t0)
+         print(' Time for renormal = %.2f s'%(t2-t1))
+         print(' Time for allsteps = %.2f s'%(t2-t0))
       # Final
       sweep_fileCloseOpers(flst)
       sweep_fileCloseOpers(flstN)
@@ -98,18 +98,18 @@ def sweep(dmrg,sitelst,ncsite,status,ifsym=False):
 def solver(dmrg,isite,ncsite,actlst,flst,status,ifsym):
    rank = dmrg.comm.rank
    if rank == 0: 
-      print '[mpo_dmrg_opt.solver] isweep =',dmrg.isweep
-      print ' * isym/ifsym/s2proj =',\
-	       (dmrg.isym,ifsym,dmrg.ifs2proj)
-      print ' * ifQt/guess/precond =',\
-	       (dmrg.ifQt,dmrg.ifguess,dmrg.ifprecond)
-      print ' * ifex/ifpt/ifH0/nref =',\
-	       (dmrg.ifex,dmrg.ifpt,dmrg.ifH0,dmrg.nref)
-      print ' Check file lists:'
-      print ' * flst0(lrop[0],lrpop[0]) =',flst[0]
-      print ' * flst1(lrsop/lrpop[iex]) =',flst[1]
-      print ' * flst2(lrhop[iex]) =',flst[2]
-      print ' * flst3(lrdop[iex]) =',flst[3]
+      print('[mpo_dmrg_opt.solver] isweep =',dmrg.isweep)
+      print(' * isym/ifsym/s2proj =',\
+	       (dmrg.isym,ifsym,dmrg.ifs2proj))
+      print(' * ifQt/guess/precond =',\
+	       (dmrg.ifQt,dmrg.ifguess,dmrg.ifprecond))
+      print(' * ifex/ifpt/ifH0/nref =',\
+	       (dmrg.ifex,dmrg.ifpt,dmrg.ifH0,dmrg.nref))
+      print(' Check file lists:')
+      print(' * flst0(lrop[0],lrpop[0]) =',flst[0])
+      print(' * flst1(lrsop/lrpop[iex]) =',flst[1])
+      print(' * flst2(lrhop[iex]) =',flst[2])
+      print(' * flst3(lrdop[iex]) =',flst[3])
    if not dmrg.ifpt:
       result = mpo_dmrg_dot.ci_solver(dmrg,isite,ncsite,actlst,flst,status,ifsym)
    else:
@@ -152,17 +152,17 @@ def sweep_checkOpersList(dmrg,nsite,sitelst,ncsite,status):
 
 def checkOpers(nsite,sitelst,ncsite,fnamel,fnamer,status,debug=False):
    if len(sitelst)<ncsite:
-      print 'error: len(sitelst) < ncsite!'
+      print('error: len(sitelst) < ncsite!')
       exit(1)
    if status == 'L':
       # [**--]
       oplstL = [sitelst[0]-1]
-      oplstR = range(sitelst[0]+ncsite,min(nsite,sitelst[-1]+ncsite)+1)
+      oplstR = list(range(sitelst[0]+ncsite,min(nsite,sitelst[-1]+ncsite)+1))
       # rank= 1  ncsite= 2  sitelst= [0, 1, 2, 3]  actlst= [0, 1, 2, 3]
       actlst = [i-ncsite for i in oplstR]
    elif status == 'R':
       # [--**]
-      oplstL = range(max(-1,sitelst[0]-ncsite),sitelst[-1]-ncsite+1)
+      oplstL = list(range(max(-1,sitelst[0]-ncsite),sitelst[-1]-ncsite+1))
       oplstR = [sitelst[-1]+1]
       #
       # i+1 maitains the consistency for [j,j+1] to represent two-site configuration.
@@ -174,22 +174,22 @@ def checkOpers(nsite,sitelst,ncsite,fnamel,fnamer,status,debug=False):
    for op in oplstL:
      path = fnamel+'_site_'+str(op)
      if not os.path.isfile(path):
-        print 'error: operator file does not exist!',path
+        print('error: operator file does not exist!',path)
         exit(1)
    for op in oplstR:
      path = fnamer+'_site_'+str(op)
      if not os.path.isfile(path):
-        print 'error: operator file does not exist!',path
+        print('error: operator file does not exist!',path)
         exit(1)
    if debug:
-      print '[mpo_dmrg_opt.checkOpers]'
-      print ' fnamel =',fnamel
-      print ' fnamer =',fnamer
-      print ' status =',status
-      print ' sitelst=',sitelst
-      print ' oplstL =',oplstL
-      print ' oplstR =',oplstR
-      print ' actlst =',actlst
+      print('[mpo_dmrg_opt.checkOpers]')
+      print(' fnamel =',fnamel)
+      print(' fnamer =',fnamer)
+      print(' status =',status)
+      print(' sitelst=',sitelst)
+      print(' oplstL =',oplstL)
+      print(' oplstR =',oplstR)
+      print(' actlst =',actlst)
    return actlst
 
 # Open operator files
@@ -351,7 +351,7 @@ def sweep_updateBoundary(dmrg,ncsite,sitelst,qred,srotR,status):
 	 smat = srotR[0]
          norm = numpy.linalg.norm(smat)
 	 if (not dmrg.ifpt) or (dmrg.ifpt and dmrg.ifcompression): smat = smat/norm
-	 key  = mpo_dmrg_dotutil.floatKey(dmrg.qsectors.keys()[0])
+	 key  = mpo_dmrg_dotutil.floatKey(list(dmrg.qsectors.keys())[0])
 	 qsym = [numpy.array(eval(key))]
 	 if dmrg.ifQt:
    	    qtmp = qtensor.qtensor([False,False,True])
@@ -365,7 +365,7 @@ def sweep_updateBoundary(dmrg,ncsite,sitelst,qred,srotR,status):
          smat = srotR[0]
          norm = numpy.linalg.norm(smat)
 	 if (not dmrg.ifpt) or (dmrg.ifpt and dmrg.ifcompression): smat = smat/norm
-	 key  = mpo_dmrg_dotutil.floatKey(dmrg.qsectors.keys()[0])
+	 key  = mpo_dmrg_dotutil.floatKey(list(dmrg.qsectors.keys())[0])
 	 qsym = [numpy.array(eval(key))]
 	 if dmrg.ifQt:
    	    qtmp = qtensor.qtensor([True,False,False])

@@ -6,8 +6,8 @@ import time
 import copy
 import numpy
 import itertools
-import qtensor_util
-import qtensor_idlst
+from . import qtensor_util
+from . import qtensor_idlst
 
 #
 # Sliced objects
@@ -29,9 +29,9 @@ class Qt:
          self.size = None
 
    def prt(self):  
-      print 'slcdim=',self.slcdim
-      print 'maxslc=',self.maxslc
-      print 'nslc  =',self.nslc 
+      print('slcdim=',self.slcdim)
+      print('maxslc=',self.maxslc)
+      print('nslc  =',self.nslc) 
       return 0
 
    def ravel(self,multi):
@@ -286,16 +286,16 @@ class qtensor:
       self.nsyms = numpy.array([qsyms.shape[0] for qsyms in self.qsyms],dtype=numpy.int32) # no. of symmetry sectors
       self.nblks = numpy.prod(self.nsyms)
       if debug:
-         print '\n[fromQsyms]'
-         print ' rank =',self.rank
-         print ' qsyms=',self.qsyms
-         print ' ndims=',self.ndims
+         print('\n[fromQsyms]')
+         print(' rank =',self.rank)
+         print(' qsyms=',self.qsyms)
+         print(' ndims=',self.ndims)
          #print ' idlst=',self.idlst
-         print ' nqnum=',self.nqnum
-         print ' shape=',self.shape
-         print ' size =',self.size
-         print ' nsyms=',self.nsyms
-         print ' nblks=',self.nblks
+         print(' nqnum=',self.nqnum)
+         print(' shape=',self.shape)
+         print(' size =',self.size)
+         print(' nsyms=',self.nsyms)
+         print(' nblks=',self.nblks)
 	 # [fromQsyms]
 	 #  rank = 3
 	 #  qsyms= [array([[ 2. ,  0. ],
@@ -334,23 +334,23 @@ class qtensor:
 	 self.value = None
       self.savings = float(self.size_allowed)/self.size
       if debug:
-         print ' Symmetry allowed:'
-         print ' iblks_allowed  =',self.iblks_allowed
-         print ' dims_allowed  =',self.dims_allowed
-         print ' ndim_allowed  =',self.ndim_allowed
-         print ' ioff_allowed  =',self.ioff_allowed
-         print ' nblks_allowed =',self.nblks_allowed,' nblks =',self.nblks
-         print ' size_allowed  =',self.size_allowed,' size =',self.size,\
-               ' savings=',self.savings
+         print(' Symmetry allowed:')
+         print(' iblks_allowed  =',self.iblks_allowed)
+         print(' dims_allowed  =',self.dims_allowed)
+         print(' ndim_allowed  =',self.ndim_allowed)
+         print(' ioff_allowed  =',self.ioff_allowed)
+         print(' nblks_allowed =',self.nblks_allowed,' nblks =',self.nblks)
+         print(' size_allowed  =',self.size_allowed,' size =',self.size,\
+               ' savings=',self.savings)
       assert self.savings < 1.0+1.e-6
       return 0
 
    def prt(self):
-      print 'Basic information:'
-      print ' rank =',self.rank,' shape =',self.shape,' nsyms =',self.nsyms
-      print ' nblks_allowed =',self.nblks_allowed,' nblks =',self.nblks
-      print ' size_allowed =',self.size_allowed,' size =',self.size,\
-            ' savings =',self.savings
+      print('Basic information:')
+      print(' rank =',self.rank,' shape =',self.shape,' nsyms =',self.nsyms)
+      print(' nblks_allowed =',self.nblks_allowed,' nblks =',self.nblks)
+      print(' size_allowed =',self.size_allowed,' size =',self.size,\
+            ' savings =',self.savings)
       return 0
 
    def fromDenseTensor(self,val,qnums,ifcollect=None):
@@ -374,7 +374,7 @@ class qtensor:
          norm0 = numpy.linalg.norm(val)
          norm1 = numpy.linalg.norm(self.value)
          diff  = abs(norm0-norm1)
-         print ' diff of vals [fromDenseTensor] =',diff
+         print(' diff of vals [fromDenseTensor] =',diff)
          if diff > 1.e-10: exit(1)
       return 0
 
@@ -393,7 +393,7 @@ class qtensor:
          norm0 = numpy.linalg.norm(val)
          norm1 = numpy.linalg.norm(self.value)
          diff  = abs(norm0-norm1)
-         print ' diff of vals [toDenseTensor] =',diff
+         print(' diff of vals [toDenseTensor] =',diff)
          if diff > 1.e-10: exit(1)
       return val
 
@@ -448,7 +448,7 @@ class qtensor:
          isyms = numpy.unravel_index(idx,self.nsyms)
 	 indices = [idlst[i][isyms[i]] for i in range(self.rank)]
 	 ntuple = qtensor_util.cartesian_prod(indices)
-	 idx = map(lambda x:numpy.ravel_multi_index(x,self.shape),ntuple)
+	 idx = [numpy.ravel_multi_index(x,self.shape) for x in ntuple]
 	 prjmap += idx
       return numpy.array(prjmap)
 
@@ -562,8 +562,8 @@ class qtensor:
    #@profile
    def tensordotSYM(self,qt1,qt2,axes):
       # indices
-      r1 = range(qt1.rank)
-      r2 = range(qt2.rank)
+      r1 = list(range(qt1.rank))
+      r2 = list(range(qt2.rank))
       i1,i2 = axes
       e1 = list(set(r1)-set(i1))
       e2 = list(set(r2)-set(i2))
@@ -593,8 +593,8 @@ class qtensor:
       if nii != 0:
          # flip if in the same direction
          if ints1[0] == ints2[0]:
-            ints2 = map(lambda x:not x,ints2)
-            exts2 = map(lambda x:not x,exts2)
+            ints2 = [not x for x in ints2]
+            exts2 = [not x for x in exts2]
          # check all status, such that those pairs are T/F pairs.
          sta = ints1[0]
          for is1,is2 in zip(ints1,ints2):
@@ -664,14 +664,14 @@ class qtensor:
 #@profile
 def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
    debug = False
-   if debug: print '[tensordot]'
+   if debug: print('[tensordot]')
    assert axes is not None
    # indices
-   r1 = range(qt1.rank)
-   r2 = range(qt2.rank)
+   r1 = list(range(qt1.rank))
+   r2 = list(range(qt2.rank))
    if axes is None:
-      i1 = range(qt1.rank)
-      i2 = range(qt2.rank)
+      i1 = list(range(qt1.rank))
+      i2 = list(range(qt2.rank))
    else:
       i1,i2 = axes
    e1 = list(set(r1)-set(i1))
@@ -680,10 +680,10 @@ def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
    ne2 = len(e2)
    nii = len(i1)
    if debug:
-      print ' t1.shape =',qt1.shape
-      print ' t2.shape =',qt2.shape
-      print ' r1,i1,e1,ne1 =',r1,i1,e1,ne1
-      print ' r2,i2,e2,ne2 =',r2,i2,e2,ne2
+      print(' t1.shape =',qt1.shape)
+      print(' t2.shape =',qt2.shape)
+      print(' r1,i1,e1,ne1 =',r1,i1,e1,ne1)
+      print(' r2,i2,e2,ne2 =',r2,i2,e2,ne2)
    # synthesize symmetry
    intqsyms1 = [qt1.qsyms[i] for i in i1]
    intqsyms2 = [qt2.qsyms[i] for i in i2]
@@ -710,17 +710,17 @@ def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
    if nii != 0:
       # flip if in the same direction
       if ints1[0] == ints2[0]:
-         ints2 = map(lambda x:not x,ints2)
-         exts2 = map(lambda x:not x,exts2)
+         ints2 = [not x for x in ints2]
+         exts2 = [not x for x in exts2]
       # check all status, such that those pairs are T/F pairs.
       sta = ints1[0]
       for is1,is2 in zip(ints1,ints2):
          assert is1 != is2 
    exts12 = exts1+exts2
    if debug:
-      print 'check status'
-      print ' s1 =',exts1,ints1
-      print ' s2 =',exts2,ints2
+      print('check status')
+      print(' s1 =',exts1,ints1)
+      print(' s2 =',exts2,ints2)
    # symmetry screening
    rank = ne1+ne2
    #
@@ -754,9 +754,9 @@ def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
       # Generation of final information
       qt.fromQsyms(rank,extqsyms12,extndims12)
       if debug:
-         print ' nblks_allowed =',qt.nblks_allowed,' nblks =',qt.nblks
-         print ' size_allowed  =',qt.size_allowed,' size =',qt.size,\
-               ' savings=',qt.savings
+         print(' nblks_allowed =',qt.nblks_allowed,' nblks =',qt.nblks)
+         print(' size_allowed  =',qt.size_allowed,' size =',qt.size,\
+               ' savings=',qt.savings)
       # Compute contraction
       sdx1 = numpy.array(e1+i1)
       sdx2 = numpy.array(e2+i2)

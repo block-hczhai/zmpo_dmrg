@@ -35,7 +35,7 @@ def initSpinOrb(norb,isym=1):
       assert norb%2 == 0	   
       lst = [[[0.,0.],[1.,0.5]],[[0.,0.],[1.,-0.5]]]*(norb/2)
    else:
-      print 'error in mpo_dmrg_qphys.initSpinOrb: no such isym=',isym
+      print('error in mpo_dmrg_qphys.initSpinOrb: no such isym=',isym)
       exit(1)
    return lst
 
@@ -51,12 +51,12 @@ def initSpatialOrb(norb,isym=1):
 def prt(qphys):
    n = 50
    nsite = len(qphys)
-   print '[mpo_dmrg_qphys.prt]'
-   print '-'*60
-   print ' Number of sites=',nsite
+   print('[mpo_dmrg_qphys.prt]')
+   print('-'*60)
+   print(' Number of sites=',nsite)
    for i in range(nsite):
-      print ' isite=',i,qphys[i]
-   print '-'*60
+      print(' isite=',i,qphys[i])
+   print('-'*60)
    return 0
 
 # Merge two indices (n1,n2) into a combined index
@@ -70,9 +70,9 @@ def dpt(q1,q2):
 # Merge more physical indices
 def merge(qphys,partition,debug=False):
    if debug: 
-      print '[mpo_dmrg_qphys.merge]'
-      print ' partition = ',partition
-      print ' qphys = ',qphys
+      print('[mpo_dmrg_qphys.merge]')
+      print(' partition = ',partition)
+      print(' qphys = ',qphys)
    if qphys is None: return None
    qphys_new = []
    for ipart in partition:
@@ -81,8 +81,8 @@ def merge(qphys,partition,debug=False):
       for j in range(1,npart):
          qnew = dpt(qnew,qphys[ipart[j]])
       if debug:
-	 print ' >>> ipart = ',ipart
-	 print ' qnew = ',qnew
+	 print(' >>> ipart = ',ipart)
+	 print(' qnew = ',qnew)
       qphys_new.append(qnew)
    return qphys_new
 
@@ -95,16 +95,16 @@ if __name__ == '__main__':
    prt(qphys)
    qnew = merge(qphys,partition)
    for idx,iqnum in enumerate(qnew):
-      print ' idx=',idx,iqnum
+      print(' idx=',idx,iqnum)
    
    qphys = initSpinOrb(8,isym=2)
    prt(qphys)
    qnew = merge(qphys,partition)
    for idx,iqnum in enumerate(qnew):
-      print ' idx=',idx,iqnum
+      print(' idx=',idx,iqnum)
 
-   print
-   print initSpinOrb(4,isym=2)
-   print initSpinOrb(4,isym=1)
-   print initSpatialOrb(4,isym=2)
-   print initSpatialOrb(4,isym=1)
+   print()
+   print(initSpinOrb(4,isym=2))
+   print(initSpinOrb(4,isym=1))
+   print(initSpatialOrb(4,isym=2))
+   print(initSpatialOrb(4,isym=1))

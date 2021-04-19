@@ -7,6 +7,7 @@ import h5py
 from pyscf import tools,gto,scf,dft
 from pyscf.tools import molden
 from pyscf.future.lo import pmloc,ulocal
+from functools import reduce
 
 def sqrtm(s):
    e, v = numpy.linalg.eigh(s)
@@ -26,20 +27,20 @@ def loadMolMf(fname):
 
 # Embedding basis
 def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debug=False,ifplot=True):
-   print '\n[embed.genEmbedBasis] for unrestricted determinant'
+   print('\n[embed.genEmbedBasis] for unrestricted determinant')
    ova = mol.intor_symmetric("cint1e_ovlp_sph")
    nb = mo_coeff.shape[1]
    # Check overlap
    diff = reduce(numpy.dot,(mo_coeff[0].T,ova,mo_coeff[0])) - numpy.identity(nb)
-   print ' (CtSC-I)[a]',numpy.linalg.norm(diff)
+   print(' (CtSC-I)[a]',numpy.linalg.norm(diff))
    diff = reduce(numpy.dot,(mo_coeff[1].T,ova,mo_coeff[1])) - numpy.identity(nb)
-   print ' (CtSC-I)[b]',numpy.linalg.norm(diff)
+   print(' (CtSC-I)[b]',numpy.linalg.norm(diff))
    # UHF-alpha/beta
    ma = mo_coeff[0]
    mb = mo_coeff[1]
    nalpha = (mol.nelectron+mol.spin)/2
    nbeta  = (mol.nelectron-mol.spin)/2
-   print ' nalpha/nbeta = ',(nalpha,nbeta)
+   print(' nalpha/nbeta = ',(nalpha,nbeta))
    # Spin-averaged DM
    ma_occ = ma[:,:nalpha]
    mb_occ = mb[:,:nbeta]
@@ -83,13 +84,13 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
       if ifselect:
          fragBasis.append(idx)
          fragLabels.append(item)
-   print ' Define central fragment:'
-   print ' No. of totalBasis:',nb
-   print ' No. of fragBasis :',len(fragBasis)
-   print ' Indices of fragBasis:',fragBasis
-   print ' fragLabels:'
+   print(' Define central fragment:')
+   print(' No. of totalBasis:',nb)
+   print(' No. of fragBasis :',len(fragBasis))
+   print(' Indices of fragBasis:',fragBasis)
+   print(' fragLabels:')
    for idx,item in enumerate(fragLabels):
-      print '  idx = ',idx,' fragBas=',item
+      print('  idx = ',idx,' fragBas=',item)
    compBasis=list(set(range(nb))-set(fragBasis))
    nfrag = len(fragBasis)
    ncomp = len(compBasis)
@@ -98,8 +99,8 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
    ef, u = scipy.linalg.eigh(-pTf)
    ef = -ef
    ne_f = sum(ef)
-   print ' Diag_values of pTf:\n',numpy.diag(pTf)
-   print ' Eigenvalues of pTf:\n',ef
+   print(' Diag_values of pTf:\n',numpy.diag(pTf))
+   print(' Eigenvalues of pTf:\n',ef)
    uf = numpy.zeros((nb,nfrag))
    # Retain the locality for impurity
    #uf[fragBasis,:] = u
@@ -110,7 +111,7 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
       ec, v = scipy.linalg.eigh(-pTc)
       ec = -ec
       ne_c = sum(ec)
-      print ' Eigenvalues of pTc:\n',ec
+      print(' Eigenvalues of pTc:\n',ec)
       cindx = []
       aindx = []
       vindx = []
@@ -135,12 +136,12 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
       vv[compBasis,:] = v[:,vindx]
       # Set up the proper ordering
       ucoeff = numpy.hstack((uf,va,vc,vv))
-      print '-'*70
-      print ' Final results for classification of basis with thresh=',thresh
-      print '-'*70
-      print ' (nf,na,nc,nv) = ',nfrag,na,nc,nv
-      print ' (ncomp,ncStrict,nvStrict,naStrict) =',ncomp,ncStrict,nvStrict,naStrict
-      print ' Eigen_na =\n',ec[aindx]
+      print('-'*70)
+      print(' Final results for classification of basis with thresh=',thresh)
+      print('-'*70)
+      print(' (nf,na,nc,nv) = ',nfrag,na,nc,nv)
+      print(' (ncomp,ncStrict,nvStrict,naStrict) =',ncomp,ncStrict,nvStrict,naStrict)
+      print(' Eigen_na =\n',ec[aindx])
       if ifplot:
          import matplotlib.pyplot as plt
 	 plt.plot(abs(ef),marker='o',linewidth=2.0)
@@ -151,16 +152,16 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
       ucoeff = uf.copy()
    # Check
    pTu = reduce(numpy.dot,(ucoeff.T,pTOAO,ucoeff))
-   print ' Nf =',ne_f,'Nc =',ne_c,'Nt =',ne_f+ne_c
+   print(' Nf =',ne_f,'Nc =',ne_c,'Nt =',ne_f+ne_c)
    if debug: 
-      print ' diagonal of pTu =' 
-      print numpy.diag(pTu)
-      print 'ucoeff\n',ucoeff
+      print(' diagonal of pTu =') 
+      print(numpy.diag(pTu))
+      print('ucoeff\n',ucoeff)
    # Back to AO basis
    basis = numpy.dot(s12inv,ucoeff)
    # Dump
    diff = reduce(numpy.dot,(basis.T,ova,basis)) - numpy.identity(nb)
-   print ' CtSC-I=',numpy.linalg.norm(diff)
+   print(' CtSC-I=',numpy.linalg.norm(diff))
    with open('embas.molden','w') as thefile:
        molden.header(mol,thefile)
        molden.orbital_coeff(mol,thefile,basis)
@@ -172,12 +173,12 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
        molden.orbital_coeff(mol,thefile,mb)
    ua = reduce(numpy.dot,(basis.T,ova,ma_occ))
    ub = reduce(numpy.dot,(basis.T,ova,mb_occ))
-   if debug: print ' ua\n',ua
-   if debug: print ' ub\n',ub
+   if debug: print(' ua\n',ua)
+   if debug: print(' ub\n',ub)
    ia = abs(reduce(numpy.dot,(ua.T,ua)))
    ib = abs(reduce(numpy.dot,(ub.T,ub)))
-   print ' diffIa=',numpy.linalg.norm(ia-numpy.identity(nalpha))
-   print ' diffIb=',numpy.linalg.norm(ib-numpy.identity(nbeta))
+   print(' diffIa=',numpy.linalg.norm(ia-numpy.identity(nalpha)))
+   print(' diffIb=',numpy.linalg.norm(ib-numpy.identity(nbeta)))
    return basis,ua,ub
 
 
@@ -194,7 +195,7 @@ if __name__ == '__main__':
 	 return False
    basis,ua,ub = genEmbedBasis(mol,mocoeff,rule,thresh=0.01)
    
-   import detToMPS
+   from . import detToMPS
    mps = detToMPS.unetworkSplit(ua,ub,threshVal=1.e-3,ifclass=True)
    exit()
    
@@ -203,7 +204,7 @@ if __name__ == '__main__':
    mps = detToMPS.unetwork(ua,ub,threshVal=1.e-3,ifclass=True)
    from mpo_dmrg.source.tools import mpslib
    bdim = mpslib.mps_bdim(mps)
-   print 'bdim=',bdim
+   print('bdim=',bdim)
    ## nc,nf,na,nv= 62 20 20 278
    #print 'bdim1=',len(bdim[62:82] ),bdim[62:82]
    #print 'bdim2=',len(bdim[82:102]),bdim[82:102]

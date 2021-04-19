@@ -29,13 +29,14 @@ import copy
 import time
 import numpy
 from mpi4py import MPI
-import mpo_dmrg_io
-import mpo_dmrg_qphys
-import mpo_dmrg_kernel
-import mpo_dmrg_qparser
-from qtensor import qtensor
-from qtensor import qtensor_util
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_io
+from . import mpo_dmrg_qphys
+from . import mpo_dmrg_kernel
+from . import mpo_dmrg_qparser
+from .qtensor import qtensor
+from .qtensor import qtensor_util
+from .sysutil_include import dmrg_dtype,dmrg_mtype
+from functools import reduce
 
 # For dot optimization
 def initializeDPTspace(dmrg,isite,ncsite,flst,ifsym):
@@ -69,7 +70,7 @@ def genDimensions(dmrg,isite,ncsite,fL,fR):
 	    rdim = fR[name].attrs['shape'][2]
 	    break
       if ldim == 0 or rdim == 0: 
-	 print 'error: ldim/rdim == 0!',ldim,rdim
+	 print('error: ldim/rdim == 0!',ldim,rdim)
 	 exit(1)
    else:	  
       ldim = fL['opers0'].shape[2]
@@ -96,7 +97,7 @@ def setupQlst(dmrg,isite,ncsite,ifsym):
 
 # Float format for keys
 def floatKey(key):
-   fkey = str(map(lambda x:float(x),eval(key)))
+   fkey = str([float(x) for x in eval(key)])
    return fkey
 
 # Symmetry-adapted CI space for NQt case.
@@ -104,7 +105,7 @@ def dptSymmetry(dmrg,isite,ncsite,ifsym,debug=False):
    ldim,cdim,rdim,ndim = dmrg.dims
    # case: NOSYM 
    if not ifsym or (ifsym and dmrg.isym == 0):
-      prjmap = numpy.array(range(ndim))
+      prjmap = numpy.array(list(range(ndim)))
       dic0 = {}
       for key in dmrg.qsectors:
          dic0[key] = prjmap.copy()
@@ -136,12 +137,12 @@ def dptSymmetry(dmrg,isite,ncsite,ifsym,debug=False):
    for key in dic0:
       dic[floatKey(key)] = numpy.array(dic0[key])
    if debug:
-      print '[mpo_dmrg_util.dptSymmetry] (ldim,cdim,rdim,ndim) = ',(ldim,cdim,rdim,ndim)
-      print ' dic =',[(key,len(dic[key])) for key in dic]
-      lst = sorted(map(lambda x:eval(x),dic.keys()))
+      print('[mpo_dmrg_util.dptSymmetry] (ldim,cdim,rdim,ndim) = ',(ldim,cdim,rdim,ndim))
+      print(' dic =',[(key,len(dic[key])) for key in dic])
+      lst = sorted([eval(x) for x in list(dic.keys())])
       for ikey in lst:
          key = str(ikey)
-         print ' key/dim =',key,len(dic[key])
+         print(' key/dim =',key,len(dic[key]))
    return dic
 
 # prjmap and ndim0
@@ -159,8 +160,8 @@ def symmetrySpaceInfo(dmrg,qkey,ncsite,dicDPT=None):
       try:
          prjmap = dicDPT[key]
       except KeyError:
-         print 'error: No basis for key=',key
-         print 'keys = ',dicDPT.keys()
+         print('error: No basis for key=',key)
+         print('keys = ',list(dicDPT.keys()))
          exit(1)
       ndim0  = len(prjmap)
      
@@ -183,8 +184,8 @@ def symmetrySpaceInfo(dmrg,qkey,ncsite,dicDPT=None):
 #>      #------------------------
 
    if ndim0 == 0:
-      print 'error: No enough basis in the symmetry sector !'
-      print ' qkey =',qkey
+      print('error: No enough basis in the symmetry sector !')
+      print(' qkey =',qkey)
       exit(1)
    return key,neig,ndim0,prjmap
 
@@ -214,7 +215,7 @@ def genHDiag(info,ndim0,prjmap):
       t0 = time.time()
       Diag_iproc = mpo_dmrg_kernel.HDiag(info,ndim0,prjmap)
       t1 = time.time()
-      if dmrg.iprt > 0: print ' Time for diagonal = %.2f s'%(t1-t0),' rank=',rank
+      if dmrg.iprt > 0: print(' Time for diagonal = %.2f s'%(t1-t0),' rank=',rank)
       # Sum of them
       Diag = numpy.zeros(ndim0,dtype=numpy.float_)
       dmrg.comm.Reduce([Diag_iproc,MPI.DOUBLE],
@@ -223,11 +224,11 @@ def genHDiag(info,ndim0,prjmap):
       # No need to broadcast, since only rank=0 execute preconditioning
       dmrg.comm.Barrier()
       t_diff = MPI.Wtime() - t_start
-      if rank == 0 and dmrg.iprt >= 0: print ' Wtime for diagonal = %.2f s'%t_diff
+      if rank == 0 and dmrg.iprt >= 0: print(' Wtime for diagonal = %.2f s'%t_diff)
       # Check 
       if dmrg.iprt > 1:
-         print ' rank=',rank,' checkSum=',numpy.sum(Diag_iproc)
-         if rank==0: print ' total checkSum=',numpy.sum(Diag)
+         print(' rank=',rank,' checkSum=',numpy.sum(Diag_iproc))
+         if rank==0: print(' total checkSum=',numpy.sum(Diag))
    return Diag
 
 # RHS of PT equation: <Psi(1)|(H-E0)|chi[m]>c[m]
@@ -239,7 +240,7 @@ def genRHSpt(info,ndim0,prjmap,iHd=0):
    t0 = time.time()
    BVec_iproc = mpo_dmrg_kernel.BVec(info,ndim0,prjmap,iHd)
    t1 = time.time()
-   if dmrg.iprt > 0: print ' Time for BVec = %.2f s'%(t1-t0),' rank=',rank
+   if dmrg.iprt > 0: print(' Time for BVec = %.2f s'%(t1-t0),' rank=',rank)
    # Depending on iHd, return different values
    if iHd == 0:
       BVec = numpy.zeros(ndim0,dtype=dmrg_dtype)
@@ -252,7 +253,7 @@ def genRHSpt(info,ndim0,prjmap,iHd=0):
    # No need to broadcast, since only rank=0 execute preconditioning
    dmrg.comm.Barrier()
    t_diff = MPI.Wtime() - t_start
-   if rank == 0 and dmrg.iprt >= 0: print ' Wtime for BVec = %.2f s'%t_diff,' iHd =',iHd
+   if rank == 0 and dmrg.iprt >= 0: print(' Wtime for BVec = %.2f s'%t_diff,' iHd =',iHd)
    return BVec
 
 # Final
@@ -288,7 +289,7 @@ def finalizeDot(info,civecs0,eigs0,actlst):
 def decimation(civecs,info,debug=False):
    ti = time.time()
    dmrg,isite,ncsite,flst,status,ifsym = info
-   if dmrg.iprt > 0: print '[mpo_dmrg_ci.decimation]'
+   if dmrg.iprt > 0: print('[mpo_dmrg_ci.decimation]')
    rank = dmrg.comm.rank
    ldim,cdim,rdim,ndim = dmrg.dims
    neig = civecs.shape[0]
@@ -316,7 +317,7 @@ def decimation(civecs,info,debug=False):
       t0 = time.time()
       rdm1_iproc = mpo_dmrg_kernel.pRDM(civecs,info)
       t1 = time.time()
-      if dmrg.iprt > 0: print ' Time for pRDM = %.2f s'%(t1-t0),' rank=',rank
+      if dmrg.iprt > 0: print(' Time for pRDM = %.2f s'%(t1-t0),' rank=',rank)
       # Sum of them
       dmrg.comm.Reduce([rdm1_iproc,dmrg_mtype],
                        [rdm1,dmrg_mtype],
@@ -325,16 +326,16 @@ def decimation(civecs,info,debug=False):
       dmrg.comm.Barrier()
       t_diff = MPI.Wtime() - t_start
       if rank == 0 and dmrg.iprt >= 0: 
-         print ' Wtime for pRDM = %.2f s'%t_diff,'with noise =',dmrg.noise
+         print(' Wtime for pRDM = %.2f s'%t_diff,'with noise =',dmrg.noise)
       # Check 
       if dmrg.iprt > 1:
-         print ' rank=',rank,' checkSum=',numpy.sum(rdm1_iproc)
-         if rank==0: print ' total checkSum=',numpy.sum(rdm1)
+         print(' rank=',rank,' checkSum=',numpy.sum(rdm1_iproc))
+         if rank==0: print(' total checkSum=',numpy.sum(rdm1))
    else:
       # Simple noise
       if rank == 0 and dmrg.inoise == 1 and dmrg.noise >= 1.e-10: 
 	 civecs += numpy.random.uniform(-1,1,size=civecs.shape)*10.0*dmrg.noise
-         print ' Simple random noise with size (for civecs) =',dmrg.noise*10.0 # due to square
+         print(' Simple random noise with size (for civecs) =',dmrg.noise*10.0) # due to square
       # Only rank-0 will add RDM
       rdm1 = mpo_dmrg_kernel.pRDM(civecs,info)
    #
@@ -346,7 +347,7 @@ def decimation(civecs,info,debug=False):
       trRDM = numpy.trace(rdm1)
       threshRDM = 1.e-12
       if trRDM < -threshRDM: 
-	 print 'error: RDM should be positive definite! trRDM=',trRDM
+	 print('error: RDM should be positive definite! trRDM=',trRDM)
 	 exit(1)
       # if |rdm|<eps, use identity like rdm1. 
       elif trRDM > -threshRDM and trRDM < threshRDM:
@@ -372,15 +373,15 @@ def decimation(civecs,info,debug=False):
 
 	 if dmrg.Dcut is not None:
 	    Dcut = dmrg.Dcut[isite+1]
-	    print ' dmrg.Dcut =',dmrg.Dcut
+	    print(' dmrg.Dcut =',dmrg.Dcut)
          if dmrg.isym > 0:
             qsyml  = dmrg.qnuml[isite]
             qsymc  = dmrg.qphys[isite]
             qsymlc = mpo_dmrg_qphys.dpt(qsyml,qsymc)
             if debug:
-               print ' qsyml  =',qsyml
-               print ' qsymc  =',qsymc
-               print ' qsymlc =',qsymlc
+               print(' qsyml  =',qsyml)
+               print(' qsymc  =',qsymc)
+               print(' qsymlc =',qsymlc)
             classes = copy.deepcopy(qsymlc)
          else:
             classes = [0]*lcdim
@@ -403,16 +404,16 @@ def decimation(civecs,info,debug=False):
 	 if dmrg.Dcut is not None:
             jsite = isite+ncsite-1
 	    Dcut = dmrg.Dcut[jsite]
-	    print ' dmrg.Dcut =',dmrg.Dcut
+	    print(' dmrg.Dcut =',dmrg.Dcut)
          if dmrg.isym > 0:
             jsite = isite+ncsite-1
             qsymr = dmrg.qnumr[jsite+1]
             qsymc = dmrg.qphys[jsite]
             qsymcr = mpo_dmrg_qphys.dpt(qsymc,qsymr)
             if debug:
-               print ' qsymc  =',qsymc
-               print ' qsymr  =',qsymr
-               print ' qsymcr =',qsymcr
+               print(' qsymc  =',qsymc)
+               print(' qsymr  =',qsymr)
+               print(' qsymcr =',qsymcr)
             classes = copy.deepcopy(qsymcr)
          else:
             classes = [0]*crdim
@@ -433,21 +434,21 @@ def decimation(civecs,info,debug=False):
 
       # Check	
       if debug:
-         print ' CImat.shape[neig,L,R] = ',civecs.shape 
-         print ' Truncated sigs :',sigs.shape,' range = (%12.8e,%12.8e)'%(numpy.amax(sigs),numpy.amin(sigs))
-         print ' Site[i] =',isite,' shape =',site.shape
-         print ' Sum of sigs =',numpy.sum(sigs)
-         print ' Discarded weights =',dwts
+         print(' CImat.shape[neig,L,R] = ',civecs.shape) 
+         print(' Truncated sigs :',sigs.shape,' range = (%12.8e,%12.8e)'%(numpy.amax(sigs),numpy.amin(sigs)))
+         print(' Site[i] =',isite,' shape =',site.shape)
+         print(' Sum of sigs =',numpy.sum(sigs))
+         print(' Discarded weights =',dwts)
       else:
-	 print ' Dcut =%5d  RDM-based decimation: %5d =>%5d  dwts = %7.2e'%(Dcut,dimSuperBlock,nres,dwts)
+	 print(' Dcut =%5d  RDM-based decimation: %5d =>%5d  dwts = %7.2e'%(Dcut,dimSuperBlock,nres,dwts))
 	 tmpsigs = -numpy.sort(-sigs)
 	 nsigprt = 4
 	 sigs_frst = tmpsigs[:nsigprt]
 	 sigs_last = tmpsigs[-1:-nsigprt-1:-1][-1::-1]
-	 print ' first %d sigs2 = '%nsigprt,sigs_frst
-	 print ' last  %d sigs2 = '%nsigprt,sigs_last
-	 print ' von Neumann entropy =',vonNeumannEntropy(tmpsigs),\
-	       ' theoretical maxS =',numpy.log(len(tmpsigs))	
+	 print(' first %d sigs2 = '%nsigprt,sigs_frst)
+	 print(' last  %d sigs2 = '%nsigprt,sigs_last)
+	 print(' von Neumann entropy =',vonNeumannEntropy(tmpsigs),\
+	       ' theoretical maxS =',numpy.log(len(tmpsigs)))	
 
       # Store the norm of wavefunction at the boundary for one-site case.
       if dmrg.ifpt and ncsite == 1:
@@ -491,7 +492,7 @@ def decimation(civecs,info,debug=False):
    dmrg.comm.Bcast([site ,dmrg_mtype])
    dmrg.comm.Bcast([srotR,dmrg_mtype])
    tf = time.time()
-   if dmrg.comm.rank == 0: print ' Wtime for decimation = %.2f s'%(tf-ti)
+   if dmrg.comm.rank == 0: print(' Wtime for decimation = %.2f s'%(tf-ti))
    return sigs,dwts,qred,site,srotR
 
 # Generate initial guess: Only rank0 generates and uses guess later. 

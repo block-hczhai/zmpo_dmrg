@@ -1,7 +1,7 @@
 import numpy 
 import scipy.linalg
 import math
-import itools
+from . import itools
 
 def det_init(N,K,iop=1):
 #
@@ -23,10 +23,10 @@ def det_init(N,K,iop=1):
          h[i,(i+1)%K]=t
 	 h[i,(i-1)%K]=t
       e,v=scipy.linalg.eigh(h)
-      print "Cyclic Hamiltonian:"
-      print h
-      print e
-      print v
+      print("Cyclic Hamiltonian:")
+      print(h)
+      print(e)
+      print(v)
       #exit(1)
    elif iop == 3:
       h=numpy.zeros((K,K))
@@ -36,10 +36,10 @@ def det_init(N,K,iop=1):
 	 h[i,(i-1)%K]=t
 	 h[i,i]=-i/10.0
       e,v=scipy.linalg.eigh(h)
-      print "Cyclic Hamiltonian:"
-      print h
-      print e
-      print v
+      print("Cyclic Hamiltonian:")
+      print(h)
+      print(e)
+      print(v)
       #exit(1)
    elif iop == 4:
       h=numpy.random.uniform(-1,1,K*N)
@@ -67,33 +67,33 @@ def det_to_mps(v):
 
 # With this, we can do Monte-Carlo !!!
 def det_fci(v):
-   print '\n[det_fci]'
+   print('\n[det_fci]')
    s=v.shape
    K=s[0]
    N=s[1]
-   for i in itools.combinations(range(K),N):
+   for i in itools.combinations(list(range(K)),N):
       matrix=v[i,:]
       coeff=numpy.linalg.det(matrix)/math.sqrt(math.factorial(N))
-      print i,coeff
+      print(i,coeff)
 
 def det_check(civec,nsorb,nelec,dets,iprt):
-   if iprt>0: print '[det_check]'
+   if iprt>0: print('[det_check]')
    det_core=dets[0]
    det_site=dets[1]
    rank=len(det_core)
    ic=0
    civec2=numpy.zeros(civec.size)
-   for i in itools.combinations(range(nsorb),nelec):
+   for i in itools.combinations(list(range(nsorb)),nelec):
       for r in range(rank):
 	 matrix=det_site[r][:,i]
          civec2[ic]+=numpy.linalg.det(matrix)*det_core[r]
       ic=ic+1
    diff=numpy.linalg.norm(civec-civec2)
-   if iprt>0: print "DIFF=",diff
+   if iprt>0: print("DIFF=",diff)
    return diff
 
 def det_cofactor(matrix,i,j):
    nr,nc=matrix.shape
-   minor=matrix[numpy.array(range(i)+range(i+1,nr))[:,numpy.newaxis],
-		numpy.array(range(j)+range(j+1,nc))]
+   minor=matrix[numpy.array(list(range(i))+list(range(i+1,nr)))[:,numpy.newaxis],
+		numpy.array(list(range(j))+list(range(j+1,nc)))]
    return (-1)**(i+j)*numpy.linalg.det(minor)

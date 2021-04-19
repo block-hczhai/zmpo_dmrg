@@ -2,7 +2,7 @@ import numpy
 
 def tensor_matricization(tensor,shape,imode):
    N=len(shape)
-   order=range(N)
+   order=list(range(N))
    order.remove(imode)
    # new indices
    order=tuple([imode]+order)
@@ -18,7 +18,7 @@ def matrix_KRprod(a,b):
    r1,p1=a.shape
    r2,p2=b.shape
    if r1 != r2: 
-      print 'inconsistent shape in KRprod !',r1,r2
+      print('inconsistent shape in KRprod !',r1,r2)
       exit(1)
    r=r1   
    #c=numpy.zeros((r1,p1*p2))

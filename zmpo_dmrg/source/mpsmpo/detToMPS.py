@@ -150,7 +150,7 @@ def genFSstates(wts,state=None,thresh=1.e-10):
 # Classfication of intermediates
 #------------------------------------------------------------
 def classification(iterator,debug=False):
-   if debug: print '\n[detToMPS.classification]'
+   if debug: print('\n[detToMPS.classification]')
    dic = {}
    for info in iterator:
       wts,state = info
@@ -159,14 +159,14 @@ def classification(iterator,debug=False):
    dim = 0
    psum = 0.0
    dic2 = {}
-   for key in dic.keys():
-      dic2[key] = map(lambda x:x[1],dic[key])
+   for key in list(dic.keys()):
+      dic2[key] = [x[1] for x in dic[key]]
       dim0 = len(dic[key])
       dim += dim0
-      wts = numpy.sum(map(lambda x:x[0]**2,dic[key]))
+      wts = numpy.sum([x[0]**2 for x in dic[key]])
       psum += wts
-      if debug: print ' ne=',key,' dim=',dim0,' wts=',wts
-   if debug: print ' total=',dim,' wts=',psum
+      if debug: print(' ne=',key,' dim=',dim0,' wts=',wts)
+   if debug: print(' total=',dim,' wts=',psum)
    return dim,dic2
 
 #------------------------------------------------------------
@@ -182,14 +182,14 @@ def classification(iterator,debug=False):
 #------------------------------------------------------------
 def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=False):
    k,n = vmat.shape
-   print '\n[detToMPS.network] threshVal = %7.1e'%threshVal,' (k,n) =',(k,n)
+   print('\n[detToMPS.network] threshVal = %7.1e'%threshVal,' (k,n) =',(k,n))
    if k == 1:
-      print ' error: k = 1' 
+      print(' error: k = 1') 
       exit(1)
    #
    # Construct networks from DET[vmat].
    #
-   print ' >>> 1. Generate impurity Fock space:'
+   print(' >>> 1. Generate impurity Fock space:')
    commonBasis = []
    intermediates = {}
    keff = k
@@ -201,9 +201,9 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
 	 u,sigs,vt = scipy.linalg.svd(tmp)
          #print sigs
       except numpy.linalg.linalg.LinAlgError:
-	 print '\nerror: numpy.linalg.linalg.LinAlgError'     
-	 print tmp.shape
-	 print tmp.dump('tmpMatrix')
+	 print('\nerror: numpy.linalg.linalg.LinAlgError')     
+	 print(tmp.shape)
+	 print(tmp.dump('tmpMatrix'))
          exit()
       #>>> The global sign is not important in screening! 
       #sgn = numpy.linalg.det(vt)
@@ -213,7 +213,7 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       rf = numpy.zeros((nf,n))
       nsigs = len(sigs)
       assert nsigs == min(nf,n)
-      rf[range(nsigs),range(nsigs)] = sigs
+      rf[list(range(nsigs)),list(range(nsigs))] = sigs
       # C*V
       rc = vmat[irow+1:].dot(vt.T)
       rmat = numpy.vstack((rf,rc))
@@ -233,14 +233,14 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       ispace = genFSstates(weights,thresh=threshVal)
       dim,dic = classification(ispace,ifclass)
       if debug:
-         print ' irow =',irow
-         print '   > nsigs =',nsigs
-         print '   > (cfrag,cbath) = ',weights
-         print '   > ucoeff =',u[:,:nsigs]
-         print '   > dim(Lspace) =',dim
-         print '   > generated L-fock space =',dic
+         print(' irow =',irow)
+         print('   > nsigs =',nsigs)
+         print('   > (cfrag,cbath) = ',weights)
+         print('   > ucoeff =',u[:,:nsigs])
+         print('   > dim(Lspace) =',dim)
+         print('   > generated L-fock space =',dic)
       else:
-         print ' irow =',irow,' nsigs =',nsigs,' dim(Lspace) =',dim
+         print(' irow =',irow,' nsigs =',nsigs,' dim(Lspace) =',dim)
       # Only ON states are stored.
       intermediates[irow] = [dim,dic]
       commonBasis.append(u[:,:nsigs])
@@ -248,10 +248,10 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       if ifbdim and dim == 1: 
 	 keff = irow
 	 break
-   print
-   print ' Summary: intermediate states on each layer (bdims) for keff/k =',(keff,k)
-   print [intermediates[i][0] for i in range(keff)]
-   print
+   print()
+   print(' Summary: intermediate states on each layer (bdims) for keff/k =',(keff,k))
+   print([intermediates[i][0] for i in range(keff)])
+   print()
    if ifbdim: return 0
    #
    # |Psi> = |U*Sig*Vt> = |Phi(U)>*det(Vt)
@@ -261,7 +261,7 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
    #
    # Compute the possible overlaps
    #
-   print ' >>> 2. Compute site tensor:'
+   print(' >>> 2. Compute site tensor:')
    sites = []
    for irow in range(k):
       u1 = commonBasis[irow]
@@ -272,7 +272,7 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       if irow == 0:
 	 site = numpy.zeros((2,dim1))
 	 idx = 0
-	 for isym in space1.keys():
+	 for isym in list(space1.keys()):
 	    ispace = space1[isym]
 	    ndim = len(ispace)
 	    assert ndim == 1
@@ -292,11 +292,11 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
          dim0,space0 = intermediates[irow-1]
 	 site = numpy.zeros((dim0,2,dim1))
 	 idx0 = 0
-	 for isym0 in space0.keys():
+	 for isym0 in list(space0.keys()):
 	    ispace0 = space0[isym0]
 	    ndim0 = len(ispace0)
 	    idx1 = 0
-	    for isym1 in space1.keys():
+	    for isym1 in list(space1.keys()):
 	       ispace1 = space1[isym1]
 	       ndim1 = len(ispace1)
 	       #
@@ -305,11 +305,11 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
 	       if isym1 == isym0:
 		  for id0,istate0 in enumerate(ispace0):
 		     orbs0 = numpy.argwhere(numpy.array(istate0)==1)
-		     orbs0 = map(lambda x:x[0],orbs0)
+		     orbs0 = [x[0] for x in orbs0]
 		     umat0 = numpy.vstack((u0[:,orbs0],numpy.zeros((1,isym1))))
 	             for id1,istate1 in enumerate(ispace1):
 			orbs1 = numpy.argwhere(numpy.array(istate1)==1)
-			orbs1 = map(lambda x:x[0],orbs1)
+			orbs1 = [x[0] for x in orbs1]
 			umat1 = u1[:,orbs1]
 			if isym0 == 0:
 			   site[idx0+id0,0,idx1+id1] = 1.0
@@ -322,14 +322,14 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
        	       elif isym1 == isym0+1:
 		  for id0,istate0 in enumerate(ispace0):
 		     orbs0 = numpy.argwhere(numpy.array(istate0)==1)
-		     orbs0 = map(lambda x:x[0],orbs0)
+		     orbs0 = [x[0] for x in orbs0]
 		     nelec0 = len(orbs0) 
 		     umat0 = numpy.zeros((irow+1,nelec0+1))
 		     umat0[:irow,:nelec0] = u0[:,orbs0]
 		     umat0[ irow, nelec0] = 1.0
 	             for id1,istate1 in enumerate(ispace1):
 			orbs1 = numpy.argwhere(numpy.array(istate1)==1)
-			orbs1 = map(lambda x:x[0],orbs1)
+			orbs1 = [x[0] for x in orbs1]
 			umat1 = u1[:,orbs1]
 			s01 = numpy.dot(umat0.T,umat1)
 			site[idx0+id0,1,idx1+id1] = numpy.linalg.det(s01)
@@ -340,7 +340,7 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
          s = site.shape
 	 assert s[2] == 1
 	 site = sgn*site.reshape(s[0],s[1])
-      print ' irow =',irow,' isite.shape =',site.shape
+      print(' irow =',irow,' isite.shape =',site.shape)
       sites.append(site)
    return sites
 
@@ -364,7 +364,7 @@ def detMerge(vmata,vmatb):
 # Unrestricted case
 #------------------------------------------------------------
 def unetwork(vmata,vmatb,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False):
-   print '\n[detToMPS.unetwork]'
+   print('\n[detToMPS.unetwork]')
    # >>> a,b,a,b ordering
    vmat = detMerge(vmata,vmatb)
    sites = network(vmat,thresh,threshVal,debug,ifclass)
@@ -393,13 +393,13 @@ def unetwork(vmata,vmatb,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False)
 # Unrestricted case: Merge MPSa & MPSb
 #------------------------------------------------------------
 def unetworkSplit(vmata,vmatb,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False):
-   print '\n[detToMPS.unetworkSplit]'
+   print('\n[detToMPS.unetworkSplit]')
    k,na = vmata.shape
    k,nb = vmatb.shape
    sitesA = network(vmata,thresh,threshVal,debug,ifclass,ifbdim=True)
    sitesB = network(vmatb,thresh,threshVal,debug,ifclass,ifbdim=True)
-   print k,na
-   print k,nb
+   print(k,na)
+   print(k,nb)
    exit()
    msites = [0]*k
    # site[0]
@@ -428,39 +428,39 @@ if __name__ == '__main__':
 
    weights = [[1.0,0.0]]
    gen = genFSstates(weights)
-   print '*** Fock space basis (idx) = [wts,state] ***' 
+   print('*** Fock space basis (idx) = [wts,state] ***') 
    for idx,i in enumerate(gen):
-      print idx,i
+      print(idx,i)
    
    weights = [[0.0,1.0]]
    gen = genFSstates(weights)
-   print '*** Fock space basis (idx) = [wts,state] ***' 
+   print('*** Fock space basis (idx) = [wts,state] ***') 
    for idx,i in enumerate(gen):
-      print idx,i
+      print(idx,i)
    
    weights = [[1.0,0.0],[1.0,0.0]]
    gen = genFSstates(weights)
-   print '*** Fock space basis (idx) = [wts,state] ***' 
+   print('*** Fock space basis (idx) = [wts,state] ***') 
    for idx,i in enumerate(gen):
-      print idx,i
+      print(idx,i)
    
    weights = [[1.0,0.0],[0.0,1.0]]
    gen = genFSstates(weights)
-   print '*** Fock space basis (idx) = [wts,state] ***' 
+   print('*** Fock space basis (idx) = [wts,state] ***') 
    for idx,i in enumerate(gen):
-      print idx,i
+      print(idx,i)
    
    weights = [[0.3,0.4],[0.2,0.8]]
    gen = genFSstates(weights)
-   print '*** Fock space basis (idx) = [wts,state] ***' 
+   print('*** Fock space basis (idx) = [wts,state] ***') 
    for idx,i in enumerate(gen):
-      print idx,i
+      print(idx,i)
 
    weights = [[0.5,0.5],[0.5,0.5],[0.5,0.6],[0.5,1],[0.5,1],[0,1],[0.1,1],[0.1,0.2],[0.2,0.3],[0.1,0.2]]
    gen = genFSstates(weights)
-   print '*** Fock space basis (idx) = [wts,state] ***' 
+   print('*** Fock space basis (idx) = [wts,state] ***') 
    for idx,i in enumerate(gen):
-      print idx,i
+      print(idx,i)
 
    # Init: 
    # [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2]
@@ -477,22 +477,22 @@ if __name__ == '__main__':
    mps2 = network(vmat,threshVal=1.e-4)
    # Test
    mps = mpo_class.detToMPS(vmat)
-   print '\n*** Comparison ***'
+   print('\n*** Comparison ***')
    bdim = mpslib.mps_bdim(mps)
-   print 'bdim=',bdim
+   print('bdim=',bdim)
    bdim2 = mpslib.mps_bdim(mps2)
-   print 'bdim2=',bdim2
+   print('bdim2=',bdim2)
    rr = mpslib.mps_diff(mps,mps2,iprt=1)
-   print 'diff=',rr
+   print('diff=',rr)
 
    # SVD test:
    #vmat[1::2,::2] = 0.0
    #vmat[::2,1::2] = 0.0
    u,sig,vt = scipy.linalg.svd(vmat)
-   print 'vmat\n',vmat
-   print 'u\n',u
-   print 'vt\n',vt
-   print 'sig\n',sig
+   print('vmat\n',vmat)
+   print('u\n',u)
+   print('vt\n',vt)
+   print('sig\n',sig)
    #
    # SVD do not mix alpha and beta in U and V.
    #
@@ -517,18 +517,18 @@ if __name__ == '__main__':
    mps2 = network(vmat2,threshVal=1.e-2)
    # Test
    mps = mpo_class.detToMPS(vmat2)
-   print '\n*** Comparison ***'
+   print('\n*** Comparison ***')
    bdim = mpslib.mps_bdim(mps)
-   print 'bdim=',bdim
+   print('bdim=',bdim)
    bdim2 = mpslib.mps_bdim(mps2)
-   print 'bdim2=',bdim2
+   print('bdim2=',bdim2)
    rr = mpslib.mps_diff(mps,mps2,iprt=1)
-   print 'diff=',rr
+   print('diff=',rr)
    
    # Unrestricted case
    vmata = vmat[:,:2]
    vmatb = vmat[:,:1]
    mps2 = unetwork(vmata,vmatb,threshVal=1.e-2)
    # Test
-   print '\n*** Comparison ***'
-   print 'shape=',map(lambda x:x.shape,mps2)
+   print('\n*** Comparison ***')
+   print('shape=',[x.shape for x in mps2])

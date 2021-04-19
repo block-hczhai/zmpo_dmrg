@@ -27,8 +27,8 @@
 # 
 import math
 import numpy
-import mpo_dmrg_const
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_const
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # Product vertically
 def prodTwoOpers(op1,op2):

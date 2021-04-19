@@ -46,7 +46,7 @@ def laplacian(dij):
 
 # Get the orbital ordering
 def orbitalOrdering(eri,mode='kij',debug=False):
-   if debug: print '\n[fielder.orbitalOrdering] determing ordering based on',mode.lower()
+   if debug: print('\n[fielder.orbitalOrdering] determing ordering based on',mode.lower())
    nb  = eri.shape[0]
    if mode.lower() == 'dij':
       dij = distanceMatrix(eri)
@@ -59,8 +59,8 @@ def orbitalOrdering(eri,mode='kij',debug=False):
    # From postive to negative
    order=numpy.argsort(v[:,1])[::-1]
    if debug: 
-      print 'dij:\n',dij
-      print 'eig:\n',eig
-      print 'v[1]=',v[:,1]
-      print 'new order:',order
+      print('dij:\n',dij)
+      print('eig:\n',eig)
+      print('v[1]=',v[:,1])
+      print('new order:',order)
    return order

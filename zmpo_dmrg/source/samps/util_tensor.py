@@ -11,8 +11,8 @@
 # def lastSite(site1,qnumsl,ne,ms,sval):
 # 
 import numpy
-import util_spinsym
-import util_angular
+from . import util_spinsym
+from . import util_angular
 
 # Transformation to (S1M1,a)(S2M2,b)=>(S3M3,ab) basis for decimation
 def spinCouple(tf0,qr1,qr2):
@@ -102,7 +102,7 @@ def genQredDic(qr3):
       if key not in dic: 
 	 dic[key] = idx
       else:
-	 print 'error: repeated key in reduced dimension!'
+	 print('error: repeated key in reduced dimension!')
 	 exit(1)
    return dic
 
@@ -166,7 +166,7 @@ def expandRotL(rotL,qr1,qr2,qr12,qr3):
 
 # |Psi>
 def lastSite(rotL1,site1,srotR,qnumsl,ne,ms,sval):
-   print '[util_tensor.lastSite] Population analysis of MPS'
+   print('[util_tensor.lastSite] Population analysis of MPS')
    off_red = util_spinsym.offs_red(qnumsl)
    off_ful = util_spinsym.offs_ful(qnumsl)
    pop = 0.0
@@ -179,19 +179,19 @@ def lastSite(rotL1,site1,srotR,qnumsl,ne,ms,sval):
          msi = im1-s1 
          wti = numpy.sum(coeff**2)
          pop += wti
-         print ' qsym(N,S,M)=',(n1,s1,msi),'dr=',dr1,'wt=',wti,'accum=',pop
+         print(' qsym(N,S,M)=',(n1,s1,msi),'dr=',dr1,'wt=',wti,'accum=',pop)
          if abs(ms-msi)>1.e-8 and wti > 1.e-10:
-            print 'error: The M-adapted MPS is not correct!'
+            print('error: The M-adapted MPS is not correct!')
             #exit(1)
    if abs(pop-1.0)>1.e-5:
-      print ' warning: losing norm for the normalized left-MPS! pop=',pop
+      print(' warning: losing norm for the normalized left-MPS! pop=',pop)
    # Select
    qnum = numpy.array([ne,sval])
    key = str(qnum)
-   print ' Target key =',key,' original ms=',ms
+   print(' Target key =',key,' original ms=',ms)
    dic = genQredDic(qnumsl)
    if key not in dic:
-      print ' >>> No such state for sym=',key
+      print(' >>> No such state for sym=',key)
       info = 0
       rotL = numpy.zeros(0)
       site = numpy.zeros(0)
@@ -212,6 +212,6 @@ def lastSite(rotL1,site1,srotR,qnumsl,ne,ms,sval):
       wt = wt**2
       rotL = numpy.tensordot(rotL1[:,or1:or1+dr1],coeff,axes=([1],[0]))
       site = numpy.tensordot(site1[:,:,ista:iend],coeff,axes=([2],[0])) #lnr,ri->lni
-      print ' weight =',wt,' for qsym=',(n1,s1,ms),' site.shape=',site.shape
+      print(' weight =',wt,' for qsym=',(n1,s1,ms),' site.shape=',site.shape)
    qnum = numpy.array([[ne,sval,1]])
    return info,qnum,rotL,site,wt 

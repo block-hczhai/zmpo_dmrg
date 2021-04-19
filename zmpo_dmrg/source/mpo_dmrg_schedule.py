@@ -37,7 +37,7 @@ class schedule():
    def getParameters(self,dmrg,isweep):
       taglst = ['Normal0','Normal1','Normal2','Fixed1','Fixed2']
       if self.Tag not in taglst:
-         print 'error: no such Tag in taglst! Tag=',self.Tag
+         print('error: no such Tag in taglst! Tag=',self.Tag)
 	 exit(1)
       if self.Tag == 'Normal0':
 	 if isweep < self.change:
@@ -87,7 +87,7 @@ class schedule():
    def checkConv(self,dmrg,isweep,deltaE):
       taglst = ['Normal0','Normal1','Normal2','Fixed1','Fixed2']
       if self.Tag not in taglst:
-         print 'error: no such Tag in taglst! Tag=',self.Tag
+         print('error: no such Tag in taglst! Tag=',self.Tag)
 	 exit(1)
       ifconv = False	 
       if self.Tag in ['Normal0','Normal1','Normal2']:
@@ -170,7 +170,7 @@ class schedule():
    # Setup convergence
    def collect(self):
       if self.Tag is None: 
-         print 'error: Tag still needs to be set!'
+         print('error: Tag still needs to be set!')
 	 exit(1)
       self.maxM = self.MaxMs[-1]
       self.tol  = self.Tols[-1]
@@ -180,14 +180,14 @@ class schedule():
       
    def prt(self):
       n = len(self.Sweeps)
-      print ' DMRG sweep schedule:',\
+      print(' DMRG sweep schedule:',\
       	    ' Tag = ',self.Tag,\
 	    ' maxM =',self.maxM,\
-      	    ' etol =',self.tol
+      	    ' etol =',self.tol)
       for i in range(min(n,self.maxiter)):
-         print '  isweep =%4d   maxM = %5d   etol = %6.2e   noise = %6.2e'%\
-	       (self.Sweeps[i],self.MaxMs[i],self.Tols[i],self.Noises[i])
-      print ' change =%4d'%self.change,'  maxiter =',self.maxiter
+         print('  isweep =%4d   maxM = %5d   etol = %6.2e   noise = %6.2e'%\
+	       (self.Sweeps[i],self.MaxMs[i],self.Tols[i],self.Noises[i]))
+      print(' change =%4d'%self.change,'  maxiter =',self.maxiter)
       return 0
 
 if __name__ == '__main__':
@@ -196,22 +196,22 @@ if __name__ == '__main__':
    sc.normal()
    sc.prt()
    
-   print
+   print()
    sc.fixed()
    sc.prt() 
    
-   print
+   print()
    sc.maxM = 10
    sc.maxiter = 1
    sc.tol = 1.e-1
    sc.fixed()
    sc.prt()
    
-   print
+   print()
    sc.fixed()
    sc.prt()
    
-   print
+   print()
    sc.Sweeps = [0,2,4,6,8]
    sc.MaxMs  = [10,20,30,50,100]
    sc.Tols   = [1.e-3,1.e-4,1.e-5,1.e-6,1.e-7]

@@ -28,7 +28,7 @@ mpo_dmrg_conversion.sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-8,\
 path = './lmps_compact'
 block_itrf.compact_rotL(flmps1,path)
 t1 = time.time()
-print 'dt=',(t1-t0)
+print('dt=',(t1-t0))
 
 flmpsQ.close()
 flmps0.close()

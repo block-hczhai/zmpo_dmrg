@@ -5,6 +5,7 @@ import time
 import numpy
 import scipy.linalg
 from mpi4py import MPI
+from functools import reduce
 
 #
 # Mask for Matrix vector product subroutine
@@ -53,13 +54,13 @@ class linsqSolver:
 
     # Debug: full diagonalization
     def fullDiag(self):
-	print 'diag=',self.diag
-	print 'sumdiag=',numpy.sum(self.diag)
+	print('diag=',self.diag)
+	print('sumdiag=',numpy.sum(self.diag))
 	v0 = numpy.identity(self.ndim,dtype=self.dtype)
         hmat = self.HVecs(v0)
-        print 'hmat\n',hmat
+        print('hmat\n',hmat)
 	eig,vr = scipy.linalg.eigh(hmat)
-	print 'eig=',eig
+	print('eig=',eig)
 	exit()
     
     # Matrix vector product H[iproc]*v
@@ -83,14 +84,14 @@ class linsqSolver:
     # Main solver: 
     def solve_iter(self,v0=None,iop=4):
 	if self.neig > self.ndim:
-	   print ' error in dvdson: neig>ndim, neig/ndim=',self.neig,self.ndim
+	   print(' error in dvdson: neig>ndim, neig/ndim=',self.neig,self.ndim)
 	   exit(1)
 	# Check the shape of RHS
 	if self.comm.rank == 0: 
 	   assert self.bvec.shape == (self.neig,self.ndim)
 	   bnorm = numpy.linalg.norm(self.bvec)
-	   print '[plinsq]: Ax=-b with (noise,size,ndim,crit_e,crit_v,||b||) = (%i,%d,%d,%.1e,%.1e,%.2e)'%\
-				        (self.noise,self.comm.size,self.ndim,self.crit_e,self.crit_vec,bnorm)
+	   print('[plinsq]: Ax=-b with (noise,size,ndim,crit_e,crit_v,||b||) = (%i,%d,%d,%.1e,%.1e,%.2e)'%\
+				        (self.noise,self.comm.size,self.ndim,self.crit_e,self.crit_vec,bnorm))
 	# Clear counter
 	self.nmvp = 0
 	t0 = time.time()
@@ -103,14 +104,14 @@ class linsqSolver:
            else:
 	      vbas = v0.copy()
 	      if numpy.linalg.norm(vbas) < 1.e-14: 
-	         print ' Regenerate initial guess ...'
+	         print(' Regenerate initial guess ...')
 		 vbas = self.genV0()
 	   # Add random noise to interact with the whole space
 	   if self.noise: vbas = vbas + self.nz*numpy.random.uniform(-1,1,size=(self.neig,self.ndim))
 	   if self.ifex: vbas = self.projection(vbas)
 	   # Check again
 	   normV0 = numpy.linalg.norm(vbas[0])
-	   print ' norm of V0 for plinsq =',normV0
+	   print(' norm of V0 for plinsq =',normV0)
         else:
 	   normV0 = 0.
         # 2016.08.31: Check norm of initial guess
@@ -128,8 +129,8 @@ class linsqSolver:
 	self.comm.Bcast([vbas,self.mtype])
 	wbas = self.HVecs(vbas)
 	if self.comm.rank == 0: 
-	   print ' iter  dim  nmvp   ieig         eig[-x^t*b]	 ediff      rnorm     emin     time/s     '
-	   print ' --------------------------------------------------------------------------------------'
+	   print(' iter  dim  nmvp   ieig         eig[-x^t*b]	 ediff      rnorm     emin     time/s     ')
+	   print(' --------------------------------------------------------------------------------------')
         #
         # Begin to solve
         #
@@ -150,8 +151,8 @@ class linsqSolver:
 	      iden = numpy.dot(vbas,vbas.T.conj())
 	      diff = numpy.linalg.norm(iden-numpy.identity(ndim))
 	      if diff > 1.e-10:
-	         print ' diff_VBAS=',diff
-	         print iden
+	         print(' diff_VBAS=',diff)
+	         print(iden)
 	         exit(1)
 	      # An important note: Vh*H*V \= Vt*Hc*Vc
 	      # WRONG  : tmpH = numpy.dot(vbas,wbas.T.conj())
@@ -159,8 +160,8 @@ class linsqSolver:
 	      tmpH = numpy.dot(vbas.conj(),wbas.T)
 	      diff = numpy.linalg.norm(tmpH-tmpH.T.conj())
 	      if diff > 1.e-8:
-	         print ' diff_skewH=',diff
-		 print ' tmpH =\n',tmpH
+	         print(' diff_skewH=',diff)
+		 print(' tmpH =\n',tmpH)
 	         #exit(1)
 	      # Explicit symmetrizaiton
 	      tmpH = 0.5*(tmpH+tmpH.T.conj())
@@ -179,7 +180,7 @@ class linsqSolver:
               ##################################################
 	      e,v = scipy.linalg.eigh(tmpH)
 	      if e[0]<0.0 and ineg==0: 
-		 print ' Warning: negative eigenvalue: e[0]=',e[0]
+		 print(' Warning: negative eigenvalue: e[0]=',e[0])
 		 ineg = 1
               ##################################################
 
@@ -215,9 +216,9 @@ class linsqSolver:
 	      t1 = time.time()
 	      if self.iprt >= 0:
 	         for i in range(neig):
-	            print '%4d %4d %5d %4d + %s %20.12f %10.2e %9.1e %9.1e %9.1e'%(niter,ndim,self.nmvp,\
+	            print('%4d %4d %5d %4d + %s %20.12f %10.2e %9.1e %9.1e %9.1e'%(niter,ndim,self.nmvp,\
 	                  i,str(rconv[i][0] or econv[i])[0],self.const+eigval[i,niter],\
-		          eigval[i,niter]-eigval[i,niter-1],rconv[i][1],e[0],t1-t0)
+		          eigval[i,niter]-eigval[i,niter-1],rconv[i][1],e[0],t1-t0))
 	      t0 = time.time()
 
            #=======================================
@@ -266,7 +267,7 @@ class linsqSolver:
 	      if self.ifex: rbas = self.projection(rbas)
 	      # Re-orthogonalization and get Nindp
 	      nindp,vbas2 = dvdson_ortho(vbas,rbas[rindx,:],self.crit_indp)
-	      if self.iprt > 0: print ' final nindp = ',nindp
+	      if self.iprt > 0: print(' final nindp = ',nindp)
 
  	   else:
 	      nindp = None
@@ -283,11 +284,11 @@ class linsqSolver:
                  wbas  = numpy.vstack((wbas,wbas2))
 	         ndim  = vbas.shape[0]
            else:
-	      print 'Convergence failure: unable to generate new direction: Nindp=0 !'
+	      print('Convergence failure: unable to generate new direction: Nindp=0 !')
               exit(1)
 	   
         if not ifconv:
-           print 'Convergence failure: out of maxcycle ! maxcycle =',self.maxcycle
+           print('Convergence failure: out of maxcycle ! maxcycle =',self.maxcycle)
            exit(1)
 
         #=======================================
@@ -312,7 +313,7 @@ def genOrthoBas(vbas,crit_indp):
       if nindp + 1 == nbas:
 	 vbas[1:] = vbas2
       else:
-	 print 'error: insufficient orthonormal basis: nbas/nindp',nbas,nindp+1
+	 print('error: insufficient orthonormal basis: nbas/nindp',nbas,nindp+1)
          exit()
    return 0
 
@@ -321,7 +322,7 @@ def genOrthoBas(vbas,crit_indp):
 #
 def dvdson_ortho(vbas,rbas,crit_indp):
     debug = False
-    if debug: print '[dvdson_ortho]'
+    if debug: print('[dvdson_ortho]')
     ndim  = vbas.shape[0] 
     nres  = rbas.shape[0]
     nindp = 0
@@ -335,7 +336,7 @@ def dvdson_ortho(vbas,rbas,crit_indp):
        rvec = rbas[i,:].copy()	    
        rii  = numpy.linalg.norm(rvec)
        if rii <= crit_indp: continue
-       if debug: print '  i,rii=',i,rii
+       if debug: print('  i,rii=',i,rii)
        # NORMALIZE
        rvec = rvec / rii
        rii  = numpy.linalg.norm(rvec)
@@ -354,11 +355,11 @@ def dvdson_ortho(vbas,rbas,crit_indp):
        iden = numpy.dot(tmp,tmp.T.conj())
        diff = numpy.linalg.norm(iden-numpy.identity(iden.shape[0],dtype=rbas.dtype))
        if diff > 1.e-10:
-          print ' error in mgs_ortho: diff=',diff
-          print iden
+          print(' error in mgs_ortho: diff=',diff)
+          print(iden)
           exit(1)
        else:
-          print ' final nindp from mgs_ortho =',nindp,' diffIden=',diff	   
+          print(' final nindp from mgs_ortho =',nindp,' diffIden=',diff)	   
     return nindp,vbas2
 
 
@@ -370,11 +371,11 @@ if __name__ == '__main__':
       neig = 2
       numpy.random.seed(0)
       mat = numpy.random.uniform(-1,1,size=(ndim,ndim)) 
-      mat = 0.5*(mat+mat.T) + numpy.diag(range(ndim))
+      mat = 0.5*(mat+mat.T) + numpy.diag(list(range(ndim)))
       b = numpy.random.uniform(-1,1,size=(ndim,neig))
       x0 = scipy.linalg.solve(mat,b)
       e,v = scipy.linalg.eigh(mat)
-      print 'eigs=',e
+      print('eigs=',e)
 
       def matvecp(v,mat):
          return mat.dot(v)
@@ -394,9 +395,9 @@ if __name__ == '__main__':
       solver.mtype = MPI.DOUBLE
       solver.bvec  = -b.T.copy()
       e1,x1,nmvp = solver.solve_iter(v0=None,iop=4)
-      print 'vec1 =',x1.shape
-      print 'vec0 =',x0.shape
-      print 'vdiff=',numpy.linalg.norm(x1[0]-x0[:,0])
+      print('vec1 =',x1.shape)
+      print('vec0 =',x0.shape)
+      print('vdiff=',numpy.linalg.norm(x1[0]-x0[:,0]))
       return 0
 
    # Complex Hermitian A
@@ -407,8 +408,8 @@ if __name__ == '__main__':
       mat1 = numpy.random.uniform(-1,1,size=(ndim,ndim)) 
       mat2 = numpy.random.uniform(-1,1,size=(ndim,ndim))
       # The current method only applies to diagonal dominate case !
-      hmat = 0.1j*(mat2-mat2.T) + 0.5*numpy.diag(range(ndim))
-      print 'Hermicity=',numpy.linalg.norm(hmat-hmat.T.conj())
+      hmat = 0.1j*(mat2-mat2.T) + 0.5*numpy.diag(list(range(ndim)))
+      print('Hermicity=',numpy.linalg.norm(hmat-hmat.T.conj()))
       b = numpy.random.uniform(-1,1,size=(ndim,neig)) \
         + 1.j*numpy.random.uniform(-1,1,size=(ndim,neig)) 
       x0 = scipy.linalg.solve(hmat,b)
@@ -432,9 +433,9 @@ if __name__ == '__main__':
       solver.mtype = MPI.C_DOUBLE_COMPLEX
       solver.bvec  = -b.T.copy()
       e1,x1,nmvp = solver.solve_iter(v0=None,iop=4)
-      print 'vec1 =',x1.shape
-      print 'vec0 =',x0.shape
-      print 'vdiff=',numpy.linalg.norm(x1[0]-x0[:,0])
+      print('vec1 =',x1.shape)
+      print('vec0 =',x0.shape)
+      print('vdiff=',numpy.linalg.norm(x1[0]-x0[:,0]))
       return 0
 
    # TEST

@@ -20,18 +20,18 @@
 # 
 import time
 import numpy
-import mpo_dmrg_io
-import mpo_dmrg_dotutil
-from qtensor import qtensor
-from qtensor import qtensor_opers
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_io
+from . import mpo_dmrg_dotutil
+from .qtensor import qtensor
+from .qtensor import qtensor_opers
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # Diagonal term of H in Vl*Vr
 def HDiagQt(info,ndim0,prjmap):
    dmrg,isite,ncsite,flst,status,ifsym = info
    fL,fR = flst[0][0:2]
    ldim,cdim,rdim,ndim = dmrg.dims
-   if dmrg.iprt > 0: print '[mpo_dmrg_kernel.HDiag] (l,c,r,n,n0)=',(ldim,cdim,rdim,ndim,ndim0) 
+   if dmrg.iprt > 0: print('[mpo_dmrg_kernel.HDiag] (l,c,r,n,n0)=',(ldim,cdim,rdim,ndim,ndim0)) 
    # Loop over operators
    diag = numpy.zeros(ndim,dtype=dmrg_dtype)
    lops = qtensor.Qt()
@@ -127,7 +127,7 @@ def HDiagQt(info,ndim0,prjmap):
    return diag
 
 def checkDiagQt(diag,funQt,vec,info,ndim0,prjmap):
-   print ' checkDiagQt: debuging diag and funQt ...'
+   print(' checkDiagQt: debuging diag and funQt ...')
    dmrg = info[0]
    assert dmrg.comm.size == 1
    Hmat = numpy.zeros((ndim0,ndim0),dtype=dmrg_dtype)
@@ -135,17 +135,17 @@ def checkDiagQt(diag,funQt,vec,info,ndim0,prjmap):
       vec = numpy.zeros(ndim0,dtype=dmrg_dtype)
       vec[i] = 1.0
       Hmat[:,i] = funQt(vec,info,ndim0,prjmap)
-      print ' idx=',i,'diag[i]=',diag[i],'Hii=',Hmat[i,i],'diff=',Hmat[i,i]-diag[i]
+      print(' idx=',i,'diag[i]=',diag[i],'Hii=',Hmat[i,i],'diff=',Hmat[i,i]-diag[i])
    diff1 = numpy.linalg.norm(Hmat-Hmat.T.conj())
    diff2 = numpy.linalg.norm(numpy.diag(Hmat)-diag)
    if dmrg.comm.size == 1:
-      print ' diff1(H-H.T.conj)=',diff1 # diff1= 8.21020104329e-08
+      print(' diff1(H-H.T.conj)=',diff1) # diff1= 8.21020104329e-08
       if diff1 > 1.e-10:
-         print ' error: Fmat is not Hermitian!'
+         print(' error: Fmat is not Hermitian!')
          exit(1)
-   print ' diff2(H.diag-D)=',diff2 # diff2= 1.47061633021e-14
+   print(' diff2(H.diag-D)=',diff2) # diff2= 1.47061633021e-14
    if diff2 > 1.e-10:
-      print ' error: diag and Fmat are not consistent!'
+      print(' error: diag and Fmat are not consistent!')
       exit(1)
    return 0
 
@@ -454,7 +454,7 @@ def pRDMQt(cimat,info):
    dmrg,isite,ncsite,flst,status,ifsym = info
    fL,fR = flst[0][0:2]
    ldim,cdim,rdim,ndim = dmrg.dims
-   if dmrg.iprt > 0: print '[mpo_dmrg_kernel.pRDM] (l,c,r,n)=',(ldim,cdim,rdim,ndim)
+   if dmrg.iprt > 0: print('[mpo_dmrg_kernel.pRDM] (l,c,r,n)=',(ldim,cdim,rdim,ndim))
    neig,diml,dimc,dimr = cimat.shape
    nop = dmrg.nops
    dims = numpy.array([6]+[dmrg.maxslc]*2)

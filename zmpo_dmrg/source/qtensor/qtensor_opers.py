@@ -46,15 +46,15 @@
 import time
 import numpy
 import itertools
-import qtensor
-import qtensor_util
+from . import qtensor
+from . import qtensor_util
 from zmpo_dmrg.source import mpo_dmrg_opers
 from zmpo_dmrg.source import mpo_dmrg_ptopers
 from zmpo_dmrg.source import mpo_dmrg_qphys
 from zmpo_dmrg.source.tools import parallel_util
 
 def sortQnums(qnums):
-   idx = sorted(range(len(qnums)), key=lambda k: str(qnums[k]))
+   idx = sorted(list(range(len(qnums))), key=lambda k: str(qnums[k]))
    return numpy.array(idx)
 
 #
@@ -514,10 +514,10 @@ def testElem():
 	    tb += t2-t1
 	    diff  = numpy.linalg.norm(site0-site1)
 	    assert diff < 1.e-10
-	    print 'iop,p,isite,diff=',iop,p,isite,diff
+	    print('iop,p,isite,diff=',iop,p,isite,diff)
 	    #assert diff < 1.e-10
-   print 'ta =',ta
-   print 'tb =',tb
+   print('ta =',ta)
+   print('tb =',tb)
    return 0 
 
 def testElemSingle():
@@ -527,11 +527,11 @@ def testElemSingle():
    for iop in [1,0]:
       qt1 = genElemSpinQt(p,isite,iop)
       qt1.prt()
-      print qt1.qsyms
-      print qt1.ndims
-      print qt1.idlst
-      print qt1.shape
-      print qt1.toDenseTensor()
+      print(qt1.qsyms)
+      print(qt1.ndims)
+      print(qt1.idlst)
+      print(qt1.shape)
+      print(qt1.toDenseTensor())
       ref = numpy.zeros((1,1,2,2))
       if iop == 1:
 	 ref[0,0,1,0] = 1.0
@@ -545,10 +545,10 @@ def testElemSingle():
       qt2.prt()
       t1 = qt1.toDenseTensor()
       t2 = qt1.toDenseTensor()
-      print 't1',t1.shape
-      print 't1',t1
-      print 't2',t2.shape
-      print 't2',t2
+      print('t1',t1.shape)
+      print('t1',t1)
+      print('t2',t2.shape)
+      print('t2',t2)
       ref = numpy.zeros((1,1,4,4))
       if iop == 1:
 	 ref[0,0,2,0] = 1.
@@ -556,8 +556,8 @@ def testElemSingle():
       else:
 	 ref[0,0,0,2] = 1.
          ref[0,0,1,3] = 1.
-      print 'ref',ref.shape
-      print 'ref',ref
+      print('ref',ref.shape)
+      print('ref',ref)
       assert numpy.linalg.norm(t1-ref)<1.e-10
       assert numpy.linalg.norm(t2-ref)<1.e-10
 #
@@ -611,11 +611,11 @@ def testWfacSpin():
       ta = 0.
       tb = 0.
       for isite in range(nbas):
-         print '\nisz,isite=',isz,isite
+         print('\nisz,isite=',isz,isite)
          t0 = time.time()
          site0 = mpo_dmrg_opers.genWfacSpin(nbas,isite,hq,vqrs)
          t1 = time.time()
-         print 'wop=',site0.shape
+         print('wop=',site0.shape)
 	 # Wsite
 	 qt12 = genWfacSpinQt(nbas,isite,hq,vqrs,isz)
 	 qt12.prt()
@@ -625,13 +625,13 @@ def testWfacSpin():
          tb += t2-t1
          assert site0.shape == site1.shape
          diff  = numpy.linalg.norm(site0-site1)
-         print 'isz,isite,diff=',isz,isite,diff
+         print('isz,isite,diff=',isz,isite,diff)
          assert diff < 1.e-10
-	 print ' t1=',t1-t0
-	 print ' t2=',t2-t1
-      print
-      print 'ta =',ta
-      print 'tb =',tb
+	 print(' t1=',t1-t0)
+	 print(' t2=',t2-t1)
+      print()
+      print('ta =',ta)
+      print('tb =',tb)
    return 0 
 
 def testWfacSpatial():
@@ -680,11 +680,11 @@ def testWfacSpatial():
       tb = 0.
       tc = 0.
       for isite in range(nsite):
-         print '\nisz,isite=',isz,isite
+         print('\nisz,isite=',isz,isite)
          t0 = time.time()
          site0 = mpo_dmrg_opers.genWfacSpatial(nbas,isite,hq,vqrs)
          t1 = time.time()
-         print 'wop=',site0.shape
+         print('wop=',site0.shape)
 	 # Wsite
 	 qt12 = genWfacSpatialQt(nbas,isite,hq,vqrs,isz)
 	 qt12.prt()
@@ -694,7 +694,7 @@ def testWfacSpatial():
          tb += t2-t1
          assert site0.shape == site1.shape
          diff  = numpy.linalg.norm(site0-site1)
-         print 'isz,isite,diff=',isz,isite,diff
+         print('isz,isite,diff=',isz,isite,diff)
          assert diff < 1.e-10
 	 
 	 t3 = time.time()
@@ -707,17 +707,17 @@ def testWfacSpatial():
 	 tc += t4-t3
          assert site1.shape == site2.shape
          diff  = numpy.linalg.norm(site1-site2)
-         print 'isz,isite,diff=',isz,isite,diff
+         print('isz,isite,diff=',isz,isite,diff)
          assert diff < 1.e-10
 
-	 print ' equalSym=',qt12l.equalSym(qt12)
-	 print ' t1=',t1-t0
-	 print ' t2=',t2-t1
-	 print ' t3=',t4-t3
-      print
-      print 'ta =',ta
-      print 'tb =',tb
-      print 'tc =',tc
+	 print(' equalSym=',qt12l.equalSym(qt12))
+	 print(' t1=',t1-t0)
+	 print(' t2=',t2-t1)
+	 print(' t3=',t4-t3)
+      print()
+      print('ta =',ta)
+      print('tb =',tb)
+      print('tc =',tc)
    return 0 
 
 def testHfacSpin():
@@ -769,50 +769,50 @@ def testHfacSpin():
       hq = hmo[isz]
       vqrs = eri[isz]
       for isite in range(nbas):
-         print '\np,isz,isite=',p,isz,isite
+         print('\np,isz,isite=',p,isz,isite)
          t0 = time.time()
          site0 = mpo_dmrg_opers.genHfacSpin(p,nbas,isite,hq,vqrs)
          t1 = time.time()
-         print 'hop=',site0.shape
-         print 'site0.shape=',site0.shape,' sum=',numpy.sum(site0)
+         print('hop=',site0.shape)
+         print('site0.shape=',site0.shape,' sum=',numpy.sum(site0))
 	 # Wsite
 	 qt12a = genHfacSpinQt(p,nbas,isite,hq,vqrs)
 	 qt12a.prt()
 	 site1a = qt12a.toDenseTensor()
 	 t2 = time.time()
-	 print 'site1a.shape=',site1a.shape,' sum=',numpy.sum(site1a)
+	 print('site1a.shape=',site1a.shape,' sum=',numpy.sum(site1a))
 	 assert site0.shape == site1a.shape
 	 diffa  = numpy.linalg.norm(site0-site1a)
-         print 'isz,isite,diffa=',isz,isite,diffa
+         print('isz,isite,diffa=',isz,isite,diffa)
 
 	 t3 = time.time()
 	 qt12b = genHfacSpinQt0(p,nbas,isite,hq,vqrs)
 	 qt12b.prt()
 	 site1b = qt12b.toDenseTensor()
          t4 = time.time()
-	 print 'site1b.shape=',site1b.shape,' sum=',numpy.sum(site1b)
+	 print('site1b.shape=',site1b.shape,' sum=',numpy.sum(site1b))
 	 assert site0.shape == site1b.shape
 	 diffb  = numpy.linalg.norm(site0-site1b)
-         print 'isz,isite,diffb=',isz,isite,diffb
+         print('isz,isite,diffb=',isz,isite,diffb)
 	 
 	 ta += t1-t0
          tb += t2-t1
          tc += t4-t3
 	 diffab  = numpy.linalg.norm(site1a-site1b)
-         print 'isz,isite,diffab=',isz,isite,diffab
-	 print ' t1[mat]=',t1-t0
-	 print ' t2[Qt ]=',t2-t1
-	 print ' t3[Qt0]=',t4-t3
+         print('isz,isite,diffab=',isz,isite,diffab)
+	 print(' t1[mat]=',t1-t0)
+	 print(' t2[Qt ]=',t2-t1)
+	 print(' t3[Qt0]=',t4-t3)
 	 assert diffa < 1.e-10
          assert diffb < 1.e-10
          assert diffab < 1.e-10
-	 print ' equalSym=',qt12a.equalSym(qt12b)
+	 print(' equalSym=',qt12a.equalSym(qt12b))
          assert qt12a.equalSym(qt12b)
 
-      print
-      print 'ta =',ta
-      print 'tb =',tb
-      print 'tc =',tc
+      print()
+      print('ta =',ta)
+      print('tb =',tb)
+      print('tc =',tc)
    return 0 
 
 def testHfacSpatial():
@@ -864,21 +864,21 @@ def testHfacSpatial():
       hq = hmo[isz]
       vqrs = eri[isz]
       for isite in range(nsite):
-         print '\np,isz,isite=',p,isz,isite
+         print('\np,isz,isite=',p,isz,isite)
          t0 = time.time()
          site0 = mpo_dmrg_opers.genHfacSpatial(p,nbas,isite,hq,vqrs)
          t1 = time.time()
-         print 'hop=',site0.shape
-         print 'site0.shape=',site0.shape,' sum=',numpy.sum(site0)
+         print('hop=',site0.shape)
+         print('site0.shape=',site0.shape,' sum=',numpy.sum(site0))
 	 # Wsite
 	 qt12a = genHfacSpatialQt(p,nbas,isite,hq,vqrs)
 	 qt12a.prt()
 	 site1a = qt12a.toDenseTensor()
 	 t2 = time.time()
-	 print 'site1a.shape=',site1a.shape,' sum=',numpy.sum(site1a)
+	 print('site1a.shape=',site1a.shape,' sum=',numpy.sum(site1a))
 	 assert site0.shape == site1a.shape
 	 diffa  = numpy.linalg.norm(site0-site1a)
-         print 'isz,isite,diffa=',isz,isite,diffa
+         print('isz,isite,diffa=',isz,isite,diffa)
 
 	 t3 = time.time()
 	 qt12e = genHfacSpinQt(p,nbas,2*isite  ,hq,vqrs)
@@ -887,29 +887,29 @@ def testHfacSpatial():
 	 qt12b.prt()
 	 site1b = qt12b.toDenseTensor()
          t4 = time.time()
-	 print 'site1b.shape=',site1b.shape,' sum=',numpy.sum(site1b)
+	 print('site1b.shape=',site1b.shape,' sum=',numpy.sum(site1b))
 	 assert site0.shape == site1b.shape
 	 diffb  = numpy.linalg.norm(site0-site1b)
-         print 'isz,isite,diffb=',isz,isite,diffb
+         print('isz,isite,diffb=',isz,isite,diffb)
 	 
 	 ta += t1-t0
          tb += t2-t1
          tc += t4-t3
 	 diffab  = numpy.linalg.norm(site1a-site1b)
-         print 'isz,isite,diffab=',isz,isite,diffab
-	 print ' t1[mat]=',t1-t0
-	 print ' t2[Qt ]=',t2-t1
-	 print ' t3[Qt0]=',t4-t3
+         print('isz,isite,diffab=',isz,isite,diffab)
+	 print(' t1[mat]=',t1-t0)
+	 print(' t2[Qt ]=',t2-t1)
+	 print(' t3[Qt0]=',t4-t3)
 	 assert diffa < 1.e-10
          assert diffb < 1.e-10
          assert diffab < 1.e-10
-	 print ' equalSym=',qt12a.equalSym(qt12b)
+	 print(' equalSym=',qt12a.equalSym(qt12b))
          assert qt12a.equalSym(qt12b)
 
-      print
-      print 'ta =',ta
-      print 'tb =',tb
-      print 'tc =',tc
+      print()
+      print('ta =',ta)
+      print('tb =',tb)
+      print('tc =',tc)
    return 0 
 
 def testHRfacSpatial():
@@ -951,34 +951,34 @@ def testHRfacSpatial():
    for p in range(nbas):
       isz = p%2
       for isite in range(nsite):
-         print '\np,isz,isite=',p,isz,isite
+         print('\np,isz,isite=',p,isz,isite)
          t0 = time.time()
 	 pindx = (p,0)
 	 qpts = numpy.array([0.3])
          site0 = mpo_dmrg_opers.genHRfacSpatial(pindx,nbas,isite,hmo,eri,qpts)
          t1 = time.time()
-         print 'hop=',site0.shape
-         print 'site0.shape=',site0.shape,' sum=',numpy.sum(site0)
+         print('hop=',site0.shape)
+         print('site0.shape=',site0.shape,' sum=',numpy.sum(site0))
 	 # Wsite
 	 pdic = None #fake
 	 qt12a = genHRfacSpatialQt(pindx,nbas,isite,hmo,eri,pdic,qpts)
 	 qt12a.prt()
 	 site1a = qt12a.toDenseTensor()
 	 t2 = time.time()
-	 print 'site1a.shape=',site1a.shape,' sum=',numpy.sum(site1a)
+	 print('site1a.shape=',site1a.shape,' sum=',numpy.sum(site1a))
 	 assert site0.shape == site1a.shape
 	 diffa  = numpy.linalg.norm(site0-site1a)
-         print 'isz,isite,diffa=',isz,isite,diffa
+         print('isz,isite,diffa=',isz,isite,diffa)
 	 ta += t1-t0
          tb += t2-t1
-      print
-      print 'ta =',ta
-      print 'tb =',tb
+      print()
+      print('ta =',ta)
+      print('tb =',tb)
       qt12a.prt()
-      print 'qsyms=',qt12a.qsyms
-      print 'nsyms=',qt12a.nsyms
-      print 'idlst=',qt12a.idlst
-      print 'vals =',qt12a.value
+      print('qsyms=',qt12a.qsyms)
+      print('nsyms=',qt12a.nsyms)
+      print('idlst=',qt12a.idlst)
+      print('vals =',qt12a.value)
    return 0 
 
 def testQnumHRfacSpatialQt():
@@ -1005,9 +1005,9 @@ def testQnumHRfacSpatialQt():
 	 qpts = numpy.array([0.3])
 	 pdic = None #fake
 	 qt12a = genHRfacSpatialQt(pindx,nbas,isite,hmo,eri,pdic,qpts)
-         print '\n>>> isite/p=',isite,p
-	 print 'ql=',qt12a.qsyms[0]
-	 print 'qr=',qt12a.qsyms[1]
+         print('\n>>> isite/p=',isite,p)
+	 print('ql=',qt12a.qsyms[0])
+	 print('qr=',qt12a.qsyms[1])
    return 0 
 
 

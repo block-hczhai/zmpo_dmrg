@@ -1,6 +1,7 @@
 import numpy
 import scipy.linalg
 import time
+from functools import reduce
 
 class mask:
    def __init__(self,info,mvp):
@@ -32,13 +33,13 @@ class eigenSolver:
 	self.nz    = 1.e-5
 
     def fullDiag(self):
-	print 'diag=',self.diag
-	print 'sumdiag=',numpy.sum(self.diag)
+	print('diag=',self.diag)
+	print('sumdiag=',numpy.sum(self.diag))
 	v0 = numpy.identity(self.ndim)
 	hmat = self.matvecs(v0)
-	print 'hmat\n',hmat
+	print('hmat\n',hmat)
 	eig,vr = scipy.linalg.eigh(hmat)
-	print 'eig=',eig
+	print('eig=',eig)
 	exit()
 
     #@profile
@@ -56,21 +57,21 @@ class eigenSolver:
 	diag = self.diag + 1.e-12*numpy.arange(1.0*self.ndim)/float(self.ndim)
 	index = numpy.argsort(diag)[:neig]
         v0 = numpy.zeros((neig,self.ndim),dtype=self.diag.dtype)
-	v0[range(neig),index]=1.0
+	v0[list(range(neig)),index]=1.0
         return v0
 
     #@profile
     def solve_iter(self,v0=None,iop=4,ifplot=False):
 	if self.iprt>0:    
-	   print     
-           print '-------------------------------'
-	   print '  Davidson solver for AX=wX    '
-           print '-------------------------------'
-	   print '  iop  = ',iop
-           print '  ndim = ',self.ndim
-           print '  neig = ',self.neig
-	   print '  maxcycle = ',self.maxcycle
-           print '-------------------------------'
+	   print()     
+           print('-------------------------------')
+	   print('  Davidson solver for AX=wX    ')
+           print('-------------------------------')
+	   print('  iop  = ',iop)
+           print('  ndim = ',self.ndim)
+           print('  neig = ',self.neig)
+	   print('  maxcycle = ',self.maxcycle)
+           print('-------------------------------')
 	# Clear counter
 	self.nmvp = 0
         #
@@ -96,16 +97,16 @@ class eigenSolver:
 	eigval= numpy.zeros((self.neig,self.maxcycle))
         for niter in range(1,self.maxcycle):
            if self.iprt > 0: 
-              print '\n ----------  niter,ndim0,ndim,nmvp =',\
-	      	    (niter,self.ndim,ndim,self.nmvp),' ----------'
+              print('\n ----------  niter,ndim0,ndim,nmvp =',\
+	      	    (niter,self.ndim,ndim,self.nmvp),' ----------')
 	   #
 	   # Check othonormality of basis 
 	   #
 	   iden = numpy.dot(vbas,vbas.T)
 	   diff = numpy.linalg.norm(iden-numpy.identity(ndim))
 	   if diff > 1.e-10:
-	      print ' diff_VBAS=',diff
-	      print iden
+	      print(' diff_VBAS=',diff)
+	      print(iden)
 	      exit(1)
            tmpH = numpy.dot(vbas,wbas.T)
     	   eig,vr = scipy.linalg.eigh(tmpH)
@@ -114,8 +115,8 @@ class eigenSolver:
 	   over = numpy.dot(vr,vr.T)
 	   diff = numpy.linalg.norm(over-numpy.identity(neig))
 	   if diff > 1.e-10: 
-	      print ' diff_VEC=',diff
-	      print over
+	      print(' diff_VEC=',diff)
+	      print(over)
 	      exit(1)
 	   teig = eig[:neig]
  	 	 
@@ -124,12 +125,12 @@ class eigenSolver:
   	   for i in range(neig):
   	      tmp = teig[i]-eigs[i]
 	      if self.iprt > 0: 
-		 print '  i =',i,' eold=',eigs[i],' enew=',teig[i],' ediff=',tmp
+		 print('  i =',i,' eold=',eigs[i],' enew=',teig[i],' ediff=',tmp)
   	      if abs(tmp) <= self.crit_e: nconv1+=1
-	   if self.iprt > 0: print ' No. of converged eigval:',nconv1,'/',neig
+	   if self.iprt > 0: print(' No. of converged eigval:',nconv1,'/',neig)
   	   if nconv1 == neig: 
 	      if self.iprt > 0:
-		 print ' Cong: all eignvalues converged ! '
+		 print(' Cong: all eignvalues converged ! ')
   	   eigs = teig.copy()
  	   eigval[:,niter-1] = teig.copy()
   
@@ -148,28 +149,28 @@ class eigenSolver:
               else:
   	         rconv[i]=(False,tmp)  
 		 rindx.append(i)     
-	      if self.iprt > 0: print '  i,rnorm=',i,rconv[i]
-	   if self.iprt > 0: print ' No. of converged eigvec:',nconv2,'/',neig
+	      if self.iprt > 0: print('  i,rnorm=',i,rconv[i])
+	   if self.iprt > 0: print(' No. of converged eigvec:',nconv2,'/',neig)
   	   if nconv2 == neig: 
 	      if self.iprt > 0:
-		 print ' Cong: all eignvectors converged ! '
+		 print(' Cong: all eignvectors converged ! ')
  
 	   t1 = time.time()
            if self.iprt > -1:
 	      if niter == 1:
-		 print ' [dvdson]: HC=CE'
-		 print ' iter  dim  nmvp  ieig        eigenvalue       rnorm     time/s  '
-		 print ' ----------------------------------------------------------------'
+		 print(' [dvdson]: HC=CE')
+		 print(' iter  dim  nmvp  ieig        eigenvalue       rnorm     time/s  ')
+		 print(' ----------------------------------------------------------------')
 	      for i in range(neig):
-		 print '%4d %4d %5d %3d %2s %20.12f %10.3e %9.2e'%(niter,ndim,self.nmvp,\
-			i,str(rconv[i][0])[0],self.const+eigval[i,niter-1],rconv[i][1],t1-t0)
+		 print('%4d %4d %5d %3d %2s %20.12f %10.3e %9.2e'%(niter,ndim,self.nmvp,\
+			i,str(rconv[i][0])[0],self.const+eigval[i,niter-1],rconv[i][1],t1-t0))
 	   t0 = time.time()
 
    	   # Convergence by either criteria
            ifconv = (nconv1 == neig) or (nconv2 == neig)
   	   if ifconv:
 	      if self.iprt > 0: 
- 		 print ' Cong: ALL are converged !\n'		
+ 		 print(' Cong: ALL are converged !\n')		
 	      eigs = eigs + self.const
 	      rbas = numpy.dot(vr,vbas)
    	      break		
@@ -216,34 +217,34 @@ class eigenSolver:
 	   nindp2,vbas2 = dvdson_ortho(vbas,rbas[rindx,:],self.crit_indp)
 
 	   nindp = nindp1 + nindp2
-	   if self.iprt > 0: print ' final nindp = ',nindp
+	   if self.iprt > 0: print(' final nindp = ',nindp)
            if nindp != 0:
               wbas2 = self.matvecs(vbas2)
               vbas  = numpy.vstack((vbas,vbas2))
               wbas  = numpy.vstack((wbas,wbas2))
 	      ndim  = vbas.shape[0]
            else:
-	      print 'Convergence failure: unable to generate new direction: Nindp=0 !'
+	      print('Convergence failure: unable to generate new direction: Nindp=0 !')
               #exit(1)
 	   
         if not ifconv:
-           print 'Convergence failure: out of maxcycle !'
+           print('Convergence failure: out of maxcycle !')
            #exit(1)
 
 	if ifplot:
            import matplotlib.pyplot as plt
-	   plt.plot(range(self.ndim),self.diag)
+	   plt.plot(list(range(self.ndim)),self.diag)
            plt.show()
 	   plt.savefig("diag.png")
 
 	   for i in range(self.neig):
- 	      plt.plot(range(1,niter+1),numpy.log10(rnorm[i,:niter]),label=str(i+1))
+ 	      plt.plot(list(range(1,niter+1)),numpy.log10(rnorm[i,:niter]),label=str(i+1))
 	   plt.legend()  
 	   plt.savefig("res_conv.png")
            plt.show()
         
 	   for i in range(self.neig):
- 	      plt.plot(range(1,niter+1),eigval[i,:niter],label=str(i+1))
+ 	      plt.plot(list(range(1,niter+1)),eigval[i,:niter],label=str(i+1))
 	   plt.legend()  
 	   plt.savefig("eig_conv.png")
            plt.show()
@@ -253,7 +254,7 @@ class eigenSolver:
 
 def dvdson_ortho(vbas,rbas,crit_indp):
     debug = False
-    if debug: print ' Orthogonalization:'
+    if debug: print(' Orthogonalization:')
     ndim  = vbas.shape[0] 
     nres  = rbas.shape[0]
     nindp = 0
@@ -265,7 +266,7 @@ def dvdson_ortho(vbas,rbas,crit_indp):
        rvec = rbas[i,:].copy()	    
        rii  = numpy.linalg.norm(rvec)
        if rii <= crit_indp: continue
-       if debug: print '  i,rii=',i,rii
+       if debug: print('  i,rii=',i,rii)
        # NORMALIZE
        rvec = rvec / rii
        rii  = numpy.linalg.norm(rvec)
@@ -284,11 +285,11 @@ def dvdson_ortho(vbas,rbas,crit_indp):
        iden = numpy.dot(tmp,tmp.T)
        diff = numpy.linalg.norm(iden-numpy.identity(iden.shape[0]))
        if diff > 1.e-10:
-          print ' error in mgs_ortho: diff=',diff
-          print iden
+          print(' error in mgs_ortho: diff=',diff)
+          print(iden)
           exit(1)
        else:
-          print ' final nindp from mgs_ortho =',nindp,' diffIden=',diff	    
+          print(' final nindp from mgs_ortho =',nindp,' diffIden=',diff)	    
     return nindp,vbas2
 
 
@@ -300,7 +301,7 @@ def genOrthoBas(vbas,crit_indp):
       if nindp + 1 == nbas:
 	 vbas[1:] = vbas2
       else:
-	 print 'error: insufficient orthonormal basis: nbas/nindp',nbas,nindp+1
+	 print('error: insufficient orthonormal basis: nbas/nindp',nbas,nindp+1)
          exit()
 
 
@@ -314,7 +315,7 @@ if __name__ == '__main__':
       hmat = 0.5*(hmat+hmat.T)
       import scipy.linalg
       efull,v = scipy.linalg.eigh(hmat)
-      print 'efull=',efull
+      print('efull=',efull)
 
       # Functional Programming
       def matvecp(mat):
@@ -334,11 +335,11 @@ if __name__ == '__main__':
       eigs,civec,nmvp = solver.solve_iter(v0=None,iop=4)
       vec = v[:,:neig].T.copy()
       ova = numpy.abs(vec.dot(civec.T))
-      print 'eigs  =',eigs
-      print 'efull =',efull
-      print 'civec =',civec.shape
-      print 'vec   =',vec.shape
-      print 'vdiff =',numpy.linalg.norm(ova-numpy.identity(neig))
+      print('eigs  =',eigs)
+      print('efull =',efull)
+      print('civec =',civec.shape)
+      print('vec   =',vec.shape)
+      print('vdiff =',numpy.linalg.norm(ova-numpy.identity(neig)))
       return 0
 
    # TEST

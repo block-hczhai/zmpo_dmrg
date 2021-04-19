@@ -1,9 +1,9 @@
 import h5py
 import time
 import numpy
-import qtensor
-import qtensor_util
-import qtensor_opers
+from . import qtensor
+from . import qtensor_util
+from . import qtensor_opers
 from zmpo_dmrg.source.mpsmpo import mps_io
 from zmpo_dmrg.source import mpo_dmrg_qphys
 from zmpo_dmrg.source import mpo_dmrg_opers
@@ -14,17 +14,17 @@ def test_tensordot():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    for item in mps:
-      print item.shape
+      print(item.shape)
    for item in qnum:
-      print item
+      print(item)
    nsite = len(mps)
-   print nsite
+   print(nsite)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
-   print qphys
-   print len(qnum)
+   print(qphys)
+   print(len(qnum))
    ta = 0.
    tb = 0.
    for isite in range(nsite):
@@ -35,8 +35,8 @@ def test_tensordot():
       cn = qtensor_util.classification(qn)
       cr = qtensor_util.classification(qr)
       site = mps[isite]
-      print
-      print 'isite=',isite
+      print()
+      print('isite=',isite)
       #print len(ql),len(qn),len(qr)
       #print 'cl',cl
       #print 'cn',cn
@@ -45,7 +45,7 @@ def test_tensordot():
       tmps.fromDenseTensor(site,[ql,qn,qr])     
       tsite = tmps.toDenseTensor()
       diffDense = numpy.linalg.norm(tsite-site)
-      print ' diffDense=',diffDense
+      print(' diffDense=',diffDense)
       assert diffDense<1.e-12
       ##
       ## test-1
@@ -72,26 +72,26 @@ def test_tensordot():
       #
       # test-2: full contraction
       #
-      print 'full contraction:',site.shape
+      print('full contraction:',site.shape)
       t0 = time.time()
       tmp = numpy.tensordot(site,site,axes=([0,1,2],[0,1,2]))
       t1 = time.time()
-      print 'norm=',numpy.linalg.norm(tmp),'t1-t0=',t1-t0
+      print('norm=',numpy.linalg.norm(tmp),'t1-t0=',t1-t0)
       t1 = time.time()
       tmp2 = qtensor.tensordot(tmps,tmps,axes=([0,1,2],[0,1,2]),debug=False)
       t2 = time.time()
-      print 'norm=',numpy.linalg.norm(tmp2),'t2-t1=',t2-t1
-      print 'ratio=',(t2-t1)/(t1-t0)
+      print('norm=',numpy.linalg.norm(tmp2),'t2-t1=',t2-t1)
+      print('ratio=',(t2-t1)/(t1-t0))
       ta += t1-t0
       tb += t2-t1
       # compare
       diff = numpy.linalg.norm(tmp-tmp2)
-      print ' diff=',diff
+      print(' diff=',diff)
       assert diff<1.e-10
-   print 
-   print 'ta=',ta
-   print 'tb=',tb
-   print
+   print() 
+   print('ta=',ta)
+   print('tb=',tb)
+   print()
    return 0
 
 #@profile
@@ -100,8 +100,8 @@ def test_transpose_merge():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    nsite = len(mps)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
    for isite in range(nsite):
@@ -113,19 +113,19 @@ def test_transpose_merge():
       cr = qtensor_util.classification(qr)
       site = mps[isite]
       tsite0 = site.transpose(2,0,1)
-      print 'isite=',isite
+      print('isite=',isite)
       tmps  = qtensor.qtensor([False,False,True])
       tmps.fromDenseTensor(site,[ql,qn,qr])     
       tmps  = tmps.transpose(2,0,1)
       tsite = tmps.toDenseTensor()
       diff1 = numpy.linalg.norm(tsite0-tsite)
-      print ' diff1=',diff1
+      print(' diff1=',diff1)
       shape = tsite0.shape
       tmp   = tsite0.reshape((shape[0],shape[1]*shape[2]))
       tmps  = tmps.merge([[0],[1,2]])
       tmat  = tmps.toDenseTensor()
       diff2 = numpy.linalg.norm(tmp-tmat) 
-      print ' diff2=',diff2
+      print(' diff2=',diff2)
    return 0
 
 #@profile
@@ -134,8 +134,8 @@ def test_creann():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    nsite = len(mps)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
    ta = 0.
@@ -147,7 +147,7 @@ def test_creann():
       cl = qtensor_util.classification(ql)
       cn = qtensor_util.classification(qn)
       cr = qtensor_util.classification(qr)
-      print 'isite/nsite=',isite,nsite
+      print('isite/nsite=',isite,nsite)
       site = mps[isite]
       tmps  = qtensor.qtensor([False,False,True])
       tmps.fromDenseTensor(site,[ql,qn,qr])    
@@ -169,16 +169,16 @@ def test_creann():
 	    t2 = time.time()
 	    assert csite.shape == tsite.shape
 	    diff = numpy.linalg.norm(tsite-csite)
-	    print 'iop,p,diff=',iop,p,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1
+	    print('iop,p,diff=',iop,p,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1)
 	    assert diff < 1.e-10
 	    ta += t1-t0
 	    tb += t2-t1
    # In case of large bond dimension, e.g., 
    # D=2000, t0/t1~0.21/0.09 due to sparsity!
-   print
-   print 'ta=',ta # ta= 20.7766697407
-   print 'tb=',tb # tb= 18.2862818241
-   print
+   print()
+   print('ta=',ta) # ta= 20.7766697407
+   print('tb=',tb) # tb= 18.2862818241
+   print()
    return 0
 
 def test_Wfac():
@@ -230,8 +230,8 @@ def test_Wfac():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    nsite = len(mps)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
    ta = 0.
@@ -257,8 +257,8 @@ def test_Wfac():
       cl = qtensor_util.classification(ql)
       cn = qtensor_util.classification(qn)
       cr = qtensor_util.classification(qr)
-      print
-      print 'isite/nsite=',isite,nsite
+      print()
+      print('isite/nsite=',isite,nsite)
       site = mps[isite]
       tmps  = qtensor.qtensor([False,False,True])
       tmps.fromDenseTensor(site,[ql,qn,qr])    
@@ -266,14 +266,14 @@ def test_Wfac():
 	 
       t0 = time.time()
       op = mpo_dmrg_opers.genWfacSpatial(nbas,isite,hq,vqrs)
-      print ' wop=',op.shape
+      print(' wop=',op.shape)
       #csite = numpy.einsum('lrij,ajb->lairb',op,site)
       csite = numpy.tensordot(op,site,axes=([3],[1])) # lriab
       csite = csite.transpose(0,3,2,1,4) # lriab->lairb
       s = csite.shape
       csite = csite.reshape((s[0]*s[1],s[2],s[3]*s[4]))
       t1 = time.time()
-      print ' t1=',t1-t0
+      print(' t1=',t1-t0)
 
       qop = qtensor_opers.genWfacSpatialQt(nbas,isite,hq,vqrs,isz)
       tmps2 = qtensor.tensordot(qop,tmps,axes=([3],[1]))
@@ -281,18 +281,18 @@ def test_Wfac():
       tmps2 = tmps2.merge([[0,1],[2],[3,4]])
       tsite = tmps2.toDenseTensor()
       t2 = time.time()
-      print ' t2=',t2-t1
+      print(' t2=',t2-t1)
    
       assert csite.shape == tsite.shape
       diff = numpy.linalg.norm(tsite-csite)
-      print 'isite,diff=',isite,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1
+      print('isite,diff=',isite,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1)
       assert diff < 1.e-10
       ta += t1-t0
       tb += t2-t1
-   print
-   print 'ta=',ta 
-   print 'tb=',tb 
-   print
+   print()
+   print('ta=',ta) 
+   print('tb=',tb) 
+   print()
    return 0
 
 def test_Hfac():
@@ -322,8 +322,8 @@ def test_Hfac():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    nsite = len(mps)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
    ta = 0.
@@ -350,12 +350,12 @@ def test_Hfac():
          cl = qtensor_util.classification(ql)
          cn = qtensor_util.classification(qn)
          cr = qtensor_util.classification(qr)
-         print
-         print 'isite/nsite=',isite,nsite
+         print()
+         print('isite/nsite=',isite,nsite)
          site = mps[isite]
          tmps  = qtensor.qtensor([False,False,True])
          tmps.fromDenseTensor(site,[ql,qn,qr])    
-	 print 'mps site info:'
+	 print('mps site info:')
 	 tmps.prt()
            
          if isite < maxn:
@@ -363,14 +363,14 @@ def test_Hfac():
             
 	    #op = mpo_dmrg_opers.genWfacSpatial(nbas,isite,hq,vqrs)
 	    op = mpo_dmrg_opers.genHfacSpatial(p,nbas,isite,hq,vqrs)
-	    print ' wop=',op.shape
+	    print(' wop=',op.shape)
             #csite = numpy.einsum('lrij,ajb->lairb',op,site)
             csite = numpy.tensordot(op,site,axes=([3],[1])) # lriab
             csite = csite.transpose(0,3,2,1,4) # lriab->lairb
             s = csite.shape
             csite = csite.reshape((s[0]*s[1],s[2],s[3]*s[4]))
             t1 = time.time()
-            print ' t1=',t1-t0
+            print(' t1=',t1-t0)
 
 	    #qop = qtensor_opers.genWfacSpatialQt(nbas,isite,hq,vqrs,isz)
             qop = qtensor_opers.genHfacSpatialQt(p,nbas,isite,hq,vqrs)
@@ -379,18 +379,18 @@ def test_Hfac():
             tmps2 = tmps2.merge([[0,1],[2],[3,4]])
             tsite = tmps2.toDenseTensor()
             t2 = time.time()
-            print ' t2=',t2-t1
+            print(' t2=',t2-t1)
       
             assert csite.shape == tsite.shape
             diff = numpy.linalg.norm(tsite-csite)
-            print 'isite,diff=',isite,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1
+            print('isite,diff=',isite,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1)
             assert diff < 1.e-10
             ta += t1-t0
             tb += t2-t1
 
          else:
 
-	    if isite == maxn: print '>>> Check internal consistency <<<'
+	    if isite == maxn: print('>>> Check internal consistency <<<')
 	    t0 = time.time()
             #qop = qtensor_opers.genWfacSpatialQt(nbas,isite,hq,vqrs,isz)
             qop = qtensor_opers.genHfacSpatialQt(p,nbas,isite,hq,vqrs)
@@ -400,7 +400,7 @@ def test_Hfac():
             tmps2.prt()
             t1 = time.time()
 	    sum1 = numpy.sum(tmps2.value)
-            print 'isite=',isite,tmps.shape,' t0=',t1-t0,' sum=',sum1
+            print('isite=',isite,tmps.shape,' t0=',t1-t0,' sum=',sum1)
 	    tmps2 = None
 
 	    qop = qtensor_opers.genHfacSpatialQt0(p,nbas,isite,hq,vqrs)
@@ -410,16 +410,16 @@ def test_Hfac():
             tmps2.prt()
 	    t2 = time.time()
 	    sum2 = numpy.sum(tmps2.value)
-            print 'isite=',isite,tmps2.shape,' t1=',t2-t1,' sum=',sum2
+            print('isite=',isite,tmps2.shape,' t1=',t2-t1,' sum=',sum2)
 	    tmps2 = None
 
 	    diff = abs(sum1-sum2)
-	    print 'diff =',diff
+	    print('diff =',diff)
 	    assert diff<1.e-10
-   print
-   print 'ta=',ta 
-   print 'tb=',tb 
-   print
+   print()
+   print('ta=',ta) 
+   print('tb=',tb) 
+   print()
    return 0
 
 
@@ -428,8 +428,8 @@ def test_HRfac():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    nsite = len(mps)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
    ta = 0.
@@ -454,12 +454,12 @@ def test_HRfac():
          cl = qtensor_util.classification(ql)
          cn = qtensor_util.classification(qn)
          cr = qtensor_util.classification(qr)
-         print
-         print 'isite/nsite=',isite,nsite
+         print()
+         print('isite/nsite=',isite,nsite)
          site = mps[isite]
          tmps  = qtensor.qtensor([False,False,True])
          tmps.fromDenseTensor(site,[ql,qn,qr])    
-	 print 'mps site info:'
+	 print('mps site info:')
 	 tmps.prt()
            
          if isite < maxn:
@@ -468,14 +468,14 @@ def test_HRfac():
 	    pindx = (p,0)
 	    qpts = numpy.array([0.3])
 	    op = mpo_dmrg_opers.genHRfacSpatial(pindx,nbas,isite,hmo,eri,qpts)
-	    print ' wop=',op.shape
+	    print(' wop=',op.shape)
             #csite = numpy.einsum('lrij,ajb->lairb',op,site)
             csite = numpy.tensordot(op,site,axes=([3],[1])) # lriab
             csite = csite.transpose(0,3,2,1,4) # lriab->lairb
             s = csite.shape
             csite = csite.reshape((s[0]*s[1],s[2],s[3]*s[4]))
             t1 = time.time()
-            print ' t1=',t1-t0
+            print(' t1=',t1-t0)
 
 	    # Lowering the symmetry of MPS?
 	    qop = qtensor_opers.genHRfacSpatialQt(pindx,nbas,isite,hmo,eri,qpts)
@@ -490,10 +490,10 @@ def test_HRfac():
             tsite = tmps2.toDenseTensor()
             
 	    t2 = time.time()
-            print ' t2=',t2-t1
+            print(' t2=',t2-t1)
             assert csite.shape == tsite.shape
             diff = numpy.linalg.norm(tsite-csite)
-            print 'isite,diff=',isite,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1
+            print('isite,diff=',isite,csite.shape,diff,' t0=',t1-t0,' t1=',t2-t1)
             assert diff < 1.e-10
             ta += t1-t0
             tb += t2-t1
@@ -508,21 +508,21 @@ def test_HRfac():
 	    qop = qtensor_opers.genHRfacSpatialQt(pindx,nbas,isite,hmo,eri,qpts)
 	    tmps2 = tmps.reduceQsymsToN()
 	    tmps2 = qtensor.tensordot(qop,tmps2,axes=([3],[1]))
-	    print 'before transposing:'
+	    print('before transposing:')
 	    tmps2.prt()
             tmps2 = tmps2.transpose(0,3,2,1,4)
-	    print 'after transposing:'
+	    print('after transposing:')
 	    tmps2.prt()
             tmps2 = tmps2.merge([[0,1],[2],[3,4]])
-	    print 'after merging:'
+	    print('after merging:')
 	    tmps2.prt()
 	    t2 = time.time()
-            print 'isite=',isite,' t2=',t2-t1
+            print('isite=',isite,' t2=',t2-t1)
 
-   print
-   print 'ta=',ta 
-   print 'tb=',tb 
-   print
+   print()
+   print('ta=',ta) 
+   print('tb=',tb) 
+   print()
    return 0
 
 #@profile
@@ -531,25 +531,25 @@ def test_io():
    fname = './mps.h5'
    mps,qnum = mps_io.loadMPS(fname)
    lmps = [mps,qnum]
-   bdim = map(lambda x:len(x),qnum)
-   print ' bdim = ',bdim
+   bdim = [len(x) for x in qnum]
+   print(' bdim = ',bdim)
    for item in mps:
-      print item.shape
+      print(item.shape)
    for item in qnum:
-      print item
+      print(item)
    nsite = len(mps)
-   print nsite
+   print(nsite)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
-   print qphys
-   print len(qnum)
+   print(qphys)
+   print(len(qnum))
    f1 = h5py.File("mpsQt.h5","w") 
    for isite in range(nsite):
       ql = qnum[isite]
       qn = qphys[isite]
       qr = qnum[isite+1]
       site = mps[isite]
-      print
-      print 'isite=',isite
+      print()
+      print('isite=',isite)
       tmps = qtensor.qtensor([False,False,True])
       tmps.fromDenseTensor(site,[ql,qn,qr])    
       tmps.dump(f1,'site'+str(isite))

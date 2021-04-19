@@ -13,9 +13,9 @@ comm = MPI.COMM_WORLD
 size = comm.size
 rank = comm.rank
 # MPI init
-if size > 0 and rank ==0: print '\n[MPI init]'
+if size > 0 and rank ==0: print('\n[MPI init]')
 comm.Barrier()
-print ' Rank= %s of %s processes'%(rank,size)
+print(' Rank= %s of %s processes'%(rank,size))
 
 mol=class_molinfo()
 mol.comm=comm

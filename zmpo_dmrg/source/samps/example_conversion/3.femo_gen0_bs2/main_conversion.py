@@ -23,7 +23,7 @@ qtensor_api.fmpsQtReverse(flmpsQ,flmps0,'L')
 t0 = time.time()
 mpo_dmrg_conversion.sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-3)
 t1 = time.time()
-print 'dt=',(t1-t0)
+print('dt=',(t1-t0))
 
 qtensor_api.fmpsQt(flmps1,flmps2,'L')
 

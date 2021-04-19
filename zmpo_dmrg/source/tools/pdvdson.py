@@ -5,6 +5,7 @@ import time
 import numpy
 import scipy.linalg
 from mpi4py import MPI
+from functools import reduce
 
 #
 # Mask for Matrix vector product subroutine
@@ -54,13 +55,13 @@ class eigenSolver:
 
     # Debug: full diagonalization
     def fullDiag(self):
-	print 'diag=',self.diag
-	print 'sumdiag=',numpy.sum(self.diag)
+	print('diag=',self.diag)
+	print('sumdiag=',numpy.sum(self.diag))
 	v0 = numpy.identity(self.ndim,dtype=self.dtype)
         hmat = self.HVecs(v0)
-        print 'hmat\n',hmat
+        print('hmat\n',hmat)
 	eig,vr = scipy.linalg.eigh(hmat)
-	print 'eig=',eig
+	print('eig=',eig)
 	exit()
     
     # Matrix vector product H[iproc]*V
@@ -83,13 +84,13 @@ class eigenSolver:
 	diag = self.diag + 1.e-12*numpy.arange(1,1+self.ndim)/float(self.ndim)
 	index = numpy.argsort(diag)[:neig]
         v0 = numpy.zeros((neig,self.ndim),dtype=self.dtype)
-	v0[range(neig),index] = 1.0
+	v0[list(range(neig)),index] = 1.0
         return v0
 
     # Main solver: LOBPCG + Davidson preconditioning
     def solve_iter(self,v0=None,iop=4,ifplot=False):
 	if self.neig > self.ndim:
-	   print ' error in dvdson: neig>ndim, neig/ndim=',self.neig,self.ndim
+	   print(' error in dvdson: neig>ndim, neig/ndim=',self.neig,self.ndim)
 	   exit(1)
 	# Clear counter
 	self.nmvp = 0
@@ -131,8 +132,8 @@ class eigenSolver:
 	      iden = numpy.dot(vbas,vbas.T.conj())
 	      diff = numpy.linalg.norm(iden-numpy.identity(ndim))
 	      if diff > 1.e-10:
-	         print ' diff_VBAS=',diff
-	         print iden
+	         print(' diff_VBAS=',diff)
+	         print(iden)
 	         exit(1)
 	      # An important note: Vh*H*V \= Vt*Hc*Vc
 	      # WRONG  : tmpH = numpy.dot(vbas,wbas.T.conj())
@@ -140,8 +141,8 @@ class eigenSolver:
 	      tmpH = numpy.dot(vbas.conj(),wbas.T)
 	      diff = numpy.linalg.norm(tmpH-tmpH.T.conj())
 	      if diff > 1.e-10:
-	         print ' diff_skewH=',diff
-		 print ' tmpH =\n',tmpH
+	         print(' diff_skewH=',diff)
+		 print(' tmpH =\n',tmpH)
 	         exit(1)
 	      # Explicit symmetrizaiton
 	      tmpH = 0.5*(tmpH+tmpH.T.conj()) 
@@ -152,8 +153,8 @@ class eigenSolver:
 	      over = numpy.dot(vr,vr.T.conj())
 	      diff = numpy.linalg.norm(over-numpy.identity(neig))
 	      if diff > 1.e-10: 
-	         print ' diff_VEC=',diff
-	         print over
+	         print(' diff_VEC=',diff)
+	         print(over)
 	         exit(1)
 	      # Save
 	      teig = eig[:neig]
@@ -191,20 +192,20 @@ class eigenSolver:
 	      t1 = time.time()
 	      if self.iprt >= 0:
 	         if niter == 1: 
-		    print '[pdvdson]: Hc=ce with (noise,size,ndim,crit_e,crit_v) = (%i,%d,%d,%.1e,%.1e)'%\
-				      (self.noise,self.comm.size,self.ndim,self.crit_e,self.crit_vec)
-	            print ' iter  dim  nmvp   ieig         eigenvalue        ediff      rnorm     time/s  '
-	            print ' ------------------------------------------------------------------------------'
+		    print('[pdvdson]: Hc=ce with (noise,size,ndim,crit_e,crit_v) = (%i,%d,%d,%.1e,%.1e)'%\
+				      (self.noise,self.comm.size,self.ndim,self.crit_e,self.crit_vec))
+	            print(' iter  dim  nmvp   ieig         eigenvalue        ediff      rnorm     time/s  ')
+	            print(' ------------------------------------------------------------------------------')
 		 if niter%2 == 1:
 	            for i in range(neig):
-	               print '%4d %4d %5d %4d + %s %20.12f %11.3e %10.3e %9.2e'%(niter,ndim,self.nmvp,\
+	               print('%4d %4d %5d %4d + %s %20.12f %11.3e %10.3e %9.2e'%(niter,ndim,self.nmvp,\
 	                     i,str(rconv[i][0] or econv[i])[0],self.const+eigval[i,niter],\
-		             eigval[i,niter]-eigval[i,niter-1],rconv[i][1],t1-t0)
+		             eigval[i,niter]-eigval[i,niter-1],rconv[i][1],t1-t0))
 	         else:		
 	            for i in range(neig):
-	               print '%4d %4d %5d %4d - %s %20.12f %11.3e %10.3e %9.2e'%(niter,ndim,self.nmvp,\
+	               print('%4d %4d %5d %4d - %s %20.12f %11.3e %10.3e %9.2e'%(niter,ndim,self.nmvp,\
 	                     i,str(rconv[i][0] or econv[i])[0],self.const+eigval[i,niter],\
-		             eigval[i,niter]-eigval[i,niter-1],rconv[i][1],t1-t0)
+		             eigval[i,niter]-eigval[i,niter-1],rconv[i][1],t1-t0))
 	      t0 = time.time()
 
            #=======================================
@@ -281,7 +282,7 @@ class eigenSolver:
 	      if self.ifex: rbas = self.projection(rbas)
 	      # Re-orthogonalization and get Nindp
 	      nindp,vbas2 = dvdson_ortho(vbas,rbas[rindx,:],self.crit_indp)
-	      if self.iprt > 0: print ' final nindp = ',nindp
+	      if self.iprt > 0: print(' final nindp = ',nindp)
 
  	   else:
 	      nindp = None
@@ -298,11 +299,11 @@ class eigenSolver:
                  wbas  = numpy.vstack((wbas,wbas2))
 	         ndim  = vbas.shape[0]
            else:
-	      print 'Convergence failure: unable to generate new direction: Nindp=0 !'
+	      print('Convergence failure: unable to generate new direction: Nindp=0 !')
               exit(1)
 	   
         if not ifconv:
-           print 'Convergence failure: out of maxcycle ! maxcycle =',self.maxcycle
+           print('Convergence failure: out of maxcycle ! maxcycle =',self.maxcycle)
            #exit(1)
 
 	#
@@ -310,18 +311,18 @@ class eigenSolver:
 	#
 	if ifplot:
            import matplotlib.pyplot as plt
-	   plt.plot(range(self.ndim),self.diag)
+	   plt.plot(list(range(self.ndim)),self.diag)
            plt.show()
 	   plt.savefig("diag.png")
 
 	   for i in range(self.neig):
- 	      plt.plot(range(1,niter+1),numpy.log10(rnorm[i,:niter]),label=str(i+1))
+ 	      plt.plot(list(range(1,niter+1)),numpy.log10(rnorm[i,:niter]),label=str(i+1))
 	   plt.legend()  
 	   plt.savefig("res_conv.png")
            plt.show()
         
 	   for i in range(self.neig):
- 	      plt.plot(range(1,niter+1),eigval[i,1:niter+1],label=str(i+1))
+ 	      plt.plot(list(range(1,niter+1)),eigval[i,1:niter+1],label=str(i+1))
 	   plt.legend()  
 	   plt.savefig("eig_conv.png")
            plt.show()
@@ -340,7 +341,7 @@ def genOrthoBas(vbas,crit_indp):
       if nindp + 1 == nbas:
 	 vbas[1:] = vbas2
       else:
-	 print 'error: insufficient orthonormal basis: nbas/nindp',nbas,nindp+1
+	 print('error: insufficient orthonormal basis: nbas/nindp',nbas,nindp+1)
          exit()
    return 0
 
@@ -349,7 +350,7 @@ def genOrthoBas(vbas,crit_indp):
 #
 def dvdson_ortho(vbas,rbas,crit_indp):
     debug = False
-    if debug: print '[dvdson_ortho]'
+    if debug: print('[dvdson_ortho]')
     ndim  = vbas.shape[0] 
     nres  = rbas.shape[0]
     nindp = 0
@@ -363,7 +364,7 @@ def dvdson_ortho(vbas,rbas,crit_indp):
        rvec = rbas[i,:].copy()	    
        rii  = numpy.linalg.norm(rvec)
        if rii <= crit_indp: continue
-       if debug: print '  i,rii=',i,rii
+       if debug: print('  i,rii=',i,rii)
        # NORMALIZE
        rvec = rvec / rii
        rii  = numpy.linalg.norm(rvec)
@@ -382,11 +383,11 @@ def dvdson_ortho(vbas,rbas,crit_indp):
        iden = numpy.dot(tmp,tmp.T.conj())
        diff = numpy.linalg.norm(iden-numpy.identity(iden.shape[0],dtype=rbas.dtype))
        if diff > 1.e-10:
-          print ' error in mgs_ortho: diff=',diff
-          print iden
+          print(' error in mgs_ortho: diff=',diff)
+          print(iden)
           exit(1)
        else:
-          print ' final nindp from mgs_ortho =',nindp,' diffIden=',diff	   
+          print(' final nindp from mgs_ortho =',nindp,' diffIden=',diff)	   
     return nindp,vbas2
 
 
@@ -421,11 +422,11 @@ if __name__ == '__main__':
       eigs,civec,nmvp = solver.solve_iter(v0=None,iop=4)
       vec = v[:,:neig].T.copy()
       ova = numpy.abs(vec.dot(civec.T))
-      print 'eigs  =',eigs
-      print 'efull =',efull[:neig]
-      print 'civec =',civec.shape
-      print 'vec   =',vec.shape
-      print 'vdiff =',numpy.linalg.norm(ova-numpy.identity(neig))
+      print('eigs  =',eigs)
+      print('efull =',efull[:neig])
+      print('civec =',civec.shape)
+      print('vec   =',vec.shape)
+      print('vdiff =',numpy.linalg.norm(ova-numpy.identity(neig)))
       return 0
 
    # Complex Hermitian A
@@ -438,7 +439,7 @@ if __name__ == '__main__':
       # eig =  -4.56176434e-02   9.84557515e-01   1.97239188e+00   2.98118809e+00
       #mat = numpy.diag(range(ndim))+1.e-1j*(mat2-mat2.T)
       mat = 0.5j*(mat2-mat2.T)
-      print 'Hermicity=',numpy.linalg.norm(mat-mat.T.conj())
+      print('Hermicity=',numpy.linalg.norm(mat-mat.T.conj()))
       efull,v = scipy.linalg.eigh(mat)
 
       def matvecp(v,mat):
@@ -461,11 +462,11 @@ if __name__ == '__main__':
       eigs,civec,nmvp = solver.solve_iter(v0=None,iop=4)
       vec = v[:,:neig].T.copy()
       ova = numpy.abs(vec.dot(civec.T.conj()))
-      print 'eigs  =',eigs
-      print 'efull =',efull[:neig]
-      print 'civec =',civec.shape
-      print 'vec   =',vec.shape
-      print 'vdiff =',numpy.linalg.norm(ova-numpy.identity(neig))
+      print('eigs  =',eigs)
+      print('efull =',efull[:neig])
+      print('civec =',civec.shape)
+      print('vec   =',vec.shape)
+      print('vdiff =',numpy.linalg.norm(ova-numpy.identity(neig)))
       return 0
 
    # TEST

@@ -7,11 +7,11 @@
 # -->c_ON - 2^K: fermion Fock space
 # these three formats are stored as 1Darray
 #===========================================
-import itools
+from . import itools
 import numpy
 import scipy.linalg
 import math
-import misc
+from . import misc
 from pyscf import fci
 
 #==========================================
@@ -47,7 +47,7 @@ def str2addr_o1(norb, nelec, string):
     #TODO: assert norb > first-bit-in-string, nelec == num-1-in-string
     addr = 0
     nelec_left = nelec
-    for norb_left in reversed(range(norb)):
+    for norb_left in reversed(list(range(norb))):
         if nelec_left == 0 or norb_left < nelec_left:
             break
         elif (1<<norb_left) & string:
@@ -61,7 +61,7 @@ def addr2str_o1(norb, nelec, addr):
         return (1<<nelec) - 1   # ..0011..11
     str1 = 0
     nelec_left = nelec
-    for norb_left in reversed(range(norb)):
+    for norb_left in reversed(list(range(norb))):
         addrcum = num_strings(norb_left, nelec_left)
         if nelec_left == 0:
             break
@@ -79,12 +79,12 @@ def addr2str_o1(norb, nelec, addr):
 #==========================================
 
 def toCIanalyze(norb,ne,civec):
-   print '\n[toCIanalyze]: analyze CI_coeff'
+   print('\n[toCIanalyze]: analyze CI_coeff')
    assert civec.ndim == 2
-   print 'norb=',norb,' ne=',ne
+   print('norb=',norb,' ne=',ne)
    mrkA=min(norb-ne[0],ne[0])
    mrkB=min(norb-ne[1],ne[1])
-   print 'mrkA=',mrkA,' mrkB=',mrkB
+   print('mrkA=',mrkA,' mrkB=',mrkB)
    # HF reference
    refA=2**ne[0]-1
    refB=2**ne[1]-1
@@ -102,21 +102,21 @@ def toCIanalyze(norb,ne,civec):
 	 rCount[rkA+rkB]+=1
 	 cCount[rkA+rkB]+=civec[isA,isB]**2
    # PRINT
-   print "Statistics of CI coeff:"
+   print("Statistics of CI coeff:")
    for rc in enumerate(zip(rCount,cCount)):
-      print 'rank=',rc[0],' stat=',rc[1]
-   print "sum of rCount =",sum(rCount)
-   print "sum of cCount =",sum(cCount)
+      print('rank=',rc[0],' stat=',rc[1])
+   print("sum of rCount =",sum(rCount))
+   print("sum of cCount =",sum(cCount))
 
 def toCIspinorb(norb,ne,civec):
-   print '\n[toCIspinorb]: spin-orbit rep C(Ia,Ib)->C(I)'
+   print('\n[toCIspinorb]: spin-orbit rep C(Ia,Ib)->C(I)')
    nsA,nsB= civec.shape
    nelec  = ne[0]+ne[1]
    nsorb  = 2*norb
    ndim   = misc.binomial(nsorb,nelec)
-   print 'nsA,nsB=',nsA,nsB
-   print 'nstring=',ndim
-   print 'nfactor=',ndim*1.0/(nsA*nsB)
+   print('nsA,nsB=',nsA,nsB)
+   print('nstring=',ndim)
+   print('nfactor=',ndim*1.0/(nsA*nsB))
    civec2=numpy.zeros(ndim)
    for isA in range(nsA):
       bsA =addr2str_o1(norb,ne[0],isA)
@@ -140,22 +140,22 @@ def toCIspinorb(norb,ne,civec):
 	 civec2[addr]=civec[isA,isB]*sgn
    #print civec2[numpy.argwhere(civec2>1.e-10)]
    norm=numpy.linalg.norm(civec2)
-   print "NORM1=",norm
+   print("NORM1=",norm)
    if(abs(norm-1.0)>1.e-6): exit(1)
    return civec2 
  
 def toCItensor(nsorb,nelec,civec,iop=0):
-   print '\n[toCItensor]: iop=',iop
+   print('\n[toCItensor]: iop=',iop)
    ndim = misc.binomial(nsorb,nelec)
-   print 'nsorb=',nsorb
-   print 'nelec=',nelec
-   print 'C_K^N=',ndim,civec.size
+   print('nsorb=',nsorb)
+   print('nelec=',nelec)
+   print('C_K^N=',ndim,civec.size)
    if ndim != civec.size: 
-      print 'ndim='
-      print 'civec.size='
+      print('ndim=')
+      print('civec.size=')
       exit(1)
    citensor=numpy.zeros(nsorb**nelec)
-   print 'd_K^N=',citensor.shape
+   print('d_K^N=',citensor.shape)
    stride=[nsorb**(nelec-i-1) for i in range(nelec)]
    if iop==0:
       for i in range(civec.size):
@@ -172,25 +172,25 @@ def toCItensor(nsorb,nelec,civec,iop=0):
 	    citensor[addr]=string_sgn(j)*civec[i]
       fac=1.0/math.sqrt(math.factorial(nelec))
       citensor=citensor*fac
-   print 'NORM of Tensor=',numpy.linalg.norm(citensor)
+   print('NORM of Tensor=',numpy.linalg.norm(citensor))
    return citensor
 
 def toCItensor2(nsorb,nelec,civec):
-   print '\n[toCItensor2]'
+   print('\n[toCItensor2]')
    ndim = misc.binomial(nsorb,nelec)
-   print 'nsorb=',nsorb
-   print 'nelec=',nelec
-   print 'C_K^N=',ndim,civec.size
+   print('nsorb=',nsorb)
+   print('nelec=',nelec)
+   print('C_K^N=',ndim,civec.size)
    if ndim != civec.size: 
-      print 'ndim='
-      print 'civec.size='
+      print('ndim=')
+      print('civec.size=')
       exit(1)
    # phys=K-N+1   
    nphys=nsorb-nelec+1
    citensor=numpy.zeros(nphys**nelec)
-   print 'd_K^N=',citensor.shape
+   print('d_K^N=',citensor.shape)
    stride=[nphys**(nelec-i-1) for i in range(nelec)]
-   offset=numpy.array(range(nelec))
+   offset=numpy.array(list(range(nelec)))
    for i in range(civec.size):
       bstring=bin(addr2str_o1(nsorb,nelec,i))
       orblst0=numpy.array(bit2string( int(bstring,2),nsorb ))
@@ -198,39 +198,39 @@ def toCItensor2(nsorb,nelec,civec):
       addr  =numpy.dot(orblst1,stride)
       #print orblst0,orblst1,addr
       citensor[addr]=civec[i]
-   print 'NORM of Tensor=',numpy.linalg.norm(citensor)
+   print('NORM of Tensor=',numpy.linalg.norm(citensor))
    return citensor
 
 def toONtensor(nsorb,nelec,civec):
-   print '\n[toONtensor]:'
+   print('\n[toONtensor]:')
    ndim = misc.binomial(nsorb,nelec)
-   print 'nsorb=',nsorb
-   print 'nelec=',nelec
-   print 'C_K^N=',ndim,civec.size
+   print('nsorb=',nsorb)
+   print('nelec=',nelec)
+   print('C_K^N=',ndim,civec.size)
    if ndim != civec.size: exit(1)
    ontensor=numpy.zeros(2**nsorb)
-   print 'd_2^K=',ontensor.shape
+   print('d_2^K=',ontensor.shape)
    for i in range(civec.size):
       bstring=bin(addr2str_o1(nsorb,nelec,i))
       addr=int(bstring,2)
-      print 'idx=',i,bstring,addr
+      print('idx=',i,bstring,addr)
       # idx= 0 0b1 1
       # idx= 1 0b10 2
       # idx= 2 0b100 4
       ontensor[addr]=civec[i]
-   print 'NORM of Tensor=',numpy.linalg.norm(ontensor)
+   print('NORM of Tensor=',numpy.linalg.norm(ontensor))
    return ontensor
 
 #==========================================
 # Reverse function
 #==========================================
 def toCIspinorbReverse(norb,ne,civec2):
-   print '\n[toCIspinorbReverse]: spin-orbit rep C(Ia,Ib)<-C(I)'
+   print('\n[toCIspinorbReverse]: spin-orbit rep C(Ia,Ib)<-C(I)')
    nsA = misc.binomial(norb,ne[0])
    nsB = misc.binomial(norb,ne[1])
    nelec = ne[0]+ne[1]
    nsorb = 2*norb
-   print 'nsA,nsB=',nsA,nsB
+   print('nsA,nsB=',nsA,nsB)
    civec=numpy.zeros((nsA,nsB))
    for isA in range(nsA):
       bsA =addr2str_o1(norb,ne[0],isA)
@@ -248,7 +248,7 @@ def toCIspinorbReverse(norb,ne,civec2):
 	 civec[isA,isB]=civec2[addr]*sgn
    #print civec2[numpy.argwhere(civec2>1.e-10)]
    norm=numpy.linalg.norm(civec)
-   print "NORM1=",norm
+   print("NORM1=",norm)
    #if(abs(norm-1.0)>1.e-6): exit(1)
    return civec 
 
@@ -272,15 +272,15 @@ def toCItensorReverse(nsorb,nelec,citensor,iop=0):
    return civec
 
 def toONtensorReverse(nsorb,nelec,ontensor):
-   print '\n[toONtensorReverse]:'
+   print('\n[toONtensorReverse]:')
    ndim = misc.binomial(nsorb,nelec)
-   print 'nsorb=',nsorb
-   print 'nelec=',nelec
-   print 'C_K^N=',ndim
+   print('nsorb=',nsorb)
+   print('nelec=',nelec)
+   print('C_K^N=',ndim)
    civec=numpy.zeros(ndim)
    for i in range(civec.size):
       bstring=bin(addr2str_o1(nsorb,nelec,i))
       addr=int(bstring,2)
       civec[i]=ontensor[addr]
-   print 'NORM of Tensor=',numpy.linalg.norm(civec)
+   print('NORM of Tensor=',numpy.linalg.norm(civec))
    return civec

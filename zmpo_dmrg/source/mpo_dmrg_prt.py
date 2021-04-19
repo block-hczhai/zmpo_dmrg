@@ -17,16 +17,16 @@ import numpy
 
 def title(dmrg):
    n = 70
-   print '='*n 
-   print ' FS-DMRG calculations: '
-   print ' Data =',time.asctime()
-   print ' Path =',dmrg.path
-   print ' Settings = {ifex:%i, s2proj:%i, Qt:%i, AllInts:%i, guess:%i, precond:%i}'%\
+   print('='*n) 
+   print(' FS-DMRG calculations: ')
+   print(' Data =',time.asctime())
+   print(' Path =',dmrg.path)
+   print(' Settings = {ifex:%i, s2proj:%i, Qt:%i, AllInts:%i, guess:%i, precond:%i}'%\
            (dmrg.ifex,dmrg.ifs2proj,dmrg.ifQt,\
-            dmrg.ifAllInts,dmrg.ifguess,dmrg.ifprecond)
-   print '-'*n
+            dmrg.ifAllInts,dmrg.ifguess,dmrg.ifprecond))
+   print('-'*n)
    dmrg.schedule.prt()
-   print '='*n     
+   print('='*n)     
    return 0
 
 # Print sweep configuration
@@ -34,7 +34,7 @@ def block(nsite,isite,ncsite,status):
    l=isite
    r=nsite-isite-ncsite
    if l<0 or r<0: 
-      print 'error! l/r=',l,r
+      print('error! l/r=',l,r)
       exit(1)
    if status=='L':
       symbol1='='
@@ -48,21 +48,21 @@ def block(nsite,isite,ncsite,status):
    # Banner   
    string=[symbol1]*l+['*']*ncsite+[symbol2]*r
    string=''.join(string)
-   print
-   print ' Site[i]:',isite,'/',nsite,\
-	 ' status =',status,': [',string,']  active dot:',range(isite,isite+ncsite)
+   print()
+   print(' Site[i]:',isite,'/',nsite,\
+	 ' status =',status,': [',string,']  active dot:',list(range(isite,isite+ncsite)))
    return 0
 
 def parameters(Dmax,crit_e,noise,ncsite,sitelst,actlst,status):
    n = 65
-   print '='*n
-   print ' Sweep parameters:   status  =',status,'   ncsite =',ncsite
-   print '-'*n
-   print ' sitelst =',sitelst
-   print ' actlst  =',actlst
-   print '-'*n
-   print ' (Dmax,etol,noise) = (%5d,  %7.2e,  %7.2e)'%(Dmax,crit_e,noise)
-   print '='*n
+   print('='*n)
+   print(' Sweep parameters:   status  =',status,'   ncsite =',ncsite)
+   print('-'*n)
+   print(' sitelst =',sitelst)
+   print(' actlst  =',actlst)
+   print('-'*n)
+   print(' (Dmax,etol,noise) = (%5d,  %7.2e,  %7.2e)'%(Dmax,crit_e,noise))
+   print('='*n)
    return 0
 
 def singleSweep(dmrg,his,status,dt):
@@ -75,39 +75,39 @@ def singleSweep(dmrg,his,status,dt):
    eav  = eavs[indx]
    dwt  = dwts[indx]
    if dmrg.comm.rank == 0:
-      print 
-      print '='*n
-      print ' Summary:   algorithm = ',dmrg.status,'   status = ',status
-      print ' (Dmax,etol,noise) = (%5d,  %7.2e,  %7.2e)'%(dmrg.Dmax,dmrg.crit_e,dmrg.noise)
-      print '-'*n
+      print() 
+      print('='*n)
+      print(' Summary:   algorithm = ',dmrg.status,'   status = ',status)
+      print(' (Dmax,etol,noise) = (%5d,  %7.2e,  %7.2e)'%(dmrg.Dmax,dmrg.crit_e,dmrg.noise))
+      print('-'*n)
       for i in range(m):
          eigi = eigs[i]
          dwti = dwts[i]
-	 print '  idx = %4d'%i,' dwt= %6.2e'%dwti,' eigs=',eigi
+	 print('  idx = %4d'%i,' dwt= %6.2e'%dwti,' eigs=',eigi)
       # Final
-      print '-'*n
-      print ' averaged energy [%4d] = %20.12f   dwts = %6.2e'%\
-           (indx,eav,dwt)
-      print ' time for sweep = %7.2e s'%dt
-      print ' settings: ifs2proj = ',dmrg.ifs2proj
-      print '='*n
-      print
+      print('-'*n)
+      print(' averaged energy [%4d] = %20.12f   dwts = %6.2e'%\
+           (indx,eav,dwt))
+      print(' time for sweep = %7.2e s'%dt)
+      print(' settings: ifs2proj = ',dmrg.ifs2proj)
+      print('='*n)
+      print()
    return indx,eav,dwt
 
 def finalSweep(dmrg,dt):
    n = 92
-   print
-   print '='*n
-   print ' Finalize Sweep: ',dmrg.nsweep,\
+   print()
+   print('='*n)
+   print(' Finalize Sweep: ',dmrg.nsweep,\
          '   nsites = ',dmrg.nsite,\
          '   nMVPs = ',numpy.sum(dmrg.nmvp),\
          '   time = %7.2e s'%dt,\
-	 '   comm.size = %3d'%dmrg.comm.size
-   print '-'*n
+	 '   comm.size = %3d'%dmrg.comm.size)
+   print('-'*n)
    dmrg.schedule.prt()
-   print '-'*n
+   print('-'*n)
    assert len(dmrg.eav) == dmrg.nsweep
-   print ' DMRG sweep energy:'
+   print(' DMRG sweep energy:')
    for isweep in range(dmrg.nsweep):
       if isweep == 0: 
          de = dmrg.eav[0]
@@ -115,12 +115,12 @@ def finalSweep(dmrg,dt):
          de = dmrg.eav[isweep]-dmrg.eav[isweep-1]
       # Possible change of schedule
       if dmrg.schedule.Tag == 'Normal0' and isweep == dmrg.schedule.change: 
-	 print ' twoSite to oneSite:'
-      print '  isweep =%4d  nmvp =%5d  eav[i] =%20.12f  dwt[i] = %6.2e  de = %7.1e'%\
-              (isweep,dmrg.nmvp[isweep],dmrg.eav[isweep],dmrg.dwt[isweep],de)
-   print '-'*n
-   print ' SweepInfo: ifconv = ',dmrg.ifconv,' maxiter = ',dmrg.schedule.maxiter
-   print '='*n
+	 print(' twoSite to oneSite:')
+      print('  isweep =%4d  nmvp =%5d  eav[i] =%20.12f  dwt[i] = %6.2e  de = %7.1e'%\
+              (isweep,dmrg.nmvp[isweep],dmrg.eav[isweep],dmrg.dwt[isweep],de))
+   print('-'*n)
+   print(' SweepInfo: ifconv = ',dmrg.ifconv,' maxiter = ',dmrg.schedule.maxiter)
+   print('='*n)
    if dmrg.ifplot:
       esweeps = numpy.array(dmrg.esweeps).T
       eplot(dmrg,esweeps)
@@ -130,7 +130,7 @@ def eplot(dmrg,esweeps,suffix="png",emin=None,emax=None):
    neig,n = esweeps.shape
    import matplotlib.pyplot as plt
    for ieig in range(neig):
-      plt.plot(range(n),esweeps[ieig],'-',marker='o',linewidth=2.0)
+      plt.plot(list(range(n)),esweeps[ieig],'-',marker='o',linewidth=2.0)
    if emin is None: emin = numpy.amin(esweeps)
    if emax is None: emax = numpy.amax(esweeps)
    #emax = emin+0.1

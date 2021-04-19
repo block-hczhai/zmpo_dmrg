@@ -3,17 +3,17 @@ import math
 import cmath
 import numpy
 import scipy.linalg
-from tools import misc
-from tools import jwtrans
-from tools import itools
-from tools import detlib
-from tools import tensorRep
-from tools import tensorDecomp
-from tools import qparser
-from tools import smalld
-from tools import mpslib
-import mpo_class
-import mpo_qphys
+from .tools import misc
+from .tools import jwtrans
+from .tools import itools
+from .tools import detlib
+from .tools import tensorRep
+from .tools import tensorDecomp
+from .tools import qparser
+from .tools import smalld
+from .tools import mpslib
+from . import mpo_class
+from . import mpo_qphys
 
 # Inverse S*(S+1)=val
 def seff(expval):
@@ -51,7 +51,7 @@ class class_mps:
    # Hartree-Fock reference
    #--------------------------------
    def hfstate(self,n,occ=None):
-      print '\n[mps_class.hfstate]'
+      print('\n[mps_class.hfstate]')
       sites = [0]*self.nsite
       if len(occ) == 0: #None:
          pocc = [0]*self.nsite 
@@ -89,10 +89,10 @@ class class_mps:
       return 0
 
    def analyze(self,refdet):
-      print '\n[mps_class.analyze]'
-      print ' Analyze particle-holes contributions by projection, spin-orbital is assumed.'
-      print ' refdet = ',refdet
-      print ' bdims  = ',self.bdim() 
+      print('\n[mps_class.analyze]')
+      print(' Analyze particle-holes contributions by projection, spin-orbital is assumed.')
+      print(' refdet = ',refdet)
+      print(' bdims  = ',self.bdim()) 
       #
       # The population of states with t[ph] 'quantum' number:  
       #   nt = <t|t> where |t>=P|0>
@@ -132,8 +132,8 @@ class class_mps:
       norm = self.norm()
       mps = self.copy()
       #mps.icompress()
-      print ' norm0  = ',norm
-      print ' bdims  = ',mps.bdim() 
+      print(' norm0  = ',norm)
+      print(' bdims  = ',mps.bdim()) 
       mps.mul(1.0/norm)
       norm2 = mps.norm()
       from scipy.integrate import quad
@@ -149,16 +149,16 @@ class class_mps:
         # https://en.wikipedia.org/wiki/QUADPACK
 	# http://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.integrate.quad.html
 	y,err = quad(fx,0,2*numpy.pi,args=(mps,refdet,n))#epsrel=1.e-1)
-        print ' n = %3d'%n,' erank=',n/2,' y=',y,' err=',err,' icounter=',icounter
+        print(' n = %3d'%n,' erank=',n/2,' y=',y,' err=',err,' icounter=',icounter)
 	psum += y
-      print ' Total population =',psum
+      print(' Total population =',psum)
       return 0 
 
    def analyze_fast(self,refdet):
-      print '\n[mps_class.analyze_fast]'
-      print ' Analyze particle-holes contributions by projection, spin-orbital is assumed.'
-      print ' refdet = ',refdet
-      print ' bdims  = ',self.bdim() 
+      print('\n[mps_class.analyze_fast]')
+      print(' Analyze particle-holes contributions by projection, spin-orbital is assumed.')
+      print(' refdet = ',refdet)
+      print(' bdims  = ',self.bdim()) 
       #
       # The population of states with t[ph] 'quantum' number:  
       #   nt = <t|t> where |t>=P|0>
@@ -198,8 +198,8 @@ class class_mps:
       norm = self.norm()
       mps = self.copy()
       #mps.icompress()
-      print ' norm0  = ',norm
-      print ' bdims  = ',mps.bdim() 
+      print(' norm0  = ',norm)
+      print(' bdims  = ',mps.bdim()) 
       mps.mul(1.0/norm)
       norm2 = mps.norm()
       k = self.nsite
@@ -213,12 +213,12 @@ class class_mps:
       psum = 0.0
       for n in range(maxNoQuasiParticles):
          if n%2 == 1: continue
-	 ydata2 = map(lambda x:cmath.exp(-1.j*n*x),xdata)
+	 ydata2 = [cmath.exp(-1.j*n*x) for x in xdata]
 	 ydata2 = (ydata2*ydata).real
 	 y = simps(ydata2,xdata)
-         print ' n = %3d'%n,' erank=',n/2,' y=',y,' icounter=',icounter
+         print(' n = %3d'%n,' erank=',n/2,' y=',y,' icounter=',icounter)
 	 psum += y
-      print ' Total population =',psum
+      print(' Total population =',psum)
       return 0 
 
    #--------------------------------
@@ -307,7 +307,7 @@ class class_mps:
       return rfun,wfun
 
    def analyzer(self,case,refdet=None,npoints=1000,args=None):
-      print '\n[mps_class.analyzer] case =',case
+      print('\n[mps_class.analyzer] case =',case)
       
       # Complex algebra is mandatory in order to use the separability of exp(iNx)
       def fx(xdata,mps,rfun,args=None,dtype=numpy.complex_):
@@ -342,9 +342,9 @@ class class_mps:
       k = self.nsite
       norm = self.norm()
       mps = self.copy()
-      print ' ksite =',k
-      print ' norm0 =',norm
-      print ' bdims =',mps.bdim() 
+      print(' ksite =',k)
+      print(' norm0 =',norm)
+      print(' bdims =',mps.bdim()) 
       mps.mul(1.0/norm)
       rfun,wfun = self.quadfun(case,refdet)
       from scipy.integrate import trapz,simps
@@ -356,24 +356,24 @@ class class_mps:
 	 xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
 	 for n in range(2*k+1):
-            ydata2 = map(lambda x:wfun(x,n),xdata)
+            ydata2 = [wfun(x,n) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
 	    expval += y*n
-	    print ' n =%3d'%n,' p[n] =%10.5f'%y
+	    print(' n =%3d'%n,' p[n] =%10.5f'%y)
  
       elif case == 'sz':
          b = 2*numpy.pi
 	 xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
 	 for sz in numpy.arange(-0.5*k,0.5*k+0.1,0.5):
-            ydata2 = map(lambda x:wfun(x,sz),xdata)
+            ydata2 = [wfun(x,sz) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
 	    expval += y*sz
-	    print ' sz =%5.1f'%sz,' p[n] =%10.5f'%y
+	    print(' sz =%5.1f'%sz,' p[n] =%10.5f'%y)
       
       elif case == 'omega': 
          b = 2*numpy.pi
@@ -381,54 +381,54 @@ class class_mps:
          ydata = fx(xdata,mps,rfun)
 	 # No. of unpair electrons
 	 for omega in range(0,k+1):
-            ydata2 = map(lambda x:wfun(x,omega),xdata)
+            ydata2 = [wfun(x,omega) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
 	    expval += y*omega
 	    # omega is even if n is even.
 	    # omega is odd if n is odd.
-	    print ' omega =%3d'%omega,' p[n] =%10.5f'%y
+	    print(' omega =%3d'%omega,' p[n] =%10.5f'%y)
  
       elif case == 'ph':
 	 if refdet is None:
-	    print 'error: there must be a reference determinant'
+	    print('error: there must be a reference determinant')
 	    exit(1)
          nelec = sum(refdet)
-	 print ' refdet =',refdet 
-	 print ' nelec of refdet =',nelec
+	 print(' refdet =',refdet) 
+	 print(' nelec of refdet =',nelec)
          maxNoQuasiParticles = 2*(min(nelec,2*k-nelec))
          b = 2*numpy.pi
 	 xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun,args=refdet)
 	 # No. of quasiparticles
 	 for nQ in range(maxNoQuasiParticles+1):
-            ydata2 = map(lambda x:wfun(x,nQ),xdata)
+            ydata2 = [wfun(x,nQ) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
 	    expval += y*nQ
-	    print ' nQ =%3d'%nQ,' p[n] =%10.5f'%y
+	    print(' nQ =%3d'%nQ,' p[n] =%10.5f'%y)
  
       elif case == 's2':
          if args is None:
- 	    print 'error: a Sz value of the reference must be provide!'
+ 	    print('error: a Sz value of the reference must be provide!')
 	    exit(1)
          b = numpy.pi
 	 xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
 	 for stot in numpy.arange(0,0.5*k+0.1,0.5):
-            ydata2 = map(lambda x:wfun(x,stot,args),xdata)
+            ydata2 = [wfun(x,stot,args) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
 	    expval += y*stot*(stot+1)
-	    print ' stot =%5.1f'%stot,' p[n] =',y
-         print ' S[eff] =',seff(expval)
+	    print(' stot =%5.1f'%stot,' p[n] =',y)
+         print(' S[eff] =',seff(expval))
       
       # Final print
-      print ' Total population =',psum
-      print ' <O> population =',expval
+      print(' Total population =',psum)
+      print(' <O> population =',expval)
       return psum,expval
    
    #--------------------------------
@@ -459,30 +459,30 @@ class class_mps:
       return pdim
 
    def prt(self,ifqnums=False):
-      print "\nMPSinfo:"
-      print " nsite = ",self.nsite	  
+      print("\nMPSinfo:")
+      print(" nsite = ",self.nsite)	  
       for i in range(self.nsite):
-         print " Site : ",i," Shape : ",self.sites[i].shape,\
-	       " Val = ",numpy.linalg.norm(self.sites[i])
+         print(" Site : ",i," Shape : ",self.sites[i].shape,\
+	       " Val = ",numpy.linalg.norm(self.sites[i]))
       if self.qphys is not None:
 	 mpo_qphys.prt(self.qphys)
       if self.qnums is not None and ifqnums:
 	 self.prtQnums()
-      print "End of MPSinfo\n"
+      print("End of MPSinfo\n")
       return 0
    
    def prtQnums(self):
-      print "[mps_class.prtQnums]" 
-      print '-'*60
-      print " quantum numbers on bonds:"
+      print("[mps_class.prtQnums]") 
+      print('-'*60)
+      print(" quantum numbers on bonds:")
       for i in range(self.nsite):
-	 print " Bond : ",i," bdim[i] =",len(self.qnums[i])
-	 print " Qnums[i] =",self.qnums[i]
-      print '-'*60
+	 print(" Bond : ",i," bdim[i] =",len(self.qnums[i]))
+	 print(" Qnums[i] =",self.qnums[i])
+      print('-'*60)
       return 0
 
    def prtBdim(self):
-      print 'Bdim =',self.bdim()
+      print('Bdim =',self.bdim())
       return 0
 
    def toMat(self):
@@ -510,7 +510,7 @@ class class_mps:
       mpslib.mps_compress(t2,thresh=thresh,iprt=iprt)
       rr = mpslib.mps_diff(t1,t2,iprt=0)
       if rr > 1.e-5:
-	 print 'error: compression error is too large! rr=',rr
+	 print('error: compression error is too large! rr=',rr)
 	 exit()
       mpslib.mps_mps2rank3(0,t2)
       self.sites = copy.deepcopy(t2)
@@ -524,16 +524,16 @@ class class_mps:
       return 0
 
    def checkOverlap(self,mps):
-      print '\n[mps_class.checkOverlap]'
-      print ' norm0',self.norm()
-      print ' norm1',mps.norm()
-      print ' <0|1>',self.dot(mps)
+      print('\n[mps_class.checkOverlap]')
+      print(' norm0',self.norm())
+      print(' norm1',mps.norm())
+      print(' <0|1>',self.dot(mps))
       return 0
 
    def qcompress(self,thresh=-1.e-12,Dcut=-1,debug=False,qphys=None):
       "Compress with Quantum Numbers: similar to compressions in HS-MPS,\
        performed using qleftCanon and qrightCanon without discarding."
-      print '\n[mps_class.qcompress]'
+      print('\n[mps_class.qcompress]')
       # Normalize such that sum of Schmidt values = 1.
       self.normalize()
       # Preparation step: 
@@ -541,15 +541,15 @@ class class_mps:
       if qphys is not None:
 	 mps.qphys = copy.deepcopy(qphys)
       if mps.qphys is None:
-	 print 'error: qphys cannot be NONE!'
+	 print('error: qphys cannot be NONE!')
 	 exit(1)
       # Check physical dimensions
       dphys1 = mps.pdim()
-      dphys2 = map(lambda x:len(x),mps.qphys)
+      dphys2 = [len(x) for x in mps.qphys]
       if dphys1 != dphys2:
-	 print 'error: physical dimensions must be consistent!'
-	 print 'mps.pdim() =',dphys1
-	 print 'mps.qphys  =',dphys2
+	 print('error: physical dimensions must be consistent!')
+	 print('mps.pdim() =',dphys1)
+	 print('mps.qphys  =',dphys2)
 	 exit(1)
       # M*M*M => L*L*L such that the latter Schmidt values = 1.
       mps.qleftCanon(debug=debug)
@@ -563,7 +563,7 @@ class class_mps:
 
    def dcompress(self,thresh=-1.e-12,Dcut=-1,debug=False):
       "SVD compression"
-      print '\n[mps_class.dcompress]'
+      print('\n[mps_class.dcompress]')
       self.normalize()
       mps = self.copy()
       mps.leftCanon(debug=debug)
@@ -578,12 +578,12 @@ class class_mps:
    # Left Canonical MPS
    def leftCanon(self,thresh=-1.e-12,Dcut=-1,debug=False):
       if debug:
-         print '[mps_class.leftCanon]'
-	 print ' Bdim before: ',self.bdim()
+         print('[mps_class.leftCanon]')
+	 print(' Bdim before: ',self.bdim())
       try:
 	 assert abs(self.norm()-1.0)<1.e-8
       except AssertionError:
-	 print ' norm = ',self.norm()
+	 print(' norm = ',self.norm())
 	 exit()
       sites = self.sites
       nsite = len(sites)
@@ -600,14 +600,14 @@ class class_mps:
 	 u,sigs,vt = mpslib.mps_svd_cut(mat,thresh,Dcut)
 	 bdim = len(sigs)
 	 if debug:
-	    print '-'*80	 
-	    print ' Results[i]:',isite
-	    print '-'*80	 
-	    print ' dimension:',(d1,d2),'->',bdim
+	    print('-'*80)	 
+	    print(' Results[i]:',isite)
+	    print('-'*80)	 
+	    print(' dimension:',(d1,d2),'->',bdim)
 	    sum2 = numpy.sum(numpy.array(sigs)**2)
 	    dwts = 1.0-sum2
-	    print ' sum of sigs2:',sum2,' dwts:',dwts
-	    print ' sigs:\n',sigs
+	    print(' sum of sigs2:',sum2,' dwts:',dwts)
+	    print(' sigs:\n',sigs)
 	 sval[isite] = sigs.copy()
 	 lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
 	 tmp = numpy.diag(sigs).dot(vt)
@@ -624,12 +624,12 @@ class class_mps:
    # Right Canonical MPS
    def rightCanon(self,thresh=-1.e-12,Dcut=-1,debug=False):
       if debug:
-         print '[mps_class.rightCanon]'
-	 print ' Bdim before: ',self.bdim()
+         print('[mps_class.rightCanon]')
+	 print(' Bdim before: ',self.bdim())
       try:
 	 assert abs(self.norm()-1.0)<1.e-8
       except AssertionError:
-	 print ' norm = ',self.norm()
+	 print(' norm = ',self.norm())
 	 exit()
       sites = self.sites
       nsite = len(sites)
@@ -647,14 +647,14 @@ class class_mps:
          u,sigs,vt = mpslib.mps_svd_cut(mat.T,thresh,Dcut)
 	 bdim = len(sigs)
 	 if debug:
-	    print '-'*80	 
-	    print ' Results[i]:',isite
-	    print '-'*80	 
-	    print ' dimension:',(d1,d2),'->',bdim
+	    print('-'*80)	 
+	    print(' Results[i]:',isite)
+	    print('-'*80)	 
+	    print(' dimension:',(d1,d2),'->',bdim)
 	    sum2 = numpy.sum(numpy.array(sigs)**2)
 	    dwts = 1.0-sum2
-	    print ' sum of sigs2:',sum2,' dwts:',dwts
-	    print ' sigs:\n',sigs
+	    print(' sum of sigs2:',sum2,' dwts:',dwts)
+	    print(' sigs:\n',sigs)
 	 sval[isite-1] = sigs.copy()
 	 # u = V* ---> (Vd)[alpha,n*r]
 	 rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
@@ -673,8 +673,8 @@ class class_mps:
    # Left Canonical MPS compressed with quantum numbers
    #----------------------------------------------------
    def qleftCanon(self,thresh=-1.e-12,Dcut=-1,debug=False):
-      print '\n[mps_class.qleftCanon]'
-      print ' Bdim before: ',self.bdim()
+      print('\n[mps_class.qleftCanon]')
+      print(' Bdim before: ',self.bdim())
       assert abs(self.norm()-1.0)<1.e-8
       sites = self.sites
       nsite = len(sites)
@@ -700,7 +700,7 @@ class class_mps:
          if isite != nsite-1:
 	    dwts,qred,u,sigs,vt = qparser.row_svd(mat,classes,thresh,Dcut)
 	    bdim = len(sigs)
-	    print ' isite/bdim=',isite,bdim
+	    print(' isite/bdim=',isite,bdim)
 	    lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
 	    qnuml = numpy.array(copy.deepcopy(qred))
 	    qnums[isite] = qnuml.copy()
@@ -715,29 +715,29 @@ class class_mps:
 	    # (particle number breaking!)
 	    dwts,qred,u,sigs,vt = qparser.row_svd(mat,classes,thresh,1)
 	    bdim = len(sigs)
-	    print ' isite/bdim=',isite,bdim
+	    print(' isite/bdim=',isite,bdim)
 	    assert bdim == 1
 	    lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
 	    qnuml = numpy.array(copy.deepcopy(qred))
 	    qnums[isite] = qnuml.copy()
 	 if debug:
-	    print '-'*80	 
-	    print ' Results[i]:',isite
-	    print '-'*80	 
-	    print ' dimension:',(d1,d2),'->',bdim
-	    print ' qred:',qred
-	    print ' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts
-	    print ' sigs:\n',sigs
+	    print('-'*80)	 
+	    print(' Results[i]:',isite)
+	    print('-'*80)	 
+	    print(' dimension:',(d1,d2),'->',bdim)
+	    print(' qred:',qred)
+	    print(' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts)
+	    print(' sigs:\n',sigs)
       # Final
       self.sites = copy.deepcopy(lmps)
       self.qnums = copy.deepcopy(qnums)
       if debug: self.prt()
-      print ' Bdim after: ',self.bdim()
+      print(' Bdim after: ',self.bdim())
       return link,sval
 
    def qrightCanon(self,thresh=-1.e-12,Dcut=-1,debug=False):
-      print '\n[mps_class.qrightCanon]'
-      print ' Bdim before: ',self.bdim()
+      print('\n[mps_class.qrightCanon]')
+      print(' Bdim before: ',self.bdim())
       assert abs(self.norm()-1.0)<1.e-8
       sites = self.sites
       nsite = len(sites)
@@ -764,7 +764,7 @@ class class_mps:
 	 if isite != 0:
 	    dwts,qred,u,sigs,vt = qparser.row_svd(mat.T.copy(),classes,thresh,Dcut)
 	    bdim = len(sigs)
-	    print ' isite/bdim=',isite,bdim
+	    print(' isite/bdim=',isite,bdim)
 	    rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
 	    qnumr = numpy.array(copy.deepcopy(qred))
 	    qnums[isite-1] = qnumr.copy()
@@ -778,22 +778,22 @@ class class_mps:
 	    # Always cut the last one
 	    dwts,qred,u,sigs,vt = qparser.row_svd(mat.T.copy(),classes,thresh,1)
 	    bdim = len(sigs)
-	    print ' isite/bdim=',isite,bdim
+	    print(' isite/bdim=',isite,bdim)
 	    assert bdim == 1
 	    rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
 	 if debug:
-	    print '-'*80	 
-	    print ' Results[i]:',isite
-	    print '-'*80	 
-	    print ' dimension:',(d1,d2),'->',bdim
-	    print ' qred:',qred
-	    print ' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts
-	    print ' sigs:\n',sigs
+	    print('-'*80)	 
+	    print(' Results[i]:',isite)
+	    print('-'*80)	 
+	    print(' dimension:',(d1,d2),'->',bdim)
+	    print(' qred:',qred)
+	    print(' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts)
+	    print(' sigs:\n',sigs)
       # Final
       self.sites = copy.deepcopy(rmps)
       self.qnums = copy.deepcopy(qnums)
       if debug: self.prt()
-      print ' Bdim after: ',self.bdim()
+      print(' Bdim after: ',self.bdim())
       return link,sval
 
    #--------------------------------
@@ -873,7 +873,7 @@ class class_mps:
       nb,nelec = vmat1.shape
       assert nb == self.nsite
       civec2=numpy.zeros(misc.binomial(nb,nelec))
-      for strAB in itools.combinations(range(nb),nelec):
+      for strAB in itools.combinations(list(range(nb)),nelec):
          addr=tensorRep.str2addr_o1(nb,nelec,tensorRep.string2bit(strAB))
          civec2[addr]=numpy.linalg.det(vmat1[list(strAB),:])
       # Fock-space representation
@@ -904,14 +904,14 @@ class class_mps:
       rdm1 = numpy.zeros((nb,nb))
       for i in range(nb):
          for j in range(nb):
-   	    print 'rdm[i,j] (i,j)=',i,j  
+   	    print('rdm[i,j] (i,j)=',i,j)  
             ci = mpo_class.mpo_r1(nb,i,1)
             aj = mpo_class.mpo_r1(nb,j,0)
             Aij = mpo_class.mpo_r1mul(ci,aj)
             op = mpo_class.class_mpo(nb)
             op.fromRank1(Aij)
    	    rdm1[i,j] = mpslib.mps_dot(mps,op.dot(mps))
-      print 'Hermicity=',numpy.linalg.norm(rdm1-rdm1.T)
+      print('Hermicity=',numpy.linalg.norm(rdm1-rdm1.T))
       return rdm1
 
    # RDM1q
@@ -922,7 +922,7 @@ class class_mps:
       types = [[1,0],[1,1],[0,1],[0,0]]
       for i in range(nb):
          for j in range(nb):
-   	    print 'rdm[i,j] (i,j)=',i,j 
+   	    print('rdm[i,j] (i,j)=',i,j) 
 	    for ijtp in range(4):
 	       itp,jtp = types[ijtp]  
 	       ci = mpo_class.mpo_r1(nb,i,itp)
@@ -936,7 +936,7 @@ class class_mps:
       rdm1q[:nb,nb:] = rdm1[1]
       rdm1q[nb:,:nb] = rdm1[2]
       rdm1q[nb:,nb:] = rdm1[3]
-      print 'Hermicity=',numpy.linalg.norm(rdm1q-rdm1q.T)
+      print('Hermicity=',numpy.linalg.norm(rdm1q-rdm1q.T))
       return rdm1q
 
    # many-body RDM
@@ -973,8 +973,8 @@ class class_mps:
 
    # merge physical indices
    def merge(self,partition):
-      print '\n[mps_class.merge]'
-      print ' Partition =',partition
+      print('\n[mps_class.merge]')
+      print(' Partition =',partition)
       nsite = len(partition)
       tmps = [0]*nsite
       qnums = [0]*nsite
@@ -1003,9 +1003,9 @@ class class_mps:
 	    tmps = class_mps(nsite,sites=tmps,iop=1,qnums=qnums)
       else:
 	 qphys = mpo_qphys.merge(self.qphys,partition)
-	 print ' Merged qphys_new:'
+	 print(' Merged qphys_new:')
 	 for idx,iqnum in enumerate(qphys):
-	    print ' idx=',idx,' iqnum=',iqnum
+	    print(' idx=',idx,' iqnum=',iqnum)
 	 if self.qnums is None:
             tmps = class_mps(nsite,sites=tmps,iop=1,qphys=qphys)
 	 else:
@@ -1021,7 +1021,7 @@ def detmps(nb,nelec):
 
 def testDet(nb=12,nelec=6):
    import jacobi
-   print '\n[testDet]'
+   print('\n[testDet]')
    # Init   
    numpy.random.seed(2)
    h=numpy.random.uniform(-1,1,nb*nb)
@@ -1035,7 +1035,7 @@ def testDet(nb=12,nelec=6):
    bdim0 = mps.bdim()
    rdm1 = mps.makeRDM1()
    diff = numpy.linalg.norm(rdm1-vmat1.dot(vmat1.T))
-   print 'RDMdiff=',diff
+   print('RDMdiff=',diff)
    if diff > 1.e-10: exit()
    #-----------------------------------------------------#
    # Try to convert MPS(in AO basis) to MPS(in MO basis) #
@@ -1046,29 +1046,29 @@ def testDet(nb=12,nelec=6):
    for idx,rot in enumerate(givens):
       k,l,arg = rot
       if abs(arg)<1.e-10: continue
-      print '>>> idx=',idx,'/',ngivens,' arg=',arg,math.cos(arg),math.sin(arg)
+      print('>>> idx=',idx,'/',ngivens,' arg=',arg,math.cos(arg),math.sin(arg))
       umpo = mpo_class.genU1mpo(nb,k,l,-arg)
       mps1 = copy.deepcopy(umpo.dotMPS(mps1))
-      print 'mps.bdim = ',mps1.bdim()
+      print('mps.bdim = ',mps1.bdim())
       mps1.compress()
    # Print 
    bdim0 = mps.bdim()
    bdim1 = mps1.bdim()
-   print 'bdim0',bdim0
-   print 'bdim1',bdim1
+   print('bdim0',bdim0)
+   print('bdim1',bdim1)
    mps1.compress(thresh=1.e-8)
-   print 'bdim2',mps1.bdim()
+   print('bdim2',mps1.bdim())
    # Comparison
    dmps = detmps(nb,nelec)
    rr = dmps.diff(mps1,iprt=1)
-   print 'diff=',rr
+   print('diff=',rr)
    nmpo = mpo_class.occmpo(nb)
    nelec1 = dmps.dot(nmpo.dotMPS(dmps))
    nelec2 = mps1.dot(nmpo.dotMPS(mps1))
-   print 'Check nelec:'
-   print 'nelec =',nelec
-   print 'nelec1=',nelec1
-   print 'nelec2=',nelec2
+   print('Check nelec:')
+   print('nelec =',nelec)
+   print('nelec1=',nelec1)
+   print('nelec2=',nelec2)
    #
    # bdim0 [2, 4, 8, 16, 32, 64, 128, 256, 128, 64, 32, 16, 8, 4, 2]
    # bdim1 [2, 3, 3, 3, 3, 3, 4, 4, 4, 3, 2, 2, 2, 1, 1]
@@ -1092,7 +1092,7 @@ def testQnum():
    sordering = [0,1,3,2,4,5]
    occ = [1]*n + [0]*(k-n)
    occ = numpy.array(occ)[sordering]
-   print 'occ=',occ
+   print('occ=',occ)
    mps0 = class_mps(k)
    mps0.hfstate(n,occ)
    mps0.prt()

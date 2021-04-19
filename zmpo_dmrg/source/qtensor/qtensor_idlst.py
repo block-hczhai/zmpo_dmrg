@@ -1,6 +1,7 @@
 import numpy
 import itertools
-import qtensor_util
+from . import qtensor_util
+from functools import reduce
 
 # Merging group of indices
 def cartesian_prod_idlst(arrays,shape):
@@ -16,7 +17,7 @@ def cartesian_prod_idlst(arrays,shape):
    else:
       tmp = reduce(cartesian_prod_idlst_pair,arrays)
       # map the multi index into new flat index
-      idlst_prod = [map(lambda x:numpy.ravel_multi_index(x,shape),idx) for idx in tmp]
+      idlst_prod = [[numpy.ravel_multi_index(x,shape) for x in idx] for idx in tmp]
    return idlst_prod
 
 # each item in idlst is [[0], [1], [2], [3]] => [0,1,2,3]

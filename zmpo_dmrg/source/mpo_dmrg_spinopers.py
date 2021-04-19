@@ -23,8 +23,8 @@
 # def genLocal2Spatial(nsite,isite,ig,jg,ikey,jkey,fac=1.0):
 # 
 import numpy
-import mpo_dmrg_opers
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_opers
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # Op = I
 # [[1 0 0 0],
@@ -93,7 +93,7 @@ def genNpXYMat(ispin,jspin):
       elif ispin == 1 and jspin == 0:
 	 tmp[1,2] = 1.
       else:
-	 print 'error: no such spin case in genNpXYMat! ispin,jspin=',(ispin,jspin)
+	 print('error: no such spin case in genNpXYMat! ispin,jspin=',(ispin,jspin))
 	 exit(1)
    return tmp
 
@@ -197,7 +197,7 @@ def genGlobalSpatial(nsite,isite,key):
    elif key == 'NaNb':
       mat = genNaNbMat()
    else:
-      print 'error: no such key in genGlobalSpatial! key =',key
+      print('error: no such key in genGlobalSpatial! key =',key)
       exit(1)
    # Site cases
    if isite == 0: 
@@ -268,26 +268,26 @@ if __name__ == '__main__':
    pab = genNpXYMat(0,1)
    pba = genNpXYMat(1,0)
    pbb = genNpXYMat(1,1)
-   print 'paa\n',paa
-   print 'pab\n',pab
-   print 'pba\n',pba
-   print 'pbb\n',pbb
-   import mpo_dmrg_const
+   print('paa\n',paa)
+   print('pab\n',pab)
+   print('pba\n',pba)
+   print('pbb\n',pbb)
+   from . import mpo_dmrg_const
    kab = numpy.kron(mpo_dmrg_const.cret,mpo_dmrg_const.ann)
    kba = -numpy.kron(mpo_dmrg_const.annt,mpo_dmrg_const.cre)
-   print 'kab\n',kab
-   print 'pab-kab =',numpy.linalg.norm(pab-kab)
-   print 'kba\n',kba
-   print 'pba-kba =',numpy.linalg.norm(pba-kba)
-   print paa.dot(paa)+pab.dot(pba)
-   print pbb.dot(pbb)+pba.dot(pab)
+   print('kab\n',kab)
+   print('pab-kab =',numpy.linalg.norm(pab-kab))
+   print('kba\n',kba)
+   print('pba-kba =',numpy.linalg.norm(pba-kba))
+   print(paa.dot(paa)+pab.dot(pba))
+   print(pbb.dot(pbb)+pba.dot(pab))
 
    # S^2 local for one orbital?
    sz = genSzMat()
    sp = genSpMat()
    sm = genSmMat()
-   print 'sz\n',sz
-   print 'sp\n',sp
-   print 'sm\n',sm
-   print 's2\n',sz.dot(sz)+sz+sm.dot(sp)
-   print 's2\n',sz.dot(sz)-sz+sp.dot(sm)
+   print('sz\n',sz)
+   print('sp\n',sp)
+   print('sm\n',sm)
+   print('s2\n',sz.dot(sz)+sz+sm.dot(sp))
+   print('s2\n',sz.dot(sz)-sz+sp.dot(sm))

@@ -14,9 +14,9 @@
 import h5py
 import time
 import numpy
-import mpo_dmrg_opers
-import mpo_dmrg_spinopers
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_opers
+from . import mpo_dmrg_spinopers
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # EN-like H0
 def genHenRfacSpatial(dmrg,pindx,isite,icase):
@@ -33,7 +33,7 @@ def genHenRfacSpatial(dmrg,pindx,isite,icase):
 	 pop = mpo_dmrg_opers.genExpISyPhiMat(dmrg.qpts[ipop])
          cop = numpy.tensordot(cop,pop,axes=([3],[0]))
       else:
-         print '\nerror: icase must be 1 or 2 for ifs2proj = True!'
+         print('\nerror: icase must be 1 or 2 for ifs2proj = True!')
 	 exit()
    return cop
 

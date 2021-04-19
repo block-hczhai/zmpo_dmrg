@@ -3,7 +3,7 @@ import numpy
 # Partition data according to size & rank
 def partitionSites(nsites,size,rank,iop=1,debug=False):
    blocksize = nsites//size
-   sites = range(nsites) 
+   sites = list(range(nsites)) 
    if size == 1:
       isites = sites
    elif size == 2:
@@ -24,7 +24,7 @@ def partitionSites(nsites,size,rank,iop=1,debug=False):
 	 else:
 	    res = [1]*nres+[0]*(size-nres)
 	 nparts = [nparts[i]+res[i] for i in range(size)]
-      if debug: print 'parts=',nparts
+      if debug: print('parts=',nparts)
       if rank == 0:
          isites = sites[:nparts[0]]
       elif rank == size-1:
@@ -32,7 +32,7 @@ def partitionSites(nsites,size,rank,iop=1,debug=False):
       else:
 	 noff = sum(nparts[:rank])
          isites = sites[noff:noff+nparts[rank]]
-   if debug: print ' size=',size,' rank=',rank,' nisites=',len(isites),' isites=',isites
+   if debug: print(' size=',size,' rank=',rank,' nisites=',len(isites),' isites=',isites)
    return numpy.array(isites)
 
 # ij = i*nj+j
@@ -45,8 +45,8 @@ if __name__ == '__main__':
    nsites = 59
    size = 4
    for i in range(size):
-      print partitionSites(nsites,size,i)
+      print(partitionSites(nsites,size,i))
 
    nj = 4
    for i in range(14):
-      print unrank(i,nj)
+      print(unrank(i,nj))

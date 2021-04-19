@@ -27,9 +27,9 @@ from zmpo_dmrg.source import mpo_dmrg_opers
 
 # Creation and Annihilation operators: {c+,a}, {c+*a+,c+*c+,a*a}
 def genCAops(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
-   if dmrg.comm.rank == 0: print '\n[mpo_dmrg_block.genCAops] ifQt=',dmrg.ifQt
+   if dmrg.comm.rank == 0: print('\n[mpo_dmrg_block.genCAops] ifQt=',dmrg.ifQt)
    if dmrg.ifQt:
-      print 'Not implemented yet!'
+      print('Not implemented yet!')
       exit()	   
       #exphop = mpo_dmrg_blockQt.genCAopsQt(norder,dmrg,fbmps,fkmps,fname,status,debug)
    else:
@@ -39,8 +39,8 @@ def genCAops(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 # Creation and Annihilation operators: {c+,a}, {c+*a+,c+*c+,a*a}
 def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
    if dmrg.comm.rank == 0: 
-      print '[mpo_dmrg_block.genCAopsNQt] status=',status
-      print ' fname = ',fname
+      print('[mpo_dmrg_block.genCAopsNQt] status=',status)
+      print(' fname = ',fname)
    t0 = time.time()
    bnsite = fbmps['nsite'].value
    knsite = fkmps['nsite'].value
@@ -69,7 +69,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 
       mpo_dmrg_init.genBmat(dmrg,fname,-1)
       for isite in range(0,nsite):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
@@ -158,7 +158,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 	 f1.close()
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti))
      
    #
    # L<-R sweeps: For properties, left canonical form is assumed even for R sweeps! 
@@ -167,7 +167,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 
       mpo_dmrg_init.genBmat(dmrg,fname,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
@@ -256,7 +256,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 	 f1.close()
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti))
   
    # CHECK
    f = h5py.File(f1name,'r')
@@ -268,16 +268,16 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
          hdm1[j,i] = f['op_AC_'+str(i)+'_'+str(j)].value
    sab = f['mat'].value[0,0]
    #print rdm1+hdm1
-   print ' ovlap=',sab
-   print ' P+H-I=',numpy.linalg.norm(rdm1+hdm1-numpy.identity(sbas)*sab) 
-   print ' skewP=',numpy.linalg.norm(rdm1-rdm1.T)
-   print ' skewH=',numpy.linalg.norm(hdm1-hdm1.T)
-   print ' trace=',numpy.trace(rdm1)
+   print(' ovlap=',sab)
+   print(' P+H-I=',numpy.linalg.norm(rdm1+hdm1-numpy.identity(sbas)*sab)) 
+   print(' skewP=',numpy.linalg.norm(rdm1-rdm1.T))
+   print(' skewH=',numpy.linalg.norm(hdm1-hdm1.T))
+   print(' trace=',numpy.trace(rdm1))
    f.close()
 
    t1=time.time()
    dmrg.comm.Barrier()
-   print ' time for genHops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' time for genHops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return rdm1
 
 #> # RDMs

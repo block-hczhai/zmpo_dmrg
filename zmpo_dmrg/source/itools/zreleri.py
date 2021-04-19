@@ -134,7 +134,7 @@ if __name__ == '__main__':
 #----------------------------------------------
     mf = scf.DHF(mol)
     mf.conv_tol = 1e-14
-    print(mf.scf())  # -75.640153125
+    print((mf.scf()))  # -75.640153125
 
     _tmpfile = tempfile.NamedTemporaryFile()
     erifile = _tmpfile.name
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     casorb = mf.mo_coeff[:,nmo//2+4:nmo//2+8]
     ao2mo(mf, casorb, erifile)
     with h5py.File(erifile) as f1:
-        print f1['ericas'].shape
+        print(f1['ericas'].shape)
 
 #----------------------------------------------
 # DCG

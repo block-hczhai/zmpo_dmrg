@@ -26,7 +26,7 @@ from zmpo_dmrg.source.sysutil_include import dmrg_dtype,dmrg_mtype
 # General computation of <bra|O|ket> for NQt/Qt version
 #
 def evalProps(dmrg,fbmps,fkmps,fop,status='L',debug=False):
-   if debug: print '\n[mpo_dmrg_props.evalProps] ifQt/ifs2proj=',(dmrg.ifQt,dmrg.ifs2proj)
+   if debug: print('\n[mpo_dmrg_props.evalProps] ifQt/ifs2proj=',(dmrg.ifQt,dmrg.ifs2proj))
    if not dmrg.ifQt:
       exphop = evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug)
    else:
@@ -45,8 +45,8 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
    nsite = bnsite
    nop = fop['nop'].value
    if debug:
-      print ' nop   = ',nop
-      print ' nsite = ',nsite
+      print(' nop   = ',nop)
+      print(' nsite = ',nsite)
    # Create directory - maybe we could use dmrg.path+'/tmpdirProps' in future
    path = dmrg.path+'/tmpdirProps'
    sysutil_io.createDIR(path,debug)
@@ -57,7 +57,7 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 
       mpo_dmrg_init.genBopsNQt(fname,nop,-1)
       for isite in range(0,nsite):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
@@ -66,7 +66,7 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,False)
 	 if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    cop = fop['site'+str(isite)+'/op'+str(iop)].value
 	    tmp = f0['opers'+str(iop)].value
 	    #--- kernel ---
@@ -81,14 +81,14 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	 f1.close()
          # final isite
 	 tf = time.time()
-         if debug: print ' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti)
+         if debug: print(' isite =',os.path.split(f1name)[-1],\
+	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
       mpo_dmrg_init.genBopsNQt(fname,nop,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
@@ -97,7 +97,7 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,False)
 	 if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    cop = fop['site'+str(isite)+'/op'+str(iop)].value
 	    tmp = f0['opers'+str(iop)].value
 	    #--- kernel ---
@@ -112,13 +112,13 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	 f1.close()
          # final isite
 	 tf = time.time()
-	 if debug: print ' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti)
+	 if debug: print(' isite =',os.path.split(f1name)[-1],\
+	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
    
    # final
    sysutil_io.deleteDIR(path,1,debug)
    t1=time.time()
-   if debug: print ' time for evalProps = %.2f s'%(t1-t0)
+   if debug: print(' time for evalProps = %.2f s'%(t1-t0))
    return exphop
 
 #
@@ -137,8 +137,8 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
    nsite = bnsite
    nop = fop['nop'].value
    if debug:
-      print ' nop   = ',nop
-      print ' nsite = ',nsite
+      print(' nop   = ',nop)
+      print(' nsite = ',nsite)
    # Create directory
    path = dmrg.path+'/tmpdirProps'
    sysutil_io.createDIR(path,debug)
@@ -151,7 +151,7 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
       lop = qtensor.qtensor()
       cop = qtensor.qtensor()
       for isite in range(0,nsite):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
@@ -164,7 +164,7 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	    ksite = ksite.reduceQsymsToN()
 	 if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
 	 for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    # COP
 	    cop.load(fop,'site'+str(isite)+'/op'+str(iop))
 	    # LOP
@@ -181,8 +181,8 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	 f1.close()
          # final isite
 	 tf = time.time()
-	 if debug: print ' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti)
+	 if debug: print(' isite =',os.path.split(f1name)[-1],\
+	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
@@ -190,7 +190,7 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
       rop = qtensor.qtensor()
       cop = qtensor.qtensor()
       for isite in range(nsite-1,-1,-1):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
@@ -203,7 +203,7 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	    ksite = ksite.reduceQsymsToN()
 	 if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
 	 for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    # COP
 	    cop.load(fop,'site'+str(isite)+'/op'+str(iop))
 	    cop.qsyms[0]  = -cop.qsyms[0]
@@ -224,11 +224,11 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 	 f1.close()
          # final isite
 	 tf = time.time()
-	 if debug: print ' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti)
+	 if debug: print(' isite =',os.path.split(f1name)[-1],\
+	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
  
    # final
    sysutil_io.deleteDIR(path,1,debug)
    t1=time.time()
-   if debug: print ' time for evalProps = %.2f s'%(t1-t0)
+   if debug: print(' time for evalProps = %.2f s'%(t1-t0))
    return exphop

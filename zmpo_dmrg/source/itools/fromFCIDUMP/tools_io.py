@@ -4,23 +4,23 @@
 import numpy
 
 def loadRDMs(n):
-   print '\n[tools_io.loadRDMs] from spatial_twopdm.0.0.txt'
+   print('\n[tools_io.loadRDMs] from spatial_twopdm.0.0.txt')
    x = numpy.loadtxt('spatial_twopdm.0.0.txt')
    rdm2 = x[:,4].reshape((n,n,n,n))
    # G[ijkl]=1/2*<ais1+ajs2^+aks2als1>
    twopdm = 2.0*rdm2
    onepdm = numpy.einsum('ijjl->il',rdm2)/(n-1.0)*2.0
-   print 'ne_act=',numpy.trace(onepdm)
+   print('ne_act=',numpy.trace(onepdm))
    numpy.save('onepdm',onepdm)
    numpy.save('twopdm',twopdm)
-   print 'finished'
+   print('finished')
    return onepdm,twopdm
 
 def loadERIs():
-   print '\n[tools_io.loadERIs] from FCIDUMP'
+   print('\n[tools_io.loadERIs] from FCIDUMP')
    with open('FCIDUMP','r') as f:
      line = f.readline().split(',')[0].split(' ')[-1]
-     print  'Num of orb: ', int(line)
+     print('Num of orb: ', int(line))
      f.readline()
      f.readline()
      f.readline()
@@ -48,15 +48,15 @@ def loadERIs():
          int2e[ind[3],ind[2], ind[1], ind[0]] = float(data[0])
    numpy.save('int2e',int1e)
    numpy.save('int1e',int2e)
-   print 'finished'
+   print('finished')
    return e,int1e,int2e
 
 def loadMOLMF(chkfile='hs_bp86.chk'):
-   print '\n[tools_io.loadMOLMF] from PYSCF.chk'
+   print('\n[tools_io.loadMOLMF] from PYSCF.chk')
    from pyscf import scf
    mol,mf = scf.chkfile.load_scf(chkfile)
    return mol,mf
 
 if __name__ == '__main__': 
    e,int1e,int2e = loadERIs()
-   print e
+   print(e)

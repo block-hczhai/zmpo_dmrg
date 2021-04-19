@@ -2,19 +2,20 @@ import copy
 import numpy
 import ctypes
 from zmpo_dmrg.source.sysutil_include import libqsym 
+from functools import reduce
 
 ##############
 # main codes
 ##############
 def reduceQnumsToN(qnums):
-   return numpy.array(map(lambda x:numpy.array([x[0]]),qnums))
+   return numpy.array([numpy.array([x[0]]) for x in qnums])
 
 # Input:
 # [array([[ 0.,  0.]]), array([[ 0. ,  0. ],[ 1. , -0.5],[ 1. ,  0.5],[ 2. ,  0. ]])]
 # Output:
 # [array([[ 0.]]), array([[ 0.],[ 1.],[ 1.],[ 2.]])]
 def reduceQsymsToN(qsyms):
-   return map(lambda x:(x.T[0:1]).T,qsyms)
+   return [(x.T[0:1]).T for x in qsyms]
 
 # Return: rank,qsyms,ndims,idlst
 def fromQnums(qnums,ifcollect=None):
@@ -35,11 +36,11 @@ def classification(qnums,ifclt=1):
    if ifclt:
       dic = {}
       for idx,val in enumerate(qnums):
-         dic.setdefault(str(map(float,val)),[]).append(idx)
-      qsyms = map(eval,dic.keys())
-      idlst = dic.values()
+         dic.setdefault(str(list(map(float,val))),[]).append(idx)
+      qsyms = list(map(eval,list(dic.keys())))
+      idlst = list(dic.values())
       # Sorting
-      arg = numpy.argsort(map(lambda x:min(x),idlst))
+      arg = numpy.argsort([min(x) for x in idlst])
       qsyms = numpy.array([qsyms[i] for i in arg]) 
       idlst = [idlst[i] for i in arg]
       ndims = numpy.array([len(indices) for indices in idlst])
@@ -85,7 +86,7 @@ def blks_allowed1(nblks,rank,nqnum,nsyms,status,qsyms,debug=False):
    if debug: 
       tmp = blks_allowed0(nblks,rank,nqnum,nsyms,status,qsyms)
       diff = numpy.linalg.norm(tmp-blks_allowed)
-      print 'diff=',diff
+      print('diff=',diff)
       assert diff<1.e-10
    return blks_allowed
 
@@ -226,7 +227,7 @@ def direct_sum(subscripts, *operands):
 
 
 if __name__ == '__main__':
-   print genOffset([3])
+   print(genOffset([3]))
    noff = genOffset([3,4,5])
-   print noff
-   print numpy.dot([2,3,4],noff)
+   print(noff)
+   print(numpy.dot([2,3,4],noff))

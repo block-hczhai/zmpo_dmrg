@@ -20,9 +20,9 @@
 #
 import numpy
 import itertools
-import qtensor
-import qtensor_util
-import qtensor_opers
+from . import qtensor
+from . import qtensor_util
+from . import qtensor_opers
 from zmpo_dmrg.source import mpo_dmrg_opers
 from zmpo_dmrg.source import mpo_dmrg_spinopers
 

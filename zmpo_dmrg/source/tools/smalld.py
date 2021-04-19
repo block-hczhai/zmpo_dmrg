@@ -47,46 +47,46 @@ if __name__ == '__main__':
    mp = 1
    ms = 1
    beta = 1.0
-   print '\ntest-1'
-   print 'd1,1,1=',0.5*(1+math.cos(beta))
-   print 'sympy =',Rotation.d(s,mp,ms,beta).doit()
-   print 'myval =',value(s,mp,ms,beta)
+   print('\ntest-1')
+   print('d1,1,1=',0.5*(1+math.cos(beta)))
+   print('sympy =',Rotation.d(s,mp,ms,beta).doit())
+   print('myval =',value(s,mp,ms,beta))
 
    s = 2
    mp = 2
    ms = -1
    beta = 1.0
-   print '\ntest-2'
-   print 'd2,2,-1=',-0.5*math.sin(beta)*(1-math.cos(beta))
-   print 'sympy  =',Rotation.d(s,mp,ms,beta).doit()
-   print 'myval  =',value(s,mp,ms,beta)
+   print('\ntest-2')
+   print('d2,2,-1=',-0.5*math.sin(beta)*(1-math.cos(beta)))
+   print('sympy  =',Rotation.d(s,mp,ms,beta).doit())
+   print('myval  =',value(s,mp,ms,beta))
 
    s = 0.5
    mp = 0.5
    ms = 0.5
    betalst = [1.0,numpy.pi]
-   print '\ntest-1 [half j]'
+   print('\ntest-1 [half j]')
    for beta in betalst:
-      print 'd1/2,1/2,1/2=',math.cos(beta/2.0)
-      print 'myval 	 =',value(s,mp,ms,beta)
+      print('d1/2,1/2,1/2=',math.cos(beta/2.0))
+      print('myval 	 =',value(s,mp,ms,beta))
 
    s = 1.5
    mp = 1.5
    ms = 0.5
    betalst = [0.1,1.0,numpy.pi]
-   print '\ntest-2 [half j]'
+   print('\ntest-2 [half j]')
    for beta in betalst:
-      print 'd3/2,3/2,1/2=',-math.sqrt(3)*(1+math.cos(beta))/2*math.sin(beta/2)
-      print 'myval 	 =',value(s,mp,ms,beta)
-      print 'd3/2,3/2,-1/2=',math.sqrt(3)*(1-math.cos(beta))/2*math.cos(beta/2)
-      print 'myval 	 =',value(s,mp,-ms,beta)
+      print('d3/2,3/2,1/2=',-math.sqrt(3)*(1+math.cos(beta))/2*math.sin(beta/2))
+      print('myval 	 =',value(s,mp,ms,beta))
+      print('d3/2,3/2,-1/2=',math.sqrt(3)*(1-math.cos(beta))/2*math.cos(beta/2))
+      print('myval 	 =',value(s,mp,-ms,beta))
       
    beta = 1.0   
-   print
-   print 'd000=',value(0,0,0,beta),1.0
-   print 'd100=',value(1,0,0,beta),math.cos(beta)
-   print 'd200=',value(2,0,0,beta),1/2.0*(3*math.cos(beta)**2-1)
+   print()
+   print('d000=',value(0,0,0,beta),1.0)
+   print('d100=',value(1,0,0,beta),math.cos(beta))
+   print('d200=',value(2,0,0,beta),1/2.0*(3*math.cos(beta)**2-1))
    
-   print value(2,0.5,0,beta)
-   print value(0,0.5,0,beta)
-   print value(1.5,0,0,beta)
+   print(value(2,0.5,0,beta))
+   print(value(0,0.5,0,beta))
+   print(value(1.5,0,0,beta))

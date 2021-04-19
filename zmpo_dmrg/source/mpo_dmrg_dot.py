@@ -11,12 +11,12 @@
 #
 import numpy
 from mpi4py import MPI
-from tools import plinsq
-from tools import pdvdson
-from tools import pgdvdson
-import mpo_dmrg_kernel
-import mpo_dmrg_dotutil
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from .tools import plinsq
+from .tools import pdvdson
+from .tools import pgdvdson
+from . import mpo_dmrg_kernel
+from . import mpo_dmrg_dotutil
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 #
 # Solve (generalized) eigenvalue problem
@@ -42,8 +42,8 @@ def ci_solver(dmrg,isite,ncsite,actlst,flst,status,ifsym):
       #
       key,neig,ndim0,prjmap = mpo_dmrg_dotutil.symmetrySpaceInfo(dmrg,qkey,ncsite,dicDPT)
       if rank == 0: 
-	 print ' Qsym =',key,' neig =',neig
-	 print ' Dimensions for ldim,cdim,rdim,ndim,ndim0 =',dmrg.dims,ndim0
+	 print(' Qsym =',key,' neig =',neig)
+	 print(' Dimensions for ldim,cdim,rdim,ndim,ndim0 =',dmrg.dims,ndim0)
       #
       # Diag
       #
@@ -99,12 +99,12 @@ def ci_solver(dmrg,isite,ncsite,actlst,flst,status,ifsym):
          nmvps += nmvp
          ioff  += neig  
          if dmrg.iprt >= 0: 
-            print ' Eigenvalues = ',eig
-	    print ' VectorNorms = ',map(lambda x:numpy.linalg.norm(x),vec)
+            print(' Eigenvalues = ',eig)
+	    print(' VectorNorms = ',[numpy.linalg.norm(x) for x in vec])
   	    if dmrg_dtype == numpy.complex_:
-	       print ' VectorReal2 = ',map(lambda x:x.dot(x),vec.real)
-	       print ' VectorImag2 = ',map(lambda x:x.dot(x),vec.imag)
-	    print ' Wtime for eigen problem of Qsym:%s = %.2f s'%(key,t_diff)
+	       print(' VectorReal2 = ',[x.dot(x) for x in vec.real])
+	       print(' VectorImag2 = ',[x.dot(x) for x in vec.imag])
+	    print(' Wtime for eigen problem of Qsym:%s = %.2f s'%(key,t_diff))
    #
    # Final
    #
@@ -135,8 +135,8 @@ def pt_solver(dmrg,isite,ncsite,actlst,flst,status,ifsym):
       #
       key,neig,ndim0,prjmap = mpo_dmrg_dotutil.symmetrySpaceInfo(dmrg,qkey,ncsite,dicDPT)
       if rank == 0: 
-	 print ' Qsym =',key,' neig =',neig
-	 print ' Dimensions for ldim,cdim,rdim,ndim,ndim0 =',dmrg.dims,ndim0
+	 print(' Qsym =',key,' neig =',neig)
+	 print(' Dimensions for ldim,cdim,rdim,ndim,ndim0 =',dmrg.dims,ndim0)
       #
       # Diag
       #
@@ -244,15 +244,15 @@ def pt_solver(dmrg,isite,ncsite,actlst,flst,status,ifsym):
          nmvps += nmvp
          ioff  += neig  
          if dmrg.iprt >= 0: 
-            print ' Eigenvalues = ',eig
-	    print ' VectorNorms = ',map(lambda x:numpy.linalg.norm(x),vec)
+            print(' Eigenvalues = ',eig)
+	    print(' VectorNorms = ',[numpy.linalg.norm(x) for x in vec])
   	    if dmrg_dtype == numpy.complex_:
-	       print ' VectorReal2 = ',map(lambda x:x.dot(x),vec.real)
-	       print ' VectorImag2 = ',map(lambda x:x.dot(x),vec.imag)
-	    print ' Wtime for eigen problem of Qsym:%s = %.2f s'%(key,t_diff)
+	       print(' VectorReal2 = ',[x.dot(x) for x in vec.real])
+	       print(' VectorImag2 = ',[x.dot(x) for x in vec.imag])
+	    print(' Wtime for eigen problem of Qsym:%s = %.2f s'%(key,t_diff))
             # Check A-orthogonality for MPS-based CG algorithms
 	    if dmrg.ifH0ortho and dmrg.nref>1:
-	       print ' Check A-orthogonality for MPSPT2 =',numpy.dot(vec,pbas[1:].T)
+	       print(' Check A-orthogonality for MPSPT2 =',numpy.dot(vec,pbas[1:].T))
    #
    # Final
    #

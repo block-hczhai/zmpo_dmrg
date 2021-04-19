@@ -17,7 +17,7 @@ ifs2proj = True #False
 
 flmps0 = h5py.File('./lmps0','r')
 nsite = flmps0['nsite'].value
-print "Input qsym=",flmps0['qnum'+str(nsite)].value
+print("Input qsym=",flmps0['qnum'+str(nsite)].value)
 
 flmps1 = h5py.File('./lmps1','w')
 
@@ -31,15 +31,15 @@ block_itrf.compact_rotL(flmps1,path)
 #flmps1.close()
 #exit()
 t1 = time.time()
-print 'dt=',(t1-t0)
+print('dt=',(t1-t0))
 
 dmrg = mpo_dmrg_class.mpo_dmrg()
 dmrg.nsite = nsite
 dmrg.path = './'
 groups = [[i] for i in range(nsite)]
 expect = mpo_dmrg_propsItrf.eval_Local(dmrg,flmps1,groups,'N',spinfo=None)
-print 'expect_N=',expect
-print '<N>=',numpy.sum(expect)
+print('expect_N=',expect)
+print('<N>=',numpy.sum(expect))
 
 #==================================
 # Main program
@@ -48,9 +48,9 @@ comm = MPI.COMM_WORLD
 size = comm.size
 rank = comm.rank
 # MPI init
-if size > 0 and rank ==0: print '\n[MPI init]'
+if size > 0 and rank ==0: print('\n[MPI init]')
 comm.Barrier()
-print ' Rank= %s of %s processes'%(rank,size)
+print(' Rank= %s of %s processes'%(rank,size))
 
 mol=class_molinfo()
 mol.comm=comm
@@ -105,10 +105,10 @@ sop = mpo_dmrg_init.genSops(dmrg2,flmps0,flmps1,'./tmp_sop','L')
 # sop= 0.770106557564
 # Overlap: <Psi|P|Psi0>*N0= 0.979421330091
 #
-print
-print 'pop=',pop
-print 'sop=',sop
-print 'Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop)
+print()
+print('pop=',pop)
+print('sop=',sop)
+print('Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop))
 exit()
 
 # <S2>	 
@@ -118,7 +118,7 @@ else:
    info=[dmrg2.npts,sval,sz]
 from zmpo_dmrg.source.properties import mpo_dmrg_propsItrf
 expect = mpo_dmrg_propsItrf.eval_S2Global(dmrg2,flmps1,spinfo=info)
-print 'expect_S2=',expect
+print('expect_S2=',expect)
 
 # New L-MPS
 dmrg2.final()

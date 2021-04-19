@@ -9,13 +9,13 @@ import time
 import copy
 import numpy
 import scipy.linalg
-import mpo_class
-import mpo_consw
-from tools import itools
+from . import mpo_class
+from . import mpo_consw
+from .tools import itools
 
 # General a mpo_class object for H' = H - E0 
 def genHmpo(h1e,h2e,e0=0.0,partition=None,isym=0):
-   print '\n[mpo_direct.genHmpo]'
+   print('\n[mpo_direct.genHmpo]')
    if partition is None:
       dimSpinOrb = h1e.shape[0]
       partition = [[2*i,2*i+1] for i in range(dimSpinOrb/2)]
@@ -65,15 +65,15 @@ def genTablesLCR(partition,debug=False):
       tabspt.append([sl,sc,sr])
       tabdim.append([nl,nc,nr])
       if debug:
-         print
-         print ' igroup =',igroup
-         print ' lg = ',lg
-         print ' cg = ',cg
-         print ' rg = ',rg
-         print ' sl = ',sl
-         print ' sc = ',sc
-         print ' sr = ',sr
-         print ' nl,nc,nr = ',nl,nc,nr
+         print()
+         print(' igroup =',igroup)
+         print(' lg = ',lg)
+         print(' cg = ',cg)
+         print(' rg = ',rg)
+         print(' sl = ',sl)
+         print(' sc = ',sc)
+         print(' sr = ',sr)
+         print(' nl,nc,nr = ',nl,nc,nr)
    return tablcr,tabspt,tabdim
  
 
@@ -103,15 +103,15 @@ def genTablesWdims(tabdim,debug=False):
       dim2 = numpy.sum(dims2l)
       wdims.append(dim2)
       if debug:
-         print 'igroup',igroup,'dimlcr=',(lg,cg,rg),
-         print 'dim[%d]='%(igroup-1),dim1,'dim[%d]='%igroup,dim2
-         print ' d1l=',dims1l
-         print ' d1s=',dims1s
-         print ' d2l=',dims2l
-         print ' d2s=',dims2s
+         print('igroup',igroup,'dimlcr=',(lg,cg,rg), end=' ')
+         print('dim[%d]='%(igroup-1),dim1,'dim[%d]='%igroup,dim2)
+         print(' d1l=',dims1l)
+         print(' d1s=',dims1s)
+         print(' d2l=',dims2l)
+         print(' d2s=',dims2s)
    wdims.pop()
    assert len(wdims) == ngroups-1
-   if debug: print 'Final wdims=',wdims
+   if debug: print('Final wdims=',wdims)
    return wdims
 
 
@@ -146,10 +146,10 @@ def sortQlc(lg,cg):
 # Kernel
 #
 def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
-   if iprt>0: print '\n[directHmpo]'
+   if iprt>0: print('\n[directHmpo]')
    if debug:
-      print ' h1e.shape=',h1e.shape
-      print ' h2e.shape=',h2e.shape
+      print(' h1e.shape=',h1e.shape)
+      print(' h2e.shape=',h2e.shape)
    k = h1e.shape[0]
    if partition is None:
       partition = [[i] for i in range(k)]
@@ -167,12 +167,12 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
       tmp = tmp.reshape((1,1,nc1,nc2))
       hmpo = mpo_class.class_mpo(ngroups,[tmp])
       return hmpo 
-   ndims = map(lambda x:len(x),partition)
+   ndims = [len(x) for x in partition]
    if debug:
-      print ' partition=',partition
-      print ' ngroups  =',ngroups
-      print ' ndims    =',ndims
-      print ' fsupport =',fsupport
+      print(' partition=',partition)
+      print(' ngroups  =',ngroups)
+      print(' ndims    =',ndims)
+      print(' fsupport =',fsupport)
    #   
    # LOOP over groups
    #
@@ -182,11 +182,11 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
    wfacs = [0]*ngroups
    qnums = [0]*ngroups
    if debug: 
-      print
-      print ' tablcr =',tablcr
-      print ' tabspt =',tabspt
-      print ' tabdim =',tabdim
-      print ' wdims  =',wdims
+      print()
+      print(' tablcr =',tablcr)
+      print(' tabspt =',tabspt)
+      print(' tabdim =',tabdim)
+      print(' wdims  =',wdims)
    for igroup in range(ngroups):
       diml = wdims[igroup]
       dimr = wdims[igroup+1]
@@ -196,15 +196,15 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
       a1 = [0]+list(itools.accumulate(dims1l)) 
       a2 = [0]+list(itools.accumulate(dims2l))
       if debug: 
-	 print
-	 print 'igroup=',igroup,diml,dimr
-         print ' wfacs[i]=',wtmp.shape
-         print ' sl,sc,sr=',sl,sc,sr
-         print ' lg,cg,rg=',(lg,cg,rg)
-         print ' dims1l = ',len(dims1l),dims1l
-         print ' dims2l = ',len(dims2l),dims2l
-	 print ' accum1 = ',len(a1),a1
-	 print ' accum2 = ',len(a2),a2
+	 print()
+	 print('igroup=',igroup,diml,dimr)
+         print(' wfacs[i]=',wtmp.shape)
+         print(' sl,sc,sr=',sl,sc,sr)
+         print(' lg,cg,rg=',(lg,cg,rg))
+         print(' dims1l = ',len(dims1l),dims1l)
+         print(' dims2l = ',len(dims2l),dims2l)
+	 print(' accum1 = ',len(a1),a1)
+	 print(' accum2 = ',len(a2),a2)
       if igroup == 0:
 	 # row-1: match last index for a1,a2
 	 identity = mpo_consw.l1r1(h1e,h2e,sl,sc,sr)
@@ -370,7 +370,7 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
 	    qnums[igroup] = copy.deepcopy(qtmp)
       #----------------------------------------------
    # Finally, form MPO   
-   if iprt>0: print ' wdims=',wdims
+   if iprt>0: print(' wdims=',wdims)
    #if isym == 0: 
    #   hmpo = mpo_class.class_mpo(ngroups,wfacs)
    #else:
@@ -383,7 +383,7 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
 # We associate beta factor to D and C
 #
 def polyH(hmpo,xfac=1.0):
-   print '\n[polyH]'
+   print('\n[polyH]')
    N = hmpo.nsite
    expHx = [0]*N
    if hmpo.qnums is None: 
@@ -455,7 +455,7 @@ def polyH(hmpo,xfac=1.0):
 # We associate beta factor to D and C
 #
 def linearH(hmpo,xfac=1.0):
-   print '\n[linearH]'
+   print('\n[linearH]')
    N = hmpo.nsite
    expHx = [0]*N
    if hmpo.qnums is None: 
@@ -540,32 +540,32 @@ def genRandomH(k):
    return h1e,h2e
 
 def testTwoSiteW():
-   print '**************'
-   print ' testTwoSiteW '
-   print '**************'
+   print('**************')
+   print(' testTwoSiteW ')
+   print('**************')
    k = 2
    h1e,h2e = genRandomH(k) 
    partition = [[i] for i in range(k)]
    hmpo1 = directHmpo(h1e,h2e,partition)
-   print 'sites0=\n',hmpo1.sites[0]
-   print 'sites1=\n',hmpo1.sites[1]
+   print('sites0=\n',hmpo1.sites[0])
+   print('sites1=\n',hmpo1.sites[1])
    hmpo1.prt()
    mat1 = hmpo1.toMat()
-   print 'mat1=\n',mat1
-   hmpo2 = directHmpo(h1e,h2e,[range(k)])
+   print('mat1=\n',mat1)
+   hmpo2 = directHmpo(h1e,h2e,[list(range(k))])
    hmpo2.prt()
    mat2 = hmpo2.toMat()
-   print 'mat2=\n',mat2
+   print('mat2=\n',mat2)
    diff = numpy.linalg.norm(mat1-mat2)
-   print 'diff=',diff
+   print('diff=',diff)
    hmpo0 = mpo_class.genHmpo(h1e,h2e)
    hmpo0.prt()
    mat0 = hmpo0.toMat()
-   print 'mat0=\n',mat2
+   print('mat0=\n',mat2)
    diff = numpy.linalg.norm(mat0-mat1)
-   print 'diff1=',diff
+   print('diff1=',diff)
    diff = numpy.linalg.norm(mat0-mat2)
-   print 'diff2=',diff
+   print('diff2=',diff)
 
    # Direct formation
    sl1 = []
@@ -607,17 +607,17 @@ def testTwoSiteW():
    t[6] = numpy.kron(m13l.reshape(2,2),m14r.reshape(2,2)) # a+*T1
    t[7] = numpy.kron(m15l.reshape(2,2),m15r.reshape(2,2)) # a*T3
    for i in range(8):
-      print 't[i]',i,'\n',t[i]
+      print('t[i]',i,'\n',t[i])
 
    mat = t[0]+t[1]+t[2]+t[3]+t[4]+t[5]+t[6]+t[7]
-   print 'Hmat=\n',mat
-   print '... testTwoSiteW finished ...'
+   print('Hmat=\n',mat)
+   print('... testTwoSiteW finished ...')
    return 0
 
 def testMPOpartition():
-   print '******************'
-   print ' testMPOpartition '
-   print '******************'
+   print('******************')
+   print(' testMPOpartition ')
+   print('******************')
    k = 7
    h1e,h2e = genRandomH(k)
    # MPO-1
@@ -625,30 +625,30 @@ def testMPOpartition():
    hmpo1 = directHmpo(h1e,h2e,partition)
    hmpo1.prt()
    mat1 = hmpo1.toMat()
-   print 'mat1=\n',mat1
+   print('mat1=\n',mat1)
    # MPO-2
-   hmpo2 = directHmpo(h1e,h2e,[range(k)])
+   hmpo2 = directHmpo(h1e,h2e,[list(range(k))])
    hmpo2.prt()
    mat2 = hmpo2.toMat()
-   print 'mat2=\n',mat2
+   print('mat2=\n',mat2)
    # Check
    diff = numpy.linalg.norm(mat1-mat2)
-   print 'diff=',diff
+   print('diff=',diff)
    #----------------------------------------------------
    # The HS-norm of H should be invariant to partitions
-   print hmpo1.HSnorm()
-   print numpy.linalg.norm(hmpo2.sites[0])
+   print(hmpo1.HSnorm())
+   print(numpy.linalg.norm(hmpo2.sites[0]))
    #----------------------------------------------------
    # MPO-0
    hmpo0 = mpo_class.genHmpo(h1e,h2e)
    hmpo0.prt()
    mat0 = hmpo0.toMat()
-   print 'mat0=\n',mat2
+   print('mat0=\n',mat2)
    diff = numpy.linalg.norm(mat0-mat1)
-   print 'diff1=',diff
+   print('diff1=',diff)
    diff = numpy.linalg.norm(mat0-mat2)
-   print 'diff2=',diff
-   print '... tMPOpartition finished ...'
+   print('diff2=',diff)
+   print('... tMPOpartition finished ...')
    return 0
 
 def testMPOkSites(k):
@@ -717,26 +717,26 @@ def testMPOkSites(k):
    #  Site :  59  Shape :  (3662, 1, 2, 2)  Val =  34.9337373147
    # End of MPOinfo
    # 
-   print '***************'
-   print ' testMPOkSites '
-   print '***************'
+   print('***************')
+   print(' testMPOkSites ')
+   print('***************')
    h1e,h2e = genRandomH(k)
    # MPO-1
    partition = [[i] for i in range(k)]
    hmpo1 = directHmpo(h1e,h2e,partition)
    hmpo1.prt()
-   print '... testMPOkSites finished ...'
+   print('... testMPOkSites finished ...')
    return hmpo1
 
 def Dg(k):
-   print '\n[Dg] bond dimension'
-   print ' mean (k-1)/2=',float(k-1)/2
+   print('\n[Dg] bond dimension')
+   print(' mean (k-1)/2=',float(k-1)/2)
    return [(i,((2*i-(k-1))**2+(k+1)*(k+3))/2) for i in range(1,k)]
 
 def testMOL():
-   print '*********'
-   print ' testMOL '
-   print '*********'
+   print('*********')
+   print(' testMOL ')
+   print('*********')
    from pyscf import gto,scf
    mol = gto.Mole()
    natoms = 4
@@ -760,18 +760,18 @@ def testMOL():
   
    # HS-norm test   
    diff = mpo_class.mpo_diff(hmpo1,hmpo0)
-   print 'diff=',diff
+   print('diff=',diff)
    mat1 = hmpo1.toMat()
    mat0 = hmpo0.toMat()
    e1,v = scipy.linalg.eigh(mat1)
    e0,v = scipy.linalg.eigh(mat0)
-   print 'mat1=\n',mat1
-   print 'mat0=\n',mat0
-   print 'eigs1=',e1
-   print 'eigs0=',e0
+   print('mat1=\n',mat1)
+   print('mat0=\n',mat0)
+   print('eigs1=',e1)
+   print('eigs0=',e0)
 
    # HF energy test
-   import mps_class
+   from . import mps_class
    k = 2*mf.mo_coeff.shape[0]
    n = mol.nelectron
    mps0 = mps_class.class_mps(k)
@@ -779,16 +779,16 @@ def testMOL():
    mps0.prt()
    enuc = mol.energy_nuc()
    ehf0 = mps0.dot(hmpo0.dotMPS(mps0))
-   print 'etot0[HF]=',ehf0+enuc
+   print('etot0[HF]=',ehf0+enuc)
    ehf1 = mps0.dot(hmpo1.dotMPS(mps0))
-   print 'etot1[HF]=',ehf1+enuc
-   print '... testMOL finished ...'
+   print('etot1[HF]=',ehf1+enuc)
+   print('... testMOL finished ...')
    return 0
 
 def testH6():
-   print '********'
-   print ' testH6 '
-   print '********'
+   print('********')
+   print(' testH6 ')
+   print('********')
    from pyscf import gto,scf
    mol = gto.Mole()
    natoms = 6
@@ -806,7 +806,7 @@ def testH6():
    hmpo1 = genHmpo(1,mol,mo_coeff,partition)
    hmpo1.prt()
    # HF energy test
-   import mps_class
+   from . import mps_class
    k = 2*mf.mo_coeff.shape[0]
    n = mol.nelectron
    mps0 = mps_class.class_mps(k)
@@ -814,13 +814,13 @@ def testH6():
    mps0.prt()
    enuc = mol.energy_nuc()
    ehf1 = mps0.dot(hmpo1.dotMPS(mps0))
-   print 'etot0[HF]=',ehf1
-   print 'etot1[HF]=',ehf1+enuc
-   print 'etot1[PYSCF]=',ehf
+   print('etot0[HF]=',ehf1)
+   print('etot1[HF]=',ehf1+enuc)
+   print('etot1[PYSCF]=',ehf)
    ediff = ehf1+enuc-ehf
-   print 'etot1(diff) =',ediff
+   print('etot1(diff) =',ediff)
    assert abs(ediff)<1.e-8
-   print '... testH6 finished ...'
+   print('... testH6 finished ...')
    return 0
 
 def testAll():

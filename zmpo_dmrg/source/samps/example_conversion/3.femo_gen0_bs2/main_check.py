@@ -46,12 +46,12 @@ elif fname == 'lmpsQ0':
    
 dmrg2.ifs2proj = False
 sop = mpo_dmrg_init.genSops(dmrg2,flmps0,flmps1,'./tmp_sop','L')
-print
-print 'pop(<Psi0|P|Psi0>)=',pop
-print 'sop(<Psi0|P|Psi1>)=',sop
-print 'Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop)
+print()
+print('pop(<Psi0|P|Psi0>)=',pop)
+print('sop(<Psi0|P|Psi1>)=',sop)
+print('Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop))
 sop = mpo_dmrg_init.genSops(dmrg2,flmps1,flmps1,'./tmp_sop','L')
-print 'sop(<Psi1|P|Psi1>)=',sop
+print('sop(<Psi1|P|Psi1>)=',sop)
 
 #> # <S2>	 
 #> if not ifs2proj:

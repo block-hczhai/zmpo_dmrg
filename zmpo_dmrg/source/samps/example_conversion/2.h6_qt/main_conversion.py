@@ -21,7 +21,7 @@ flmps1 = h5py.File('./lmps1','w')
 t0 = time.time()
 mpo_dmrg_conversion.sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4)
 t1 = time.time()
-print 'dt=',(t1-t0)
+print('dt=',(t1-t0))
 
 flmps2 = h5py.File('./lmpsQ2','w')
 qtensor_api.fmpsQt(flmps1,flmps2,'L')
@@ -43,9 +43,9 @@ comm = MPI.COMM_WORLD
 size = comm.size
 rank = comm.rank
 # MPI init
-if size > 0 and rank ==0: print '\n[MPI init]'
+if size > 0 and rank ==0: print('\n[MPI init]')
 comm.Barrier()
-print ' Rank= %s of %s processes'%(rank,size)
+print(' Rank= %s of %s processes'%(rank,size))
 
 mol=class_molinfo()
 mol.comm=comm
@@ -90,10 +90,10 @@ sop = mpo_dmrg_init.genSops(dmrg2,flmpsQ,flmps2,'./tmp_sop','L')
 # sop= 0.674518871551
 # Overlap: <Psi|P|Psi0>*N0= 0.999843513716
 #
-print
-print 'pop=',pop
-print 'sop=',sop
-print 'Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop)
+print()
+print('pop=',pop)
+print('sop=',sop)
+print('Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop))
 exit()
 
 
@@ -104,7 +104,7 @@ else:
    info=[dmrg2.npts,sval,sz]
 from zmpo_dmrg.source.properties import mpo_dmrg_propsItrf
 expect = mpo_dmrg_propsItrf.eval_S2Global(dmrg2,flmps2,spinfo=info)
-print 'expect_S2=',expect
+print('expect_S2=',expect)
 
 # New L-MPS
 dmrg2.final()

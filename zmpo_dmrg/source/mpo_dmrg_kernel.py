@@ -33,9 +33,9 @@
 import time
 import numpy
 import scipy.linalg
-import mpo_dmrg_io
-import mpo_dmrg_kernelQt
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_io
+from . import mpo_dmrg_kernelQt
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # Diagonal term of H in Vl*Vr
 def HDiag(info,ndim0,prjmap):
@@ -54,7 +54,7 @@ def HDiagNQt(info,ndim0,prjmap):
    dmrg,isite,ncsite,flst,status,ifsym = info
    fL,fR = flst[0][0:2]
    ldim,cdim,rdim,ndim = dmrg.dims
-   if dmrg.iprt > 0: print '[mpo_dmrg_kernel.HDiag] (l,c,r,n,n0)=',(ldim,cdim,rdim,ndim,ndim0) 
+   if dmrg.iprt > 0: print('[mpo_dmrg_kernel.HDiag] (l,c,r,n,n0)=',(ldim,cdim,rdim,ndim,ndim0)) 
    diag = numpy.zeros((ldim,cdim,rdim),dtype=dmrg_dtype)
    # Loop over operators
    nop = dmrg.fhop['nops'].value
@@ -69,8 +69,8 @@ def HDiagNQt(info,ndim0,prjmap):
       # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
       lop = fL['opers'+str(iop)].value
       rop = fR['opers'+str(iop)].value
-      ldiag = lop[:,range(ldim),range(ldim)]
-      rdiag = rop[:,range(rdim),range(rdim)]
+      ldiag = lop[:,list(range(ldim)),list(range(ldim))]
+      rdiag = rop[:,list(range(rdim)),list(range(rdim))]
       # contract bonds
       tmp = numpy.tensordot(ldiag,cdiag,axes=([0],[0])) # al,abn->lnb  
       tmp = numpy.tensordot(tmp,rdiag,axes=([1],[0]))   # lnb,br->lnr  
@@ -83,7 +83,7 @@ def HDiagNQt(info,ndim0,prjmap):
    return diag
 
 def checkDiagNQt(diag,funNQt,vec,info,ndim0,prjmap):
-   print ' checkDiagNQt: Debuging diag and funNQt ...'
+   print(' checkDiagNQt: Debuging diag and funNQt ...')
    dmrg = info[0]
    assert dmrg.comm.size == 1
    Hmat = numpy.zeros((ndim0,ndim0),dtype=dmrg_dtype)
@@ -91,17 +91,17 @@ def checkDiagNQt(diag,funNQt,vec,info,ndim0,prjmap):
       vec = numpy.zeros(ndim0,dtype=dmrg_dtype)
       vec[i] = 1.0
       Hmat[:,i] = HVecNQt(vec,info,ndim0,prjmap)
-      print ' idx=',i,'diag[i]=',diag[i],'Hii=',Hmat[i,i],'diff=',Hmat[i,i]-diag[i]
+      print(' idx=',i,'diag[i]=',diag[i],'Hii=',Hmat[i,i],'diff=',Hmat[i,i]-diag[i])
    diff1 = numpy.linalg.norm(Hmat-Hmat.T.conj())
    diff2 = numpy.linalg.norm(numpy.diag(Hmat)-diag)
    if dmrg.comm.size == 1:
-      print ' diff1(H-H.T.conj)=',diff1 # diff1= 8.21020104329e-08
+      print(' diff1(H-H.T.conj)=',diff1) # diff1= 8.21020104329e-08
       if diff1 > 1.e-10:
-         print ' error: Fmat is not symmetry!'
+         print(' error: Fmat is not symmetry!')
          exit(1)
-   print ' diff2(H.diag-D)=',diff2 # diff2= 1.47061633021e-14
+   print(' diff2(H.diag-D)=',diff2) # diff2= 1.47061633021e-14
    if diff2 > 1.e-10:
-      print ' error: diag and Fmat are not consistent!'
+      print(' error: diag and Fmat are not consistent!')
       exit(1)
    return 0
 
@@ -209,8 +209,8 @@ def SDiagNQt(info,ndim0,prjmap):
          # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
          lop = fLp['opers'+str(iop)].value
          rop = fRp['opers'+str(iop)].value
-         ldiag = lop[:,range(ldim),range(ldim)]
-         rdiag = rop[:,range(rdim),range(rdim)]
+         ldiag = lop[:,list(range(ldim)),list(range(ldim))]
+         rdiag = rop[:,list(range(rdim)),list(range(rdim))]
          # contract bonds
          tmp = numpy.tensordot(ldiag,cdiag,axes=([0],[0])) # lbn
          tmp = numpy.tensordot(tmp,rdiag,axes=([1],[0])) # lnr
@@ -286,7 +286,7 @@ def pRDMNQt(cimat,info):
    dmrg,isite,ncsite,flst,status,ifsym = info
    fL,fR,fLp,fRp = flst[0][0:4]
    ldim,cdim,rdim,ndim = dmrg.dims
-   if dmrg.iprt > 0: print '[mpo_dmrg_kernel.pRDM] (l,c,r,n)=',(ldim,cdim,rdim,ndim)
+   if dmrg.iprt > 0: print('[mpo_dmrg_kernel.pRDM] (l,c,r,n)=',(ldim,cdim,rdim,ndim))
    neig,diml,dimc,dimr = cimat.shape
    if status == 'L':
       
@@ -345,7 +345,7 @@ def pRDMNQt(cimat,info):
 
 # Renormalizaiton of operators: local operations without communication!
 def renorm(dmrg,isite,ncsite,flst,flstN,site,status):
-   if dmrg.iprt > 0: print '[mpo_dmrg_kernel.renorm] status=',status
+   if dmrg.iprt > 0: print('[mpo_dmrg_kernel.renorm] status=',status)
    #------------------------------------------
    if dmrg.ifpt and dmrg.ifH0: dmrg.fdopXfhop()
    if not dmrg.ifQt:
@@ -572,7 +572,7 @@ def PBas(info,ndim0,prjmap):
          pbas = mpo_dmrg_kernelQt.PBasPopsQt(info,ndim0,prjmap,nref) 
       else:
          pbas = PBasPopsNQt(info,ndim0,prjmap,nref)
-   print '[mpo_dmrg_kenrel.PBas] nref =',dmrg.nref,' pbas.shape =',pbas.shape
+   print('[mpo_dmrg_kenrel.PBas] nref =',dmrg.nref,' pbas.shape =',pbas.shape)
    return pbas
 
 # From the projected vectors to orthonormal basis
@@ -581,7 +581,7 @@ def PBasOrtho(pbas,thresh=1.e-12):
    u,sigs,vt = scipy.linalg.svd(pbas,full_matrices=False)
    ntot = len(sigs)
    nsig = len(numpy.argwhere(sigs>thresh))
-   print ' nsig(>1.e-12) =',nsig,' ntot =',ntot,' singular values = ',sigs
+   print(' nsig(>1.e-12) =',nsig,' ntot =',ntot,' singular values = ',sigs)
    u = u[:,:nsig].copy()
    vt = vt[:nsig].copy()
    return u,sigs,vt

@@ -10,14 +10,14 @@ def tucker_check(tensor,shape,tucker):
    tensor1=tucker_prod(tucker)
    tensor2=tensor.copy().reshape(shape)
    diff=numpy.linalg.norm(tensor1-tensor2)
-   print "DIFF=",diff
+   print("DIFF=",diff)
    return diff
 
 def tucker_pdim(tucker):
-   return map(lambda x:x.shape[0],tucker[1])
+   return [x.shape[0] for x in tucker[1]]
 
 def tucker_prod(tucker):
-   print "\n[tucker_prod]: form full T[n1,n2,...,nk]"
+   print("\n[tucker_prod]: form full T[n1,n2,...,nk]")
    tucker_core=tucker[0]
    tucker_site=tucker[1]
    N=len(tucker_site)

@@ -9,7 +9,7 @@ def dump(info,ordering=None,fname='mole.h5'):
    # dump information
    nbas = int1e.shape[0]
    sbas = nbas*2
-   print '\n[tools_itrf.dump] interface from FCIDUMP with nbas=',nbas
+   print('\n[tools_itrf.dump] interface from FCIDUMP with nbas=',nbas)
    f = h5py.File(fname, "w")
    cal = f.create_dataset("cal",(1,),dtype='i')
    cal.attrs["nelec"] = 0.
@@ -43,14 +43,14 @@ def dump(info,ordering=None,fname='mole.h5'):
    f.create_dataset("orbsym",data=orbsym)
    f.create_dataset("spinsym",data=spinsym)
    f.close()
-   print ' Successfully dump information for MPO-DMRG calculations! fname=',fname
-   print ' with ordering',ordering
+   print(' Successfully dump information for MPO-DMRG calculations! fname=',fname)
+   print(' with ordering',ordering)
    return 0
 
 if __name__ == '__main__':
    import tools_io
    info = tools_io.loadERIs()
-   ordering = range(10)
+   ordering = list(range(10))
    ordering = ordering[::-1]
-   print 'ordering=',ordering
+   print('ordering=',ordering)
    dump(info,ordering)

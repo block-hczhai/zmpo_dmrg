@@ -14,18 +14,18 @@ import os
 import h5py
 import time
 import numpy
-import mpo_dmrg_io
-from qtensor import qtensor
-from qtensor import qtensor_opers
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_io
+from .qtensor import qtensor
+from .qtensor import qtensor_opers
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # Boundary matrix (not sliced)
 def genBmatQt(dmrg,fname,isite,debug=False):
-   if debug: print '[mpo_dmrg_init.genBmatQt]'
+   if debug: print('[mpo_dmrg_init.genBmatQt]')
    prefix = fname+'_site_'
    # left or right boundary  
    f1name = prefix+str(isite)
-   if debug: print ' f1name=',f1name
+   if debug: print(' f1name=',f1name)
    f1 = h5py.File(f1name,"w")
    # *** Construct Qt ***
    status = [False,True]
@@ -47,11 +47,11 @@ def genBmatQt(dmrg,fname,isite,debug=False):
    return 0
 
 def genBopsQt(dmrg,fname,nop,isite,ifslc=False,debug=False):
-   if debug: print '[mpo_dmrg_init.genBopsQt]'
+   if debug: print('[mpo_dmrg_init.genBopsQt]')
    prefix = fname+'_site_'
    # left or right boundary  
    f1name = prefix+str(isite)
-   if debug: print ' f1name=',f1name
+   if debug: print(' f1name=',f1name)
    f1 = h5py.File(f1name,"w")
    # *** Construct Qt ***
    status = [True,False,True]
@@ -87,8 +87,8 @@ def genBopsQt(dmrg,fname,nop,isite,ifslc=False,debug=False):
 #@profile
 def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    if dmrg.comm.rank == 0: 
-      print '[mpo_dmrg_init.genHopsQt] status=',status
-      print ' fname = ',fname
+      print('[mpo_dmrg_init.genHopsQt] status=',status)
+      print(' fname = ',fname)
    t0 = time.time()
    nop = dmrg.nops
    # sites
@@ -98,10 +98,10 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    nsite = bnsite
    prefix = fname+'_site_'
    if debug:
-      print ' opers = ',dmrg.opers
-      print ' fname  = ',fname
-      print ' nop    = ',nop
-      print ' nsite  = ',nsite
+      print(' opers = ',dmrg.opers)
+      print(' fname  = ',fname)
+      print(' nop    = ',nop)
+      print(' nsite  = ',nsite)
    dims = numpy.array([6]+[dmrg.maxslc]*2)
    ncase = numpy.prod(dims)
    # L->R sweeps 
@@ -111,7 +111,7 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       lops = qtensor.Qt()
       cops = qtensor.Qt()
       for isite in range(0,nsite):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
@@ -129,7 +129,7 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 	 top2 = dict([(i,qtensor.qtensor()) for i in range(ncase)])
 	 top3 = dict([(i,qtensor.qtensor()) for i in range(ncase)])
 	 for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    # LOP
 	    lops.loadInfo(f0,'opers'+str(iop))
 	    # COP
@@ -180,8 +180,8 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          # final isite
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],\
+	          ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
@@ -189,7 +189,7 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       rops = qtensor.Qt()
       cops = qtensor.Qt()
       for isite in range(nsite-1,-1,-1):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
@@ -207,7 +207,7 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 	 top2 = dict([(i,qtensor.qtensor()) for i in range(ncase)])
 	 top3 = dict([(i,qtensor.qtensor()) for i in range(ncase)])
 	 for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    # ROP
 	    rops.loadInfo(f0,'opers'+str(iop))
 	    # COP
@@ -262,12 +262,12 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          # final isite
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],\
+	          ' nop =',nop,' t = %.2f s'%(tf-ti))
   
    t1 = time.time()
    dmrg.comm.Barrier()
-   print ' time for genHops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' time for genHops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return exphop
 
 #
@@ -275,8 +275,8 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 #
 def genSopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    if dmrg.comm.rank == 0: 
-      print '[mpo_dmrg_init.genSopsQt] status=',status
-      print ' fname = ',fname
+      print('[mpo_dmrg_init.genSopsQt] status=',status)
+      print(' fname = ',fname)
    t0 = time.time()
    # sites
    bnsite = fbmps['nsite'].value
@@ -285,15 +285,15 @@ def genSopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    nsite = bnsite
    prefix = fname+'_site_'
    if debug:
-      print ' fname  = ',fname
-      print ' nsite  = ',nsite
+      print(' fname  = ',fname)
+      print(' nsite  = ',nsite)
    # L->R sweeps 
    if status == 'L':
 
       genBmatQt(dmrg,fname,-1)
       lop = qtensor.qtensor()
       for isite in range(0,nsite):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
@@ -312,15 +312,15 @@ def genSopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          # final isite
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],\
-	          ' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],\
+	          ' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
       genBmatQt(dmrg,fname,nsite)
       rop = qtensor.qtensor()
       for isite in range(nsite-1,-1,-1):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
@@ -339,18 +339,18 @@ def genSopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          # final isite
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],\
-	          ' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],\
+	          ' t = %.2f s'%(tf-ti))
 
    t1 = time.time()
-   print ' time for genSops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' time for genSops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return expsop
 
 # <R> where R operator is independent of site
 def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    if dmrg.comm.rank == 0: 
-      print '[mpo_dmrg_init.genPopsQt] status=',status
-      print ' fname = ',fname
+      print('[mpo_dmrg_init.genPopsQt] status=',status)
+      print(' fname = ',fname)
    t0 = time.time()
    nop = dmrg.npts
    odim = 1
@@ -361,9 +361,9 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    nsite = bnsite
    prefix = fname+'_site_'
    if debug:
-      print ' fname  = ',fname
-      print ' nop    = ',nop
-      print ' nsite  = ',nsite
+      print(' fname  = ',fname)
+      print(' nop    = ',nop)
+      print(' nsite  = ',nsite)
    # L->R sweeps 
    if status == 'L':
 
@@ -371,7 +371,7 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       lop = qtensor.qtensor()
       cop = qtensor.qtensor()
       for isite in range(0,nsite):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
@@ -389,7 +389,7 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 	 top3 = dict([(i,qtensor.qtensor()) for i in range(ncase)])
 	 icase = 0
          for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 
 	    # COP
 	    cop.load(dmrg.fpop,'op'+str(iop))
@@ -417,8 +417,8 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          # final isite
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],\
+	          ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
@@ -426,7 +426,7 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       rop = qtensor.qtensor()
       cop = qtensor.qtensor()
       for isite in range(nsite-1,-1,-1):
-	 if debug: print ' isite=',isite,' of nsite=',nsite
+	 if debug: print(' isite=',isite,' of nsite=',nsite)
 	 ti = time.time()
 	 f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
@@ -444,7 +444,7 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 	 top3 = dict([(i,qtensor.qtensor()) for i in range(ncase)])
 	 icase = 0
          for iop in range(nop):
-	    if debug: print '    iop=',iop,' of nop=',nop
+	    if debug: print('    iop=',iop,' of nop=',nop)
 	    
 	    # WOP
 	    cop.load(dmrg.fpop,'op'+str(iop))
@@ -477,9 +477,9 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          # final isite
 	 tf = time.time()
 	 if dmrg.comm.rank == 0:
-	    print ' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti)
+	    print(' isite =',os.path.split(f1name)[-1],\
+	          ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    t1 = time.time()
-   print ' time for genPops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' time for genPops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return exppop

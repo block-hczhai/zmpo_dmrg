@@ -31,14 +31,14 @@ import os
 import h5py
 import time
 import numpy
-import mpo_dmrg_io
-import mpo_dmrg_opt
-import mpo_dmrg_prt
-import mpo_dmrg_util
-import mpo_dmrg_qphys
-import mpo_dmrg_init
+from . import mpo_dmrg_io
+from . import mpo_dmrg_opt
+from . import mpo_dmrg_prt
+from . import mpo_dmrg_util
+from . import mpo_dmrg_qphys
+from . import mpo_dmrg_init
 from mpi4py import MPI
-from tools import parallel_util 
+from .tools import parallel_util 
 
 #
 # Class for storage of basic information
@@ -204,9 +204,9 @@ class mpo_dmrg:
 
    # Partition operators
    def partition(self):
-      if self.comm.rank == 0: print '\n[mpo_dmrg_class.partition]'
+      if self.comm.rank == 0: print('\n[mpo_dmrg_class.partition]')
       if self.sbas is None:
-	 print 'error: sbas is not defined!'
+	 print('error: sbas is not defined!')
 	 exit(1)
       rank = self.comm.rank
       size = self.comm.size
@@ -214,22 +214,22 @@ class mpo_dmrg:
       if self.npts is None: 
          assert self.sbas >= size
 	 indices = parallel_util.partitionSites(self.sbas,size,rank)
-	 self.opers = map(lambda x:[x,None],indices)
+	 self.opers = [[x,None] for x in indices]
       # SP-MPS
       else:
 	 assert self.npts*self.sbas >= self.comm.size
 	 indices = parallel_util.partitionSites(self.npts*self.sbas,size,rank)
-	 self.opers = map(lambda x:parallel_util.unrank(x,self.npts),indices)
+	 self.opers = [parallel_util.unrank(x,self.npts) for x in indices]
       self.nops  = len(self.opers)
       # Set up mapping dictionary for integrals
       if self.ifAllInts:
-	 self.pidx = range(self.sbas)
+	 self.pidx = list(range(self.sbas))
       else:
 	 # One must be caution that both set and dic.keys()
 	 # do not preserve the ordering when converted to list!
 	 # {8: 2, 6: 0, 7: 1}
 	 # set([6,7,8]) = [8,6,7]
-	 self.pidx = sorted(list(set(map(lambda x:x[0],self.opers))))
+	 self.pidx = sorted(list(set([x[0] for x in self.opers])))
       self.pdim = len(self.pidx) 
       self.pdic = dict([(self.pidx[i],i) for i in range(self.pdim)])
       assert self.nops>0
@@ -237,11 +237,11 @@ class mpo_dmrg:
       if self.npts is None:
          self.hpwts = numpy.ones(self.nops)
       else: 
-	 self.hpwts = numpy.array(map(lambda x:self.qwts[x[1]],self.opers))
+	 self.hpwts = numpy.array([self.qwts[x[1]] for x in self.opers])
       # debug:
       for i in range(self.comm.size):
 	 if i == self.comm.rank: 
-	    print ' rank=',self.comm.rank,' nops=',self.nops,' opers=',self.opers
+	    print(' rank=',self.comm.rank,' nops=',self.nops,' opers=',self.opers)
 	 self.comm.Barrier()
       return 0
 
@@ -253,7 +253,7 @@ class mpo_dmrg:
    # Disk based  
    def dumpMPO(self,debug=False):
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.dumpMPO]'
+      if rank == 0: print('\n[mpo_dmrg_class.dumpMPO]')
       mpo_dmrg_io.dumpMPO_H(self,debug)
       mpo_dmrg_io.dumpMPO_R(self,debug)
       if self.ifpt and self.ifH0:
@@ -262,14 +262,14 @@ class mpo_dmrg:
 
    def dumpMPO_Model(self,name,debug=False):
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.dumpMPO_Model] name =',name,' path =',self.path
+      if rank == 0: print('\n[mpo_dmrg_class.dumpMPO_Model] name =',name,' path =',self.path)
       if name == 'Hubbard':
 	 mpo_dmrg_io.dumpMPO_Hubbard(self)
       elif name == 'HubbardGeneral':
          mpo_dmrg_io.dumpMPO_H1e(self,debug)
          mpo_dmrg_io.dumpMPO_R(self,debug)
       else:
-	 print 'error: Not implemented yet!'
+	 print('error: Not implemented yet!')
          exit(1)
       return 0
 
@@ -278,12 +278,12 @@ class mpo_dmrg:
    # we use nsite+1 places to keep all the symmety indices for qnuml/r.
    def build(self):
       if self.nsite < 2:
-	 print 'error: mps is not supported for nsite < 2'
+	 print('error: mps is not supported for nsite < 2')
 	 exit(1)
       assert self.isym in [1,2]
       # Initialize quantum numbers
       self.qphys = mpo_dmrg_qphys.initSpatialOrb(self.nsite,self.isym)
-      self.dphys = map(lambda x:len(x),self.qphys)
+      self.dphys = [len(x) for x in self.qphys]
       # Left
       self.qnuml = [None]*(self.nsite+1)
       self.qnuml[0] = numpy.array(mpo_dmrg_qphys.vacuum(self.isym))
@@ -298,11 +298,11 @@ class mpo_dmrg:
 
    def initStates(self):
       if self.qsectors is None and self.neig is None:
-	 print 'error: no state is specified!'
+	 print('error: no state is specified!')
          exit(1)
       if self.qsectors is not None:
          if self.isym == 0:
-            print 'error: isym must be set in accordance with qsectors =',self.qsectors
+            print('error: isym must be set in accordance with qsectors =',self.qsectors)
             exit(1)
          neig = 0
          for key in self.qsectors:
@@ -317,7 +317,7 @@ class mpo_dmrg:
          elif self.isym == 2:
             key = str([self.nelec,self.sz])
          else:
-            print 'error: no such option for isym = ',self.isym
+            print('error: no such option for isym = ',self.isym)
             exit(1)
          self.qsectors = {key:self.neig}
       # Generate weights, which can also be manually set.
@@ -331,7 +331,7 @@ class mpo_dmrg:
       self.schedule = sc
       self.crit_tol = sc.tol
       if rank == 0: 
-	 print '\n[mpo_dmrg_class.default]'
+	 print('\n[mpo_dmrg_class.default]')
 	 mpo_dmrg_prt.title(self)
       ti = time.time()
       # Count states
@@ -340,13 +340,13 @@ class mpo_dmrg:
 	 # Only set Dcut for rank-0 is sufficient, 
 	 # as RDM truncation is done here.
 	 if self.Dcut is not None:
-	    print ' Dcut = ',self.Dcut
+	    print(' Dcut = ',self.Dcut)
 	    # Similar to qnuml and qnumr
 	    assert len(self.Dcut) == self.nsite-1
 	    self.Dcut = [1]+self.Dcut+[1]
          # LogFile in current directory
 	 flog_name = 'log_'+os.path.split(self.path)[-1]
-	 print ' flog_name =',flog_name
+	 print(' flog_name =',flog_name)
 	 flog = open(flog_name,'w')
          flog.write('path:'+self.path+'\n')
       # MPSfile
@@ -381,14 +381,14 @@ class mpo_dmrg:
       self.psi0 = None
       self.eav = []
       self.dwt = []
-      sitelst  = range(self.nsite)
+      sitelst  = list(range(self.nsite))
       ifconv = False
       deltaE = 1.e3
       eold   = 1.e3
       isweep = -1
       # Optimize following the schedule
       for isweep in range(self.schedule.maxiter):
-	 if rank == 0: print '\n'+'#'*30+' isweep = ',isweep,'#'*30
+	 if rank == 0: print('\n'+'#'*30+' isweep = ',isweep,'#'*30)
 	 t0 = time.time()
 	 # Record status
 	 self.isweep = isweep
@@ -414,8 +414,8 @@ class mpo_dmrg:
 	 t1 = time.time()
 	 self.Energy = eav
     	 deltaE = eav-eold
-	 if rank == 0: print 'Summary: isweep=',isweep,' Emin=',eav,\
-			     ' dE=%9.2e  tol=%8.1e  t=%8.1e s'%(deltaE,self.crit_tol,t1-t0)
+	 if rank == 0: print('Summary: isweep=',isweep,' Emin=',eav,\
+			     ' dE=%9.2e  tol=%8.1e  t=%8.1e s'%(deltaE,self.crit_tol,t1-t0))
 	 # Check convergence
 	 ifconv = self.schedule.checkConv(self,isweep,deltaE)
          eold = eav
@@ -436,21 +436,21 @@ class mpo_dmrg:
    # MPS-based CI
    def ci(self,ifpt=False):
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.ci] ifpt =',ifpt
+      if rank == 0: print('\n[mpo_dmrg_class.ci] ifpt =',ifpt)
       result = mpo_dmrg_util.ci(self)
       return result
 
    # MPS-based VPT
    def vpt(self):
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.vpt] solve Hylleraas functional in a given linear space'
+      if rank == 0: print('\n[mpo_dmrg_class.vpt] solve Hylleraas functional in a given linear space')
       e2,c1 = mpo_dmrg_util.vpt(self)
       return e2,c1
 
    # MPS-based CI
    def detci(self):
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.detci]'
+      if rank == 0: print('\n[mpo_dmrg_class.detci]')
       self.dumpMPO()
       from mpsci import mixedci
       mixedci.main(self)
@@ -460,8 +460,8 @@ class mpo_dmrg:
    # initializations may use fhop/fpop and flmps/frmps.
    def final(self): 
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.final]'
-      print ' path = ',self.path
+      if rank == 0: print('\n[mpo_dmrg_class.final]')
+      print(' path = ',self.path)
       mpo_dmrg_io.finalMPS(self)
       mpo_dmrg_io.finalMPO(self)
       return 0
@@ -469,10 +469,10 @@ class mpo_dmrg:
    # Generate {<A|H|B>,<A|B>,<A|P|B>}
    def checkMPS(self,fbra=None,fket=None,status='L',fname0='top',ifep=False):
       rank = self.comm.rank
-      if rank == 0: print '\n[mpo_dmrg_class.checkMPS] size=',self.comm.size
+      if rank == 0: print('\n[mpo_dmrg_class.checkMPS] size=',self.comm.size)
       assert self.isym in [1,2] # Must have symmetry.
-      assert not isinstance(fbra,basestring)
-      assert not isinstance(fket,basestring)
+      assert not isinstance(fbra,str)
+      assert not isinstance(fket,str)
       # Setup files
       if fbra is not None:
          fbmps = fbra
@@ -487,8 +487,8 @@ class mpo_dmrg:
 	 fkmps = fbmps
       # bond dimension
       nsite = fbmps['nsite'].value
-      bdim = map(lambda x:len(x),mpo_dmrg_io.loadQnums(fbmps))
-      kdim = map(lambda x:len(x),mpo_dmrg_io.loadQnums(fkmps))
+      bdim = [len(x) for x in mpo_dmrg_io.loadQnums(fbmps)]
+      kdim = [len(x) for x in mpo_dmrg_io.loadQnums(fkmps)]
       # Quantities to be checked
       energy = None   
       ovlp = None
@@ -514,17 +514,17 @@ class mpo_dmrg:
             energy = esum/psum
          else:
             energy = esum/ovlp
-         print     
-         print 'Summary for '+status+'-MPS:'
-	 print ' npts   =',self.npts
-         print ' <H(P)> =',esum
-         print ' ovlp   =',ovlp
-         print ' <(P)>  =',psum
-         print ' Energy =',energy
-         print ' Econst =',self.const
-         print ' Etotal =',energy+self.const
-         print ' bBdims =',bdim
-         print ' kBdims =',kdim
+         print()     
+         print('Summary for '+status+'-MPS:')
+	 print(' npts   =',self.npts)
+         print(' <H(P)> =',esum)
+         print(' ovlp   =',ovlp)
+         print(' <(P)>  =',psum)
+         print(' Energy =',energy)
+         print(' Econst =',self.const)
+         print(' Etotal =',energy+self.const)
+         print(' bBdims =',bdim)
+         print(' kBdims =',kdim)
       # Check Ecomponents
       if ifep:
 	 if self.ifs2proj:
@@ -546,13 +546,13 @@ class mpo_dmrg:
 	    # Sum over spin cases
             for ispin in range(2):
                ecomp += tmp[ispin::2]
-	    print '### Energy decompositions: <Hp> ###'
-            print ' nsite =',self.nsite
-	    print ' ecomp =',ecomp
+	    print('### Energy decompositions: <Hp> ###')
+            print(' nsite =',self.nsite)
+	    print(' ecomp =',ecomp)
             if psum is not None:
                self.ecomp = ecomp/psum
             else:
                self.ecomp = ecomp/ovlp
-            print ' ecomp =',self.ecomp
-            print ' etot  =',numpy.sum(ecomp)
+            print(' ecomp =',self.ecomp)
+            print(' etot  =',numpy.sum(ecomp))
       return energy,esum,ovlp,psum

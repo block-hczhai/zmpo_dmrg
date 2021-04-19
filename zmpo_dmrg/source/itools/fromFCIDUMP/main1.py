@@ -14,9 +14,9 @@ comm = MPI.COMM_WORLD
 size = comm.size
 rank = comm.rank
 # MPI init
-if size > 0 and rank ==0: print '\n[MPI init]'
+if size > 0 and rank ==0: print('\n[MPI init]')
 comm.Barrier()
-print ' Rank= %s of %s processes'%(rank,size)
+print(' Rank= %s of %s processes'%(rank,size))
 
 mol=class_molinfo()
 mol.comm=comm
@@ -48,7 +48,7 @@ np = 1
 sc2 = mpo_dmrg_schedule.schedule()
 sc2.MaxMs  = [1] + [50]*np + [50]*2 #+ [100]*(2*np) + [100]*(2*np)
 ns = len(sc2.MaxMs)
-sc2.Sweeps = range(ns)
+sc2.Sweeps = list(range(ns))
 sc2.Tols   = [1.e-2] + [1.e-3]*np + [1.e-4]*2 #[1.e-4]*(2*np) + [1.e-5]*(2*np)
 sc2.Noises = [1.e-4] + [1.e-4]*np + [0.0]*2 #[0.0]*(4*np)
 sc2.coff = 0
@@ -77,4 +77,4 @@ flmps1.close()
 
 if rank == 0:
    shutil.copy( dmrg2.path+'/lmps','./lmpsQs')
-   print 'Energy',dmrg2.Energy
+   print('Energy',dmrg2.Energy)

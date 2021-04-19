@@ -69,25 +69,25 @@ niit = numpy.array([[ 0., 0.],[ 0.,-1.]])
 
 if __name__ == '__main__':
    # test
-   print sigma_p
-   print sigma_m
-   print spin_a
-   print sigma_p.dot(spin_a)
-   print sigma_p.dot(spin_b)
-   print numpy.einsum('i,j',spin_a,spin_a).reshape(len(spin_a)*2)
-   print numpy.einsum('i,j',spin_a,spin_b).reshape(len(spin_a)*2)
+   print(sigma_p)
+   print(sigma_m)
+   print(spin_a)
+   print(sigma_p.dot(spin_a))
+   print(sigma_p.dot(spin_b))
+   print(numpy.einsum('i,j',spin_a,spin_a).reshape(len(spin_a)*2))
+   print(numpy.einsum('i,j',spin_a,spin_b).reshape(len(spin_a)*2))
    
    # Matrix representation of operators in a direct product basis
-   print '[a1]_{12}'
+   print('[a1]_{12}')
    a1=numpy.einsum('ij,kl->ikjl',sigma_p,sigma_0).reshape(4,4)
-   print a1.real 
-   print '[a2]_{12}' 
+   print(a1.real) 
+   print('[a2]_{12}') 
    # This is because we choose |alpha>=|1>, so exchange 1 time
    a2=numpy.einsum('ij,kl->ikjl',-sigma_z,sigma_p).reshape(4,4)
-   print a2.real
-   print "Check {a1^+,a2^+}=0"
-   print a1.dot(a2).real
-   print a2.dot(a1).real
-   print a1.dot(a2)+a2.dot(a1)
-   print "(-sz)(-sz)"
-   print numpy.kron(-sigma_z,-sigma_z).real
+   print(a2.real)
+   print("Check {a1^+,a2^+}=0")
+   print(a1.dot(a2).real)
+   print(a2.dot(a1).real)
+   print(a1.dot(a2)+a2.dot(a1))
+   print("(-sz)(-sz)")
+   print(numpy.kron(-sigma_z,-sigma_z).real)

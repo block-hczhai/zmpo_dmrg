@@ -24,19 +24,20 @@ import copy
 import math
 import numpy
 import scipy.linalg
-import mpo_dmrg_io
-import mpo_dmrg_opt
-import mpo_dmrg_init
+from . import mpo_dmrg_io
+from . import mpo_dmrg_opt
+from . import mpo_dmrg_init
 from mpi4py import MPI
-from tools import smalld
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from .tools import smalld
+from .sysutil_include import dmrg_dtype,dmrg_mtype
+from functools import reduce
 
 # Generation of quadrature (pts,wts)
 def s2quad(dmrg,sval=0,sz=0):
    if dmrg.comm.rank == 0: 
-      print '\n[mpo_dmrg_util.s2quad]'
-      print ' sval =',sval,' sz =',sz,' npts =',dmrg.npts
-      print ' quad =',dmrg.quad
+      print('\n[mpo_dmrg_util.s2quad]')
+      print(' sval =',sval,' sz =',sz,' npts =',dmrg.npts)
+      print(' quad =',dmrg.quad)
    assert sval+1.e-4 > abs(sz)
    if dmrg.quad == 'Simpson':
       # Weights
@@ -56,7 +57,7 @@ def s2quad(dmrg,sval=0,sz=0):
       npoints = dmrg.npts-1
       assert npoints%2 == 0 and npoints>0
       h = numpy.pi/(3.0*npoints)
-      if dmrg.comm.rank == 0: print ' width of internal in [0,pi]=',h
+      if dmrg.comm.rank == 0: print(' width of internal in [0,pi]=',h)
       npts = npoints+1
       wts = numpy.zeros(npts)
       ###Trapezoidal rule
@@ -69,23 +70,23 @@ def s2quad(dmrg,sval=0,sz=0):
       wts[1::2] = 4.0
       wts[0]  = 1.0
       wts[-1] = 1.0
-      if dmrg.comm.rank == 0: print ' Simpson coeff=',wts
+      if dmrg.comm.rank == 0: print(' Simpson coeff=',wts)
       wts = wts*h
       # Sites
       xts = numpy.linspace(0,numpy.pi,num=npts)
-      wts = wts*numpy.array(map(lambda x:wfun(x,sval,sz),xts))
+      wts = wts*numpy.array([wfun(x,sval,sz) for x in xts])
    elif dmrg.quad == 'GaussLegendre':
       xts,wts = numpy.polynomial.legendre.leggauss(dmrg.npts)
-      xts = map(lambda x:math.acos(x),xts)
-      fac = map(lambda x:smalld.value(sval,sz,sz,x),xts)
+      xts = [math.acos(x) for x in xts]
+      fac = [smalld.value(sval,sz,sz,x) for x in xts]
       wts = fac*wts
       wts = (2.*sval+1.)/2.0*wts
    dmrg.qpts = xts
    dmrg.qwts = wts
    if dmrg.comm.rank == 0: 
-      print ' qpts =',dmrg.qpts
-      print ' qwts =',dmrg.qwts
-      print
+      print(' qpts =',dmrg.qpts)
+      print(' qwts =',dmrg.qwts)
+      print()
    return xts,wts
 
 # A random state
@@ -150,13 +151,13 @@ def mps0occun(dphys,occun,isym=2):
       qnumr[isite] = [[nelec-qnuml[isite][0][0],mspin-qnuml[isite][0][1]]]
    # Particle number symmetry - N   
    if isym == 1:
-      qnuml = [map(lambda x:[x[0]],qnumIbd) for qnumIbd in qnuml]
-      qnumr = [map(lambda x:[x[0]],qnumIbd) for qnumIbd in qnumr]
+      qnuml = [[[x[0]] for x in qnumIbd] for qnumIbd in qnuml]
+      qnumr = [[[x[0]] for x in qnumIbd] for qnumIbd in qnumr]
    return qnuml,qnumr,sites
 
 # initMPS
 def initMPS(dmrg,debug=False):
-   if dmrg.comm.rank == 0: print '[mpo_dmrg_util.initMPS]'
+   if dmrg.comm.rank == 0: print('[mpo_dmrg_util.initMPS]')
    # Product state MPS0
    if dmrg.occun is None:
       mps0 = mps0mixed(dmrg.dphys)
@@ -176,7 +177,7 @@ def initMPS(dmrg,debug=False):
    mpo_dmrg_init.genBops(dmrg,fnamel,dmrg.nops,-1,ifslc=False)
    mpo_dmrg_init.genHops(dmrg,fmps0,fmps0,fnamer,'R')
    # Initialize MPS
-   sitelst = range(dmrg.nsite)
+   sitelst = list(range(dmrg.nsite))
    if debug:
       mpo_dmrg_init.genHops(dmrg,fmps0,fmps0,fnamel,'L')
       mpo_dmrg_opt.sweep(dmrg,sitelst,dmrg.initNcsite,'R',ifsym=ifsym)
@@ -192,7 +193,7 @@ def initMPS(dmrg,debug=False):
 # InitOperators for DMRG
 def initOps(dmrg,fmps):
    rank = dmrg.comm.rank 
-   if rank == 0: print '\n[mpo_dmrg_util.initOps]'
+   if rank == 0: print('\n[mpo_dmrg_util.initOps]')
    #--------------------------------------------------------
    # Initialization-0: normal initialization (lrop)
    # H0 or H for LHS of eigenvalue or linear equations [PT]
@@ -224,7 +225,7 @@ def initOps(dmrg,fmps):
    #--------------------------------------------------------
    if rank == 0 and dmrg.ifex:
       for iref in range(dmrg.nref):
-	 print '\n ### Ovlps: iref =',iref,' rank =',rank,'###'
+	 print('\n ### Ovlps: iref =',iref,' rank =',rank,'###')
          fket = dmrg.wfex[iref]
 	 # <A|B>
          if not dmrg.ifs2proj: 
@@ -249,7 +250,7 @@ def initOps(dmrg,fmps):
       #--------------------------------------------------------
       ln = '#'*10
       for iref in range(dmrg.nref):
-	 print '\n'+ln+' <Psi|H|Psi[i]>: iref =',iref,' rank=',rank,ln
+	 print('\n'+ln+' <Psi|H|Psi[i]>: iref =',iref,' rank=',rank,ln)
          fket = dmrg.wfex[iref]
 	 # <A|H|B>
          fnamel = dmrg.path+'/ref'+str(iref)+'_lhop'
@@ -263,7 +264,7 @@ def initOps(dmrg,fmps):
       if dmrg.ifH0:
          dmrg.fdopXfhop()
          for iref in range(dmrg.nref):
-   	    print '\n'+ln+' <Psi|H0|Psi[i]>: iref =',iref,' rank=',rank,ln
+   	    print('\n'+ln+' <Psi|H0|Psi[i]>: iref =',iref,' rank=',rank,ln)
             fket = dmrg.wfex[iref]
    	    # <A|H|B>
             fnamel = dmrg.path+'/ref'+str(iref)+'_ldop'
@@ -305,16 +306,16 @@ def initE0pt(dmrg,fmps):
          dmrg.et = energy-dmrg.emix*dmrg.e1
          if dmrg.ifs2proj: 
             dmrg.n0 = 1/math.sqrt(smat[0,0])
-         print  
-	 print '='*40
-         print 'Summary of partition: ifH0 =',dmrg.ifH0
-	 print '='*40
-	 print ' emix = ',dmrg.emix
-         print ' e0 = ',dmrg.e0
-         print ' e1 = ',dmrg.e1
-	 print ' eH = ',energy
-         print ' et = ',dmrg.et
-         print ' n0 = ',dmrg.n0
+         print()  
+	 print('='*40)
+         print('Summary of partition: ifH0 =',dmrg.ifH0)
+	 print('='*40)
+	 print(' emix = ',dmrg.emix)
+         print(' e0 = ',dmrg.e0)
+         print(' e1 = ',dmrg.e1)
+	 print(' eH = ',energy)
+         print(' et = ',dmrg.et)
+         print(' n0 = ',dmrg.n0)
    # Broadcast
    dmrg.e0 = dmrg.comm.bcast(dmrg.e0)
    dmrg.e1 = dmrg.comm.bcast(dmrg.e1)
@@ -325,7 +326,7 @@ def initE0pt(dmrg,fmps):
 # <I|H|J> & <I|(P)|J> 
 def genCIHamiltonian(dmrg):
    rank = dmrg.comm.rank 
-   if rank == 0: print '\n[mpo_dmrg_ex.genCIHamiltonian] nref=',dmrg.nref	
+   if rank == 0: print('\n[mpo_dmrg_ex.genCIHamiltonian] nref=',dmrg.nref)	
    dmrg.nref = len(dmrg.wfex)
    hmat = numpy.zeros((dmrg.nref,dmrg.nref),dtype=dmrg_dtype)
    smat = numpy.zeros((dmrg.nref,dmrg.nref),dtype=dmrg_dtype)
@@ -335,10 +336,10 @@ def genCIHamiltonian(dmrg):
          fket = dmrg.wfex[jref]
          energy,esum,ovlp,psum = dmrg.checkMPS(fbra,fket)
 	 if rank == 0:
-	    print		 
-	    print '-'*92
-	    print '<i|O|j>:',(iref,jref),' esum,ovlp,psum=',esum,ovlp,psum
-	    print '-'*92
+	    print()		 
+	    print('-'*92)
+	    print('<i|O|j>:',(iref,jref),' esum,ovlp,psum=',esum,ovlp,psum)
+	    print('-'*92)
 	 hmat[iref,jref] = esum
 	 if not dmrg.ifs2proj:
             smat[iref,jref] = ovlp
@@ -366,7 +367,7 @@ def vpt(dmrg):
    # 3. RHS = <0|H|psi1>
    v01 = numpy.zeros(dmrg.nref)
    for iref in range(1,dmrg.nref):
-      print '\n ### Hams: iref =',iref,' rank= ',rank,'###'
+      print('\n ### Hams: iref =',iref,' rank= ',rank,'###')
       fket = dmrg.wfex[iref]
       # <A|H|B>
       fnamel = dmrg.path+'/ref'+str(iref)+'_lhop'
@@ -380,7 +381,7 @@ def vpt(dmrg):
    # 4. Solve <Psi1|H0E0|Psi1> = -<Psi1|V|Psi0>   
    if rank == 0:
       ndim = hmat.shape[0]
-      Amat = (hmat-dmrg.et*smat)[numpy.ix_(range(1,ndim),range(1,ndim))]
+      Amat = (hmat-dmrg.et*smat)[numpy.ix_(list(range(1,ndim)),list(range(1,ndim)))]
       bvec = v01[1:]
       cvec = scipy.linalg.solve(Amat,-bvec)
       e2o = cvec.dot(bvec)
@@ -388,28 +389,28 @@ def vpt(dmrg):
       lhs = numpy.sum(Amat)
       e2v = lhs+2.0*e2s
       # L = <Psi1|H0-E0|Psi1>+2<Psi1|V|0>
-      print
-      print '='*40
-      print 'Summary of PT results: ifH0 =',dmrg.ifH0
-      print '='*40
-      print ' h0mat = \n',hmat
-      print ' smat = \n',smat
-      print ' emix =',dmrg.emix
-      print ' e0 = ',dmrg.e0
-      print ' e1 = ',dmrg.e1
-      print ' eH = ',energy
-      print ' et = ',dmrg.et
-      print ' n0 = ',dmrg.n0
-      print ' ndim =',ndim-1
-      print ' Amat = \n',Amat
-      print ' bvec = \n',bvec
-      print ' (1) e2[ Sum of RHS ] =',e2s
-      print ' (2) e2[ Functional ] =',e2v
-      print '     * difference =',e2v-e2s
-      print '     * <Psi1|H0-E0|Psi1> =',lhs
-      print ' (3) e2[ ROptimized ] =',e2o
-      print '     * difference =',e2o-e2s
-      print '     * cvec =',cvec
+      print()
+      print('='*40)
+      print('Summary of PT results: ifH0 =',dmrg.ifH0)
+      print('='*40)
+      print(' h0mat = \n',hmat)
+      print(' smat = \n',smat)
+      print(' emix =',dmrg.emix)
+      print(' e0 = ',dmrg.e0)
+      print(' e1 = ',dmrg.e1)
+      print(' eH = ',energy)
+      print(' et = ',dmrg.et)
+      print(' n0 = ',dmrg.n0)
+      print(' ndim =',ndim-1)
+      print(' Amat = \n',Amat)
+      print(' bvec = \n',bvec)
+      print(' (1) e2[ Sum of RHS ] =',e2s)
+      print(' (2) e2[ Functional ] =',e2v)
+      print('     * difference =',e2v-e2s)
+      print('     * <Psi1|H0-E0|Psi1> =',lhs)
+      print(' (3) e2[ ROptimized ] =',e2o)
+      print('     * difference =',e2o-e2s)
+      print('     * cvec =',cvec)
       e2 = e2o
       #==========================================
       # If the difference is large, then this
@@ -432,31 +433,31 @@ def ci(dmrg):
       hmat0,smat0 = genCIHamiltonian(dmrg)
       dmrg.fdopXfhop()
       if rank == 0: 
-         print ' H0[I,J]=\n',hmat0
-         print ' S0[I,J]=\n',smat0
+         print(' H0[I,J]=\n',hmat0)
+         print(' S0[I,J]=\n',smat0)
    #------------------------------------------
    e = numpy.zeros(ndim,dtype=numpy.float_)
    v = numpy.zeros((ndim,ndim),dtype=dmrg_dtype)
    if rank == 0: 
-      print ' H[I,J]=\n',hmat
-      print ' S[I,J]=\n',smat
+      print(' H[I,J]=\n',hmat)
+      print(' S[I,J]=\n',smat)
       e,v = scipy.linalg.eigh(hmat,smat)
       n0 = 1.0/math.sqrt(smat[0,0])
       e0 = hmat[0,0]/smat[0,0]
       e2 = hmat[0,1]*n0
       e3 = 0.0
       # PRINT
-      print ' CI energies=',e
-      print ' Coeff[0] =',v[:,0]
-      print 'PT analysis:'
-      print ' Normalization =',n0 
-      print ' E[0-1] =',e0 
-      print ' E[2]   =',e0+e2,e2
+      print(' CI energies=',e)
+      print(' Coeff[0] =',v[:,0])
+      print('PT analysis:')
+      print(' Normalization =',n0) 
+      print(' E[0-1] =',e0) 
+      print(' E[2]   =',e0+e2,e2)
       if dmrg.ifpt and dmrg.ifH0:
          e3 = hmat[1,1]-hmat0[1,1]
-         print ' E[3]   =',e0+e2+e3,e3
-      print ' E[res] =',e[0],e[0]-e0-e2-e3
-      print ' E[ful] =',e[0],e[0]-e0
+         print(' E[3]   =',e0+e2+e3,e3)
+      print(' E[res] =',e[0],e[0]-e0-e2-e3)
+      print(' E[ful] =',e[0],e[0]-e0)
    dmrg.comm.Bcast([e,MPI.DOUBLE])
    dmrg.comm.Bcast([v,dmrg_mtype])
    # CI case
@@ -472,9 +473,9 @@ def ci(dmrg):
          hmat0[0,1:] = 0.
          hmat0[1:,0] = 0.
          vmat = hmat - hmat0
-         print ' Hmat :\n',hmat
-         print ' H0mat:\n',hmat0 
-         print ' Vmat :\n',vmat 
+         print(' Hmat :\n',hmat)
+         print(' H0mat:\n',hmat0) 
+         print(' Vmat :\n',vmat) 
          e0 = hmat0[0,0]
          e1 = hmat[0,0] - hmat0[0,0]
          # Higher-order pt energies
@@ -492,11 +493,11 @@ def ci(dmrg):
                for j in range(1,n+1):
                   #print 'o-k,j',(n,2*n+1),(2*n+1-k-j,k,j)
                   enlst[2*n+1] -= enlst[2*n+1-k-j]*smat[k,j]
-         print '\n Analysis of PT series:'
+         print('\n Analysis of PT series:')
          esum = 0.
          for n in range(2*norder+2):
             esum += enlst[n]	    
-            print ' e[%d] = (%20.12f,%20.12f)'%(n,enlst[n],esum)
+            print(' e[%d] = (%20.12f,%20.12f)'%(n,enlst[n],esum))
          enlst = numpy.array(enlst).real
       else:
          enlst = numpy.zeros(2*norder+2)

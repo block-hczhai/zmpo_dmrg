@@ -22,9 +22,9 @@
 import time
 import math
 import numpy
-import mpo_dmrg_props
-import mpo_dmrg_propsMPO
-import mpo_dmrg_propsMPORpt
+from . import mpo_dmrg_props
+from . import mpo_dmrg_propsMPO
+from . import mpo_dmrg_propsMPORpt
 from zmpo_dmrg.source.sysutil_include import dmrg_dtype
 from zmpo_dmrg.source.tools import smalld
 
@@ -34,19 +34,19 @@ def seff(s2exp):
 
 # Spin Projected case
 def s2quad(npts,sval,sz1,sz2,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.s2quad] npts=',npts,' (s,m1,m2)=',(sval,sz1,sz2)
+   if debug: print('\n[mpo_dmrg_propsMPORpt.s2quad] npts=',npts,' (s,m1,m2)=',(sval,sz1,sz2))
    assert npts > 0
    assert sval+1.e-4 > abs(sz1)
    assert sval+1.e-4 > abs(sz2)
    xts,wts = numpy.polynomial.legendre.leggauss(npts)
-   xts = map(lambda x:math.acos(x),xts)
-   fac = map(lambda x:smalld.value(sval,sz1,sz2,x),xts)
+   xts = [math.acos(x) for x in xts]
+   fac = [smalld.value(sval,sz1,sz2,x) for x in xts]
    wts = fac*wts
    wts = (2.*sval+1.)/2.0*wts
    xts = numpy.asarray(xts)
    wts = numpy.asarray(wts)
-   if debug: print ' xts =',xts
-   if debug: print ' wts =',wts
+   if debug: print(' xts =',xts)
+   if debug: print(' wts =',wts)
    return xts,wts
 
 # Overlap/Normalizaiton <P>
@@ -59,7 +59,7 @@ def eval_P(dmrg,flmps,spinfo,debug=False):
    exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
    fop.close()
    denorm = numpy.sum(wts*exphop)
-   if debug: print '<P>=',denorm
+   if debug: print('<P>=',denorm)
    return denorm,xts,wts
 
 # Overlap/Normalizaiton <P>
@@ -72,12 +72,12 @@ def eval_P2(dmrg,flmps0,flmps1,spinfo,debug=False):
    exphop = mpo_dmrg_props.evalProps(dmrg,flmps0,flmps1,fop,status='L')
    fop.close()
    denorm = numpy.sum(wts*exphop)
-   if debug: print '<P>=',denorm
+   if debug: print('<P>=',denorm)
    return denorm,xts,wts
 
 # <S2>	 
 def eval_S2Global(dmrg,flmps,fname='top',spinfo=None):
-   print '\n[mpo_dmrg_propsItrf.eval_S2Global]'
+   print('\n[mpo_dmrg_propsItrf.eval_S2Global]')
    t0 = time.time()
    nsite = dmrg.nsite
    if not dmrg.ifs2proj: 
@@ -92,12 +92,12 @@ def eval_S2Global(dmrg,flmps,fname='top',spinfo=None):
       fop.close()
       expect = numpy.sum(wts*exphop)/denorm
    t1 = time.time()
-   print ' time for eval_S2Global = %.2f s'%(t1-t0)
+   print(' time for eval_S2Global = %.2f s'%(t1-t0))
    return expect
    
 # Global properties like <Omega>
 def eval_Global(dmrg,flmps,key,fname='top',spinfo=None):
-   print '\n[mpo_dmrg_propsItrf.eval_Global] key=',key
+   print('\n[mpo_dmrg_propsItrf.eval_Global] key=',key)
    t0 = time.time()
    nsite = dmrg.nsite
    if not dmrg.ifs2proj: 
@@ -112,12 +112,12 @@ def eval_Global(dmrg,flmps,key,fname='top',spinfo=None):
       fop.close()
       expect = numpy.sum(wts*exphop)/denorm
    t1 = time.time()
-   print ' time for eval_Global = %.2f s'%(t1-t0)
+   print(' time for eval_Global = %.2f s'%(t1-t0))
    return expect
 
 # Local properties like {<Ni>}
 def eval_Local(dmrg,flmps,groups,key,fname='top',spinfo=None):
-   print '\n[mpo_dmrg_propsItrf.eval_Local] key=',key
+   print('\n[mpo_dmrg_propsItrf.eval_Local] key=',key)
    t0 = time.time()
    nsite = dmrg.nsite
    ngroup = len(groups)
@@ -136,12 +136,12 @@ def eval_Local(dmrg,flmps,groups,key,fname='top',spinfo=None):
          fop.close()
          expect[idx] = numpy.sum(wts*exphop)/denorm
    t1 = time.time()
-   print ' time for eval_Local = %.2f s'%(t1-t0)
+   print(' time for eval_Local = %.2f s'%(t1-t0))
    return expect
 
 # Local2 properties like {<Ni*Nj>}
 def eval_Local2(dmrg,flmps,groups,ikey,jkey,fname='top',spinfo=None):
-   print '\n[mpo_dmrg_propsItrf.eval_Local2] (ikey,jkey)=',(ikey,jkey)
+   print('\n[mpo_dmrg_propsItrf.eval_Local2] (ikey,jkey)=',(ikey,jkey))
    t0 = time.time()
    nsite = dmrg.nsite
    ngroup = len(groups)
@@ -166,12 +166,12 @@ def eval_Local2(dmrg,flmps,groups,ikey,jkey,fname='top',spinfo=None):
             expect[idx,jdx] = numpy.sum(wts*exphop)/denorm
             expect[jdx,idx] = expect[idx,jdx]
    t1 = time.time()
-   print ' time for eval_Local2 = %.2f s'%(t1-t0)
+   print(' time for eval_Local2 = %.2f s'%(t1-t0))
    return expect 
   
 # <vec{SA}*vec{SB}> = 0.5*(<SA+SB-> + <SA-SB+>) + SAz*SBz
 def eval_SiSj(dmrg,flmps,groups,fname='top',spinfo=None):
-   print '\n[mpo_dmrg_propsItrf.eval_SiSj]'
+   print('\n[mpo_dmrg_propsItrf.eval_SiSj]')
    t0 = time.time()
    nsite = dmrg.nsite
    ngroup = len(groups)
@@ -197,12 +197,12 @@ def eval_SiSj(dmrg,flmps,groups,fname='top',spinfo=None):
             expect[idx,jdx] = numpy.sum(wts*(exphop[:npts]+exphop[npts:2*npts]+exphop[2*npts:]))/denorm
             expect[jdx,idx] = expect[idx,jdx]
    t1 = time.time()
-   print ' time for eval_SiSj = %.2f s'%(t1-t0)
+   print(' time for eval_SiSj = %.2f s'%(t1-t0))
    return expect
 
 # Brute force Gamma[p,q]
 def eval_rdm1BF(dmrg,flmps,fname='top',spinfo=None):
-   print '\n[mpo_dmrg_propsItrf.eval_rdm1BF]'
+   print('\n[mpo_dmrg_propsItrf.eval_rdm1BF]')
    t0 = time.time()
    nsite = dmrg.nsite
    if not dmrg.ifs2proj:
@@ -253,11 +253,11 @@ def eval_rdm1BF(dmrg,flmps,fname='top',spinfo=None):
             rdm1s[q,p] = rdm1s[p,q]
    # Check skewness
    skewt = numpy.linalg.norm(rdm1t-rdm1t.T.conj())
-   print ' skewness of rdm1t =',skewt
+   print(' skewness of rdm1t =',skewt)
    assert skewt < 1.e-12
    skews = numpy.linalg.norm(rdm1s-rdm1s.T.conj())
-   print ' skewness of rdm1s =',skews
+   print(' skewness of rdm1s =',skews)
    assert skews < 1.e-12
    t1 = time.time()
-   print ' time for eval_rdm1BF = %.2f s'%(t1-t0)
+   print(' time for eval_rdm1BF = %.2f s'%(t1-t0))
    return rdm1t,rdm1s

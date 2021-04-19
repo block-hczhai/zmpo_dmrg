@@ -14,10 +14,10 @@
 # 
 import math
 import numpy
-import mpo_dmrg_const
-import mpo_dmrg_opers
-import mpo_dmrg_spinopers
-from sysutil_include import dmrg_dtype,dmrg_mtype
+from . import mpo_dmrg_const
+from . import mpo_dmrg_opers
+from . import mpo_dmrg_spinopers
+from .sysutil_include import dmrg_dtype,dmrg_mtype
 
 # Note that int1e are now full integrals!
 # porb  - spin orbital

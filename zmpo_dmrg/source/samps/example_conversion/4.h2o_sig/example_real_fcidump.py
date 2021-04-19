@@ -39,7 +39,7 @@ mf.level_shift = 0.0
 mf.max_cycle = 100
 mf.conv_tol=1.e-14
 #mf.irrep_nelec = {'B2':2}
-print(mf.scf())
+print((mf.scf()))
 mf.analyze()
 
 #==================================================================

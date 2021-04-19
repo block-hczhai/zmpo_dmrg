@@ -13,9 +13,9 @@ comm = MPI.COMM_WORLD
 size = comm.size
 rank = comm.rank
 # MPI init
-if size > 0 and rank ==0: print '\n[MPI init]'
+if size > 0 and rank ==0: print('\n[MPI init]')
 comm.Barrier()
-print ' Rank= %s of %s processes'%(rank,size)
+print(' Rank= %s of %s processes'%(rank,size))
 
 mol=class_molinfo()
 mol.comm=comm
@@ -61,7 +61,7 @@ else:
    info=[dmrg2.npts,sval,sz]
 from zmpo_dmrg.source.properties import mpo_dmrg_propsItrf
 expect = mpo_dmrg_propsItrf.eval_S2Global(dmrg2,flmps1,spinfo=info)
-print 'expect_S2=',expect
+print('expect_S2=',expect)
 
 # New L-MPS
 dmrg2.final()

@@ -19,8 +19,8 @@ import numpy
 import itertools
 from zmpo_dmrg.source import mpo_dmrg_io
 from zmpo_dmrg.source import mpo_dmrg_qparser
-import util_tensor
-import util_spinsym
+from . import util_tensor
+from . import util_spinsym
 
 #
 # * Optimize the memory by dumping into file during transformation.
@@ -45,8 +45,8 @@ def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
    nsite = flmps0['nsite'].value
    # This is the only qnum information used.
    ne,ms = flmps0['qnum'+str(nsite)].value[0]
-   print '\n[mpo_dmrg_samps.sweep_projection] ifQt=',ifQt,\
-	 ' (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval)
+   print('\n[mpo_dmrg_samps.sweep_projection] ifQt=',ifQt,\
+	 ' (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval))
    assert not ifQt
    # Left projection 
    if not ifcompress:
@@ -64,7 +64,7 @@ def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
       flmpsR.close()
       os.system('rm ./lmpsL_tmp')
       os.system('rm ./lmpsR_tmp')
-      print '\nWeights[l,r,l]=',(wt1,wt2,wt3)
+      print('\nWeights[l,r,l]=',(wt1,wt2,wt3))
       wt = wt1*wt2*wt3
    return wt
 
@@ -74,8 +74,8 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 			  ifBlockSymScreen=False,\
 			  ifpermute=False):
    nsite,ne,ms,sval = qtarget
-   print '\n[mpo_dmrg_samps.left_sweep_projection] (nsite,ne,ms,sval)=',(nsite,ne,ms,sval),\
-         'ifBlockSE=',ifBlockSingletEmbedding	   
+   print('\n[mpo_dmrg_samps.left_sweep_projection] (nsite,ne,ms,sval)=',(nsite,ne,ms,sval),\
+         'ifBlockSE=',ifBlockSingletEmbedding)	   
    flmps1['nsite'] = nsite
    # Reduced qnums - the basis states are ordered to maximize the efficiency.
    qnumsN = numpy.array([[0.,0.,1.],[1.,0.5,1.],[2.,0.,1.]])
@@ -123,7 +123,7 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 
       # Quasi-RDM (reduced): each dim is {[(SaSb)S,na*nb]}
       classes,qrdmL = util_tensor.quasiRDM(wA1,qnumsL)
-      if debug: print 'trace=',numpy.trace(qrdmL),qrdmL.shape,len(classes)
+      if debug: print('trace=',numpy.trace(qrdmL),qrdmL.shape,len(classes))
       
       # Decimation: [(SaSb)S,na*nb]=>[S,r] for all possible Sa,Sb
       # Therefore, rotL is a matrix with dimensions [(SaSb)S,na*nb]*[S,r]!
@@ -159,15 +159,15 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
          srotR = numpy.tensordot(site1,wA0,axes=([0,1],[0,1])) # LNR,LNr->Rr
 
       # Print: 
-      print ' ---> isite=',isite,'site0=',site0.shape,'rotL=',rotL.shape,\
-	 	                 'site1=',site1.shape #,'srotR=',srotR.shape
-      print 		 
+      print(' ---> isite=',isite,'site0=',site0.shape,'rotL=',rotL.shape,\
+	 	                 'site1=',site1.shape) #,'srotR=',srotR.shape
+      print() 		 
       # Check left canonical form
       if debug:
          tmp = numpy.tensordot(site1,site1,axes=([0,1],[0,1])) # lna,lnb->ab
          d = tmp.shape[0]
          diff = numpy.linalg.norm(tmp-numpy.identity(d))
-         print ' diff=',diff
+         print(' diff=',diff)
          assert diff < 1.e-10
 
       # Save
@@ -186,7 +186,7 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 
    # Dump on flmps1
    if info:
-      print '\nfinalize left_sweep ...'
+      print('\nfinalize left_sweep ...')
       qnumsm = [None]*(nsite+1)	 
       for isite in range(nsite):
 	 qnumsm[isite] = util_spinsym.expandSM(qnums1[isite])
@@ -199,14 +199,14 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       # Check
       for isite in range(nsite+1):
          dimr = util_spinsym.dim_red(qnums1[isite]) 
-	 print ' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite])
+	 print(' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite]))
    return wt
 
 # <--- 
 def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 			   ifBlockSingletEmbedding=False):
    nsite,ne,ms,sval = qtarget
-   print '\n[mpo_dmrg_samps.right_sweep_projection] (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval)
+   print('\n[mpo_dmrg_samps.right_sweep_projection] (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval))
    flmps1['nsite'] = nsite
    # Reduced qnums - the basis states are ordered to maximize the efficiency.
    qnumsN = numpy.array([[0.,0.,1.],[1.,0.5,1.],[2.,0.,1.]])
@@ -230,7 +230,7 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 
       # Quasi-RDM (reduced): each dim is {[(SaSb)S,na*nb]}
       classes,qrdmL = util_tensor.quasiRDM(wA1,qnumsL)
-      if debug: print 'trace=',numpy.trace(qrdmL),qrdmL.shape,len(classes)
+      if debug: print('trace=',numpy.trace(qrdmL),qrdmL.shape,len(classes))
       
       # Decimation: [(SaSb)S,na*nb]=>[S,r] for all possible Sa,Sb
       # Therefore, rotL is a matrix with dimensions [(SaSb)S,na*nb]*[S,r]!
@@ -255,15 +255,15 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       srotR = numpy.tensordot(site1,wA0,axes=([0,1],[0,1])) # LNR,LNr->Rr
 
       # Print: 
-      print ' ---> isite=',isite,'site0=',site0.shape,'rotL=',rotL.shape,\
-	 	                 'site1=',site1.shape #,'srotR=',srotR.shape
-      print 		 
+      print(' ---> isite=',isite,'site0=',site0.shape,'rotL=',rotL.shape,\
+	 	                 'site1=',site1.shape) #,'srotR=',srotR.shape
+      print() 		 
       # Check left canonical form
       if debug:
          tmp = numpy.tensordot(site1,site1,axes=([0,1],[0,1])) # lna,lnb->ab
          d = tmp.shape[0]
          diff = numpy.linalg.norm(tmp-numpy.identity(d))
-         print ' diff=',diff
+         print(' diff=',diff)
          assert diff < 1.e-10
 
       # Save
@@ -290,7 +290,7 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 
    # Dump on flmps1
    if info:
-      print '\nfinalize right_sweep ...'
+      print('\nfinalize right_sweep ...')
       qnumsm = [None]*(nsite+1)	 
       for isite in range(1,nsite+1):
 	 qnumsm[isite] = util_spinsym.expandSM(qnums1[isite])
@@ -303,5 +303,5 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       # Check
       for isite in range(nsite+1):
          dimr = util_spinsym.dim_red(qnums1[isite]) 
-	 print ' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite])
+	 print(' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite]))
    return wt

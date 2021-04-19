@@ -2,7 +2,8 @@
 # Construct Wfactors for a given Hamiltonian (H1,H2)
 #
 import numpy
-from tools import jwtrans
+from .tools import jwtrans
+from functools import reduce
 
 #======
 # AUX
@@ -10,7 +11,7 @@ from tools import jwtrans
 def idnC(sc):
    nc = len(sc)
    if nc == 0:
-      print 'error: mpo_consw.idnC'
+      print('error: mpo_consw.idnC')
       exit()
    else:
       idn = jwtrans.idn
@@ -21,7 +22,7 @@ def idnC(sc):
 def sgnC(sc):
    nc = len(sc)
    if nc == 0:
-      print 'error: mpo_consw.sgnC'
+      print('error: mpo_consw.sgnC')
       exit()
    else:
       sgn = jwtrans.sgn
@@ -32,7 +33,7 @@ def sgnC(sc):
 def sqC(sc,ic,iop):
    nc = len(sc)
    if nc == 0:
-      print 'error: mpo_consw.sqC'
+      print('error: mpo_consw.sqC')
       exit()
    else:
       ops = [0]*nc
@@ -114,7 +115,7 @@ def l1r4(h1e,h2e,sl,sc,sr):
    nc = len(sc)
    nr = len(sr)
    if nr*(nr-1)/2==0:
-      print 'error: mpo_consw.l1r4'
+      print('error: mpo_consw.l1r4')
       exit()
    tmp = numpy.zeros((nr*(nr-1)/2,2**nc,2**nc))
    for idxr,orbr in enumerate(sc):
@@ -137,7 +138,7 @@ def l1r5(h1e,h2e,sl,sc,sr):
    nc = len(sc)
    nr = len(sr)
    if nr*(nr-1)/2==0:
-      print 'error: mpo_consw.l1r5'
+      print('error: mpo_consw.l1r5')
       exit()
    tmp = numpy.zeros((nr*(nr-1)/2,2**nc,2**nc))
    for idxr,orbr in enumerate(sc):
@@ -293,7 +294,7 @@ def l6r16(h1e,h2e,sl,sc,sr):
    nc = len(sc)
    nr = len(sr)
    if nc*(nc-1)/2==0:
-      print 'error: mpo_consw.l6r16'
+      print('error: mpo_consw.l6r16')
       exit()
    tmp = numpy.zeros((nc*(nc-1)/2,1,2**nc,2**nc))
    irs = 0
@@ -330,7 +331,7 @@ def l8r4(h1e,h2e,sl,sc,sr):
    nr = len(sr)
    nr2 = nr*(nr-1)/2
    if nr2==0:
-      print 'error: mpo_consw.l8r4'
+      print('error: mpo_consw.l8r4')
       exit()
    tmp = numpy.zeros((nr2,nr2,2**nc,2**nc))
    idn = idnC(sc)
@@ -347,7 +348,7 @@ def l9r16(h1e,h2e,sl,sc,sr):
    nc = len(sc)
    nr = len(sr)
    if nc*(nc-1)/2==0:
-      print 'error: mpo_consw.l9r16'
+      print('error: mpo_consw.l9r16')
       exit()
    tmp = numpy.zeros((nc*(nc-1)/2,1,2**nc,2**nc))
    irs = 0
@@ -384,7 +385,7 @@ def l11r5(h1e,h2e,sl,sc,sr):
    nr = len(sr)
    nr2 = nr*(nr-1)/2
    if nr2==0:
-      print 'error: mpo_consw.l11r5'
+      print('error: mpo_consw.l11r5')
       exit()
    tmp = numpy.zeros((nr2,nr2,2**nc,2**nc))
    idn = idnC(sc)
@@ -533,7 +534,7 @@ def l14r5(h1e,h2e,sl,sc,sr):
    nc = len(sc)
    nr = len(sr)
    if nr*(nr-1)/2==0:
-      print 'error: mpo_consw.l14r5'
+      print('error: mpo_consw.l14r5')
       exit()
    tmp = numpy.zeros((nl,nr*(nr-1)/2,2**nc,2**nc))
    for idxq,orbq in enumerate(sc):
@@ -638,7 +639,7 @@ def l15r4(h1e,h2e,sl,sc,sr):
    nc = len(sc)
    nr = len(sr)
    if nr*(nr-1)/2==0:
-      print 'error: mpo_consw.l15r4'
+      print('error: mpo_consw.l15r4')
       exit()
    tmp = numpy.zeros((nl,nr*(nr-1)/2,2**nc,2**nc))
    for idxs,orbs in enumerate(sc):

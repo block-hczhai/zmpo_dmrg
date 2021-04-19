@@ -7,21 +7,22 @@
 # as MPS with diagonal site tensor
 #
 import numpy
-import tensorSubs
+from . import tensorSubs
+from functools import reduce
 
 def cp_check(tensor,shape,cp,iprt=0):
    # recover
    tensor1=cp_prod(cp)
    tensor2=tensor.copy().reshape(shape)
    diff=numpy.linalg.norm(tensor1-tensor2)
-   if iprt>0: print "DIFF=",diff
+   if iprt>0: print("DIFF=",diff)
    return diff
 
 def cp_pdim(cp):
-   return map(lambda x:x.shape[1],cp[1])
+   return [x.shape[1] for x in cp[1]]
 
 def cp_prod(cp,iprt=0):
-   if iprt>0: print "\n[cp_prod]: form full T[n1,n2,...,nk]"
+   if iprt>0: print("\n[cp_prod]: form full T[n1,n2,...,nk]")
    cp_core=cp[0]
    cp_site=cp[1]
    N=len(cp_site)

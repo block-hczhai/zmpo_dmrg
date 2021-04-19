@@ -31,7 +31,7 @@ from zmpo_dmrg.source.qtensor import qtensor_spinopers
 # Although W is indepdent of isite, but for consistency
 # we generate them for all sites.
 def genMPO_Rpt(nsite,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_Rpt] fname=',fname
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_Rpt] fname=',fname)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -50,14 +50,14 @@ def genMPO_Rpt(nsite,fname,xts,ifQt,debug=False):
 	    rop = qtensor_opers.genExpISyPhiQt(xts[ipt])
 	    rop.dump(grp,'op'+str(ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_Rpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_Rpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] for Epq = pa+*qa + pb+*qb
 def genMPO_EpqRpt(nsite,p,q,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_EpqRpt] fname=',fname
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_EpqRpt] fname=',fname)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -82,14 +82,14 @@ def genMPO_EpqRpt(nsite,p,q,fname,xts,ifQt,debug=False):
 	       wop = qtensor_opers.genElemProductRSpatialQt(oplst,isite,xts[ipt])
 	       wop.dump(grp,'op'+str(is1*npt+ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_EpqRpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_EpqRpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] for Tpq = {pa+*qa, pb+*qb, pa+*qb}
 def genMPO_TpqRpt(nsite,p,q,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_TpqRpt] fname=',fname
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_TpqRpt] fname=',fname)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -132,14 +132,14 @@ def genMPO_TpqRpt(nsite,p,q,fname,xts,ifQt,debug=False):
 	    cop = qtensor_opers.genElemProductRSpatialQt(oplst,isite,xts[ipt])
             cop.dump(grp,'op'+str(2*npt+ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_TpqRpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_TpqRpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] 
 def genMPO_S2GlobalRpt(nsite,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_S2GlobalRpt] fname=',fname
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_S2GlobalRpt] fname=',fname)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -160,14 +160,14 @@ def genMPO_S2GlobalRpt(nsite,fname,xts,ifQt,debug=False):
 	    cop = qtensor_spinopers.genS2GlobalRSpatialQt(nsite,isite,xts[ipt])
             cop.dump(grp,'op'+str(ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_S2GlobalRpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_S2GlobalRpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] 
 def genMPO_GlobalRpt(nsite,key,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_GlobalRpt] fname=',fname
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_GlobalRpt] fname=',fname)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -188,14 +188,14 @@ def genMPO_GlobalRpt(nsite,key,fname,xts,ifQt,debug=False):
 	    cop = qtensor_spinopers.genGlobalRSpatialQt(nsite,isite,key,xts[ipt])
             cop.dump(grp,'op'+str(ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_GlobalRpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_GlobalRpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] 
 def genMPO_LocalRpt(nsite,ig,key,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_LocalRpt] fname=',fname,' ig=',ig,' key=',key
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_LocalRpt] fname=',fname,' ig=',ig,' key=',key)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -216,15 +216,15 @@ def genMPO_LocalRpt(nsite,ig,key,fname,xts,ifQt,debug=False):
 	    cop = qtensor_spinopers.genLocalRSpatialQt(nsite,isite,ig,key,xts[ipt])
             cop.dump(grp,'op'+str(ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_LocalRpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_LocalRpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] 
 def genMPO_Local2Rpt(nsite,ig,jg,ikey,jkey,fac,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_Local2Rpt] fname=',fname
-   if debug: print ' ig=',ig,' jg=',jg,' ikey/jkey=',(ikey,jkey)
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_Local2Rpt] fname=',fname)
+   if debug: print(' ig=',ig,' jg=',jg,' ikey/jkey=',(ikey,jkey))
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -245,14 +245,14 @@ def genMPO_Local2Rpt(nsite,ig,jg,ikey,jkey,fac,fname,xts,ifQt,debug=False):
 	    cop = qtensor_spinopers.genLocal2RSpatialQt(nsite,isite,ig,jg,ikey,jkey,fac,xts[ipt])
             cop.dump(grp,'op'+str(ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_Local2Rpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_Local2Rpt = %.2f s'%(t1-t0))
    return fop
 
 # DUMP Wx[isite] for SiSj = 0.5*(Si+*Sj-+Si-*Sj) + Szi*Szj
 def genMPO_SiSjRpt(nsite,ig,jg,fname,xts,ifQt,debug=False):
-   if debug: print '\n[mpo_dmrg_propsMPORpt.genMPO_SiSjRpt] fname=',fname
+   if debug: print('\n[mpo_dmrg_propsMPORpt.genMPO_SiSjRpt] fname=',fname)
    t0 = time.time()
    fop = h5py.File(fname,'w')
    npt = len(xts)
@@ -308,7 +308,7 @@ def genMPO_SiSjRpt(nsite,ig,jg,fname,xts,ifQt,debug=False):
 	    cop = qtensor_spinopers.genLocal2RSpatialQt(nsite,isite,ig,jg,'Sz','Sz',1.0,xts[ipt])
  	    cop.dump(grp,'op'+str(2*npt+ipt))
       tf = time.time()
-      if debug: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   if debug: print ' time for genMPO_SiSjRpt = %.2f s'%(t1-t0)
+   if debug: print(' time for genMPO_SiSjRpt = %.2f s'%(t1-t0))
    return fop

@@ -26,14 +26,14 @@
 import h5py
 import time
 import numpy
-import mpo_dmrg_opers
-import mpo_dmrg_ptopers
-from misc import mpo_dmrg_model
-from qtensor import qtensor
-from qtensor import qtensor_opers
-from sysutil_include import dmrg_dtype,dmrg_mtype 
-import mpo_dmrg_opers1e
-from qtensor import qtensor_opers1e
+from . import mpo_dmrg_opers
+from . import mpo_dmrg_ptopers
+from .misc import mpo_dmrg_model
+from .qtensor import qtensor
+from .qtensor import qtensor_opers
+from .sysutil_include import dmrg_dtype,dmrg_mtype 
+from . import mpo_dmrg_opers1e
+from .qtensor import qtensor_opers1e
 
 #
 # Structure of MPS file:
@@ -45,7 +45,7 @@ from qtensor import qtensor_opers1e
 # copyMPS from fmps0 to fmps1
 def copyMPS(fmps1,fmps0,ifQt):
    nsite = fmps0['nsite'].value
-   print '\n[mpo_dmrg_io.copyMPS] ifQt=',ifQt,' nsite=',nsite
+   print('\n[mpo_dmrg_io.copyMPS] ifQt=',ifQt,' nsite=',nsite)
    if 'nsite' in fmps1: del fmps1['nsite']
    fmps1['nsite'] = nsite
    # Store qnums
@@ -199,10 +199,10 @@ def dumpMPO_H(dmrg,debug=False):
               		         	          dmrg.qpts,dmrg.pdic,dmrg.maxslc)
             cop.dump(grp,'op'+str(iop))
       tf = time.time()
-      if rank == 0: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   print ' path = ',dmrg.path+'/hop'
-   print ' time for dumpMPO[hop] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' path = ',dmrg.path+'/hop')
+   print(' time for dumpMPO[hop] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return 0
 
 # R=exp(-i*phi*Sy) operators
@@ -224,8 +224,8 @@ def dumpMPO_R(dmrg,debug=False):
             cop = qtensor_opers.genExpISyPhiQt(pts)
             cop.dump(dmrg.fpop,'op'+str(iop))
       t1 = time.time()
-      print ' path = ',dmrg.path+'/pop'
-      print ' time for dumpMPO[pop] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+      print(' path = ',dmrg.path+'/pop')
+      print(' time for dumpMPO[pop] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return 0
 
 # MPO for H0 used in mps-based perturbation theory
@@ -236,8 +236,8 @@ def dumpMPO_R(dmrg,debug=False):
 #      = 4 - spin-free (D=5K)
 def dumpMPO_H0(dmrg,debug=False):
    if dmrg.ifs2proj and dmrg.ifH0 < 3:
-      print 'error: PT for SP-MPS must be based on spin-free H0!'
-      print '       In the current implementation ifH0 = 3 or 4.' 
+      print('error: PT for SP-MPS must be based on spin-free H0!')
+      print('       In the current implementation ifH0 = 3 or 4.') 
       exit(1)
    rank = dmrg.comm.rank
    t0 = time.time()
@@ -285,13 +285,13 @@ def dumpMPO_H0(dmrg,debug=False):
                cop.dump(grp,'op'+str(iop))
 
       else:  
-	 print '\nerror: No such option for dumpMPO_H0!'
+	 print('\nerror: No such option for dumpMPO_H0!')
 	 exit(1)
 
       tf = time.time()
-      if rank == 0: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   print ' time for dumpMPO[dop] = %.2f s'%(t1-t0),' rank =',rank
+   print(' time for dumpMPO[dop] = %.2f s'%(t1-t0),' rank =',rank)
    return 0
 
 def dumpMPO_Hubbard(dmrg,debug=False):
@@ -311,13 +311,13 @@ def dumpMPO_Hubbard(dmrg,debug=False):
             grp['op'+str(iop)] = cop
          else:
 	    #cop.dump(grp,'op'+str(iop))
-            print 'Not implemented yet!'
+            print('Not implemented yet!')
 	    exit()
-         if debug: print ' isite/iop =',isite,iop,' pindx =',pindx
+         if debug: print(' isite/iop =',isite,iop,' pindx =',pindx)
       tf = time.time()
-      if rank == 0: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   print ' time for dumpMPO[Hubbard] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' time for dumpMPO[Hubbard] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return 0
 
 # DUMP Wx[isite] for H
@@ -346,10 +346,10 @@ def dumpMPO_H1e(dmrg,debug=False):
               		         	            dmrg.qpts,dmrg.maxslc,dmrg.model_u)
             cop.dump(grp,'op'+str(iop))
       tf = time.time()
-      if rank == 0: print ' isite =',isite,' time = %.2f s'%(tf-ti) 
+      if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
-   print ' path = ',dmrg.path+'/hop'
-   print ' time for dumpMPO[1e] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' path = ',dmrg.path+'/hop')
+   print(' time for dumpMPO[1e] = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return 0
 
 #######
@@ -357,12 +357,12 @@ def dumpMPO_H1e(dmrg,debug=False):
 ########
 
 def finalMPS(dmrg):   
-   print ' close flmps ...'
+   print(' close flmps ...')
    try: 
       dmrg.flmps.close()
    except AttributeError or ValueError:
       pass
-   print ' close frmps ...'
+   print(' close frmps ...')
    try: 
       dmrg.frmps.close()
    except AttributeError or ValueError:
@@ -371,13 +371,13 @@ def finalMPS(dmrg):
 
 def finalMPO(dmrg):
    rank = dmrg.comm.rank
-   print ' close fhop ...'
+   print(' close fhop ...')
    try:
       dmrg.fhop.close() 
    except AttributeError or ValueError:
       pass 
    if rank == 0 and dmrg.ifs2proj: 
-      print ' close fpop ...'
+      print(' close fpop ...')
       try:
          dmrg.fpop.close()
       except AttributeError or ValueError:
@@ -403,7 +403,7 @@ def loadInts(dmrg,mol):
    else:
       # Rank-0 loads its all integrals first 
       if rank == 0:
-         print '\n[mpo_dmrg_io.loadInts]'
+         print('\n[mpo_dmrg_io.loadInts]')
          t0 = time.time()
          f = h5py.File(mol.fname, "r")
          dmrg.int1e= f['int1e'][dmrg.pidx]
@@ -428,7 +428,7 @@ def loadInts(dmrg,mol):
    # test
    debug = False
    if debug:
-      print 'rank/pdim/int2e=',rank,dmrg.pdim,dmrg.int2e.shape
+      print('rank/pdim/int2e=',rank,dmrg.pdim,dmrg.int2e.shape)
       tmp = h5py.File('tmp'+str(irank)+'.h5','w')
       tmp['int1e'] = dmrg.int1e
       tmp['int2e'] = dmrg.int2e
@@ -436,5 +436,5 @@ def loadInts(dmrg,mol):
    if rank == 0: 
       f.close()	   
       t1 = time.time()
-      print " loadInts sucessfully! time = %.2f s"%(t1-t0)
+      print(" loadInts sucessfully! time = %.2f s"%(t1-t0))
    return 0

@@ -1,19 +1,19 @@
 import numpy
-import qtensor
+from . import qtensor
 from zmpo_dmrg.source import mpo_dmrg_qphys
 from zmpo_dmrg.source import mpo_dmrg_io
 
 # Reverse the Cast fmps0 to fmps1[Qt form]
 def fmpsQtReverse(fmps0,fmps1,status,isym=2):
-   print '\n[qtensor_api.fmpsQtReverse] status=',status
+   print('\n[qtensor_api.fmpsQtReverse] status=',status)
    nsite = fmps0['nsite'].value
    fmps1['nsite'] = nsite
    # Check symmetry
    lenSym = len(fmps0['qnum0'].value[0])
    if lenSym != isym:
-      print ' error: isym is not consistent!'
-      print ' qnum0:',fmps0['qnum0'].value[0]
-      print ' lenSym/isym =',lenSym,isym
+      print(' error: isym is not consistent!')
+      print(' qnum0:',fmps0['qnum0'].value[0])
+      print(' lenSym/isym =',lenSym,isym)
       exit()
    # Save qnums   
    for isite in range(nsite+1):
@@ -23,13 +23,13 @@ def fmpsQtReverse(fmps0,fmps1,status,isym=2):
    for isite in range(nsite):
       qtsite = mpo_dmrg_io.loadSite(fmps0,isite,True)
       npsite = qtsite.toDenseTensor(qtsite.idlst)
-      print ' isite =',isite,' shape=',npsite.shape
+      print(' isite =',isite,' shape=',npsite.shape)
       fmps1['site'+str(isite)] = npsite
    return 0
 
 # Cast fmps0 to fmps1[Qt form]
 def fmpsQt(fmps0,fmps1,status,isym=2):
-   print '\n[qtensor_api.fmpsQt] status=',status
+   print('\n[qtensor_api.fmpsQt] status=',status)
    nsite = fmps0['nsite'].value
    fmps1['nsite'] = nsite
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,isym)
@@ -41,9 +41,9 @@ def fmpsQt(fmps0,fmps1,status,isym=2):
    # Check symmetry
    lenSym = len(fmps0['qnum0'].value[0])
    if lenSym != isym:
-      print ' error: isym is not consistent!'
-      print ' qnum0:',fmps0['qnum0'].value[0]
-      print ' lenSym/isym =',lenSym,isym
+      print(' error: isym is not consistent!')
+      print(' qnum0:',fmps0['qnum0'].value[0])
+      print(' lenSym/isym =',lenSym,isym)
       exit()
    # Cast into Qt tensor
    for isite in range(nsite):
@@ -51,7 +51,7 @@ def fmpsQt(fmps0,fmps1,status,isym=2):
       qn = qphys[isite]
       qr = fmps0['qnum'+str(isite+1)].value
       site = fmps0['site'+str(isite)].value
-      print ' isite =',isite,' shape=',site.shape
+      print(' isite =',isite,' shape=',site.shape)
       tmps = qtensor.qtensor(sta)
       tmps.fromDenseTensor(site,[ql,qn,qr])    
       tmps.dump(fmps1,'site'+str(isite))     
@@ -63,7 +63,7 @@ def fmpsQt(fmps0,fmps1,status,isym=2):
 
 # Cast mps0 to fmps1[Qt form]
 def mpsQt(mps,qnum,status):
-   print '\n[qtensor_api.mpsQt] status=',status
+   print('\n[qtensor_api.mpsQt] status=',status)
    debug=False
    nsite = len(mps)
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
@@ -83,10 +83,10 @@ def mpsQt(mps,qnum,status):
       qtlst.append(tmps)
       # Test
       if debug:
-         print 'isite=',isite
+         print('isite=',isite)
          tsite = tmps.toDenseTensor()
          diffDense = numpy.linalg.norm(tsite-site)
-         print ' diffDense=',diffDense
+         print(' diffDense=',diffDense)
          tmps.prt()
          assert diffDense<1.e-12
    return qtlst

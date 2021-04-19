@@ -3,15 +3,16 @@ import copy
 import math
 import numpy
 import scipy.linalg
-from tools import misc
-from tools import jwtrans
-from tools import itools
-from tools import detlib
-from tools import tensorRep
-from tools import tensorDecomp
-from tools import mpslib
-import mps_class
-import mpo_qphys
+from .tools import misc
+from .tools import jwtrans
+from .tools import itools
+from .tools import detlib
+from .tools import tensorRep
+from .tools import tensorDecomp
+from .tools import mpslib
+from . import mps_class
+from . import mpo_qphys
+from functools import reduce
 
 #
 # A simple MPO class: support basic algebras of MPO.
@@ -40,7 +41,7 @@ class class_mpo:
 	 tmp1 = self.sites[i].transpose(2,3,0,1).copy()
 	 tmp2 = numpy.zeros(tmp1.shape)
 	 nd = tmp1.shape[0]
-	 tmp2[range(nd),range(nd)] = tmp1[range(nd),range(nd)]
+	 tmp2[list(range(nd)),list(range(nd))] = tmp1[list(range(nd)),list(range(nd))]
          tmpo.sites[i] = tmp2.transpose(2,3,0,1).copy() 
       return tmpo
 
@@ -67,21 +68,21 @@ class class_mpo:
       return dk
 
    def prt(self,ifqnums=None):
-      print "\nMPOinfo:"
-      print " nsite = ",self.nsite	   
+      print("\nMPOinfo:")
+      print(" nsite = ",self.nsite)	   
       for i in range(self.nsite):
-         print " Site : ",i," Shape : ",self.sites[i].shape,\
-	       " Val = ",numpy.linalg.norm(self.sites[i])
+         print(" Site : ",i," Shape : ",self.sites[i].shape,\
+	       " Val = ",numpy.linalg.norm(self.sites[i]))
       if self.qnums is not None and ifqnums:
 	 self.prtQnums()
-      print "End of MPOinfo\n"
+      print("End of MPOinfo\n")
       return 0
 
    def prtQnums(self):
-      print " quantum numbers:"
+      print(" quantum numbers:")
       for i in range(self.nsite):
-	 print " Bond : ",i," bdim[i] =",len(self.qnums[i])
-	 print " Qnums[i] =",self.qnums[i]
+	 print(" Bond : ",i," bdim[i] =",len(self.qnums[i]))
+	 print(" Qnums[i] =",self.qnums[i])
       return 0
 
    def toMat(self):
@@ -131,8 +132,8 @@ class class_mpo:
       #
       rr = mpslib.mps_diff(t1,t2,iprt=0)
       if rr > 1.e-5:
-	 print 'error: compression error in MPOcompression! rr=',rr
-	 print 'HSnorm = ',self.HSnorm()
+	 print('error: compression error in MPOcompression! rr=',rr)
+	 print('HSnorm = ',self.HSnorm())
       # from t1 (list) -> MPO
       N = self.nsite
       # t1(0)[ud,r']->s(0)[l=1,r',u,d]
@@ -280,7 +281,7 @@ class class_mpo:
       return tmps
 
    def dotMPS(self,mps,debug=False):
-      if debug: print '\n[mpo_class.dotMPS]'	   
+      if debug: print('\n[mpo_class.dotMPS]')	   
       assert self.nsite == mps.nsite
       mps2 = mps.torank2()
       tmps = self.dot(mps2)
@@ -289,7 +290,7 @@ class class_mpo:
       #
       qnums = None
       if self.qnums is not None and mps.qnums is not None:
-	 if debug: print 'Merge quantum numbers:'
+	 if debug: print('Merge quantum numbers:')
 	 q1 = self.qnums
 	 q2 = mps.qnums
 	 b1 = self.bdim()
@@ -299,7 +300,7 @@ class class_mpo:
 	    q1i = self.qnums[ibond]
 	    q2i = mps.qnums[ibond]
 	    q12 = mpo_qphys.dpt(q1i,q2i)
-	    if debug: print 'q12=',q12
+	    if debug: print('q12=',q12)
 	    # Some compressions are required to remove negative 
 	    # and large q12 that exceed the allowed qnums.
 	    qnums[ibond] = copy.deepcopy(q12)
@@ -311,7 +312,7 @@ class class_mpo:
    # IO
    #--------------------------------
    def dump(self,fname='mpo.h5'):
-      print '\n[mpo_class.dump]: fname = ',fname
+      print('\n[mpo_class.dump]: fname = ',fname)
       f = h5py.File(fname, "w")
       f.create_dataset("nsite",data=self.nsite)
       f.create_dataset("hmpo_bdim",data=self.bdim())
@@ -321,11 +322,11 @@ class class_mpo:
       return 0
 
    def merge(self,partition):
-      print '\n[mps_class.merge]'
-      print ' Partition =',partition
+      print('\n[mps_class.merge]')
+      print(' Partition =',partition)
       nsite = len(partition)
       if nsite == 0:
- 	 print 'error: empty partition!'
+ 	 print('error: empty partition!')
 	 exit()
       # Start construction
       tmpo = [0]*nsite
@@ -391,9 +392,9 @@ def mpo_r1mat(t1):
 # Diff <P-Q|P-Q>
 def mpo_diff(mpo1,mpo2,iprt=0):
    if iprt != 0:
-      print '[mpo_diff]'
-      print 'mpo1.bdim=',mpo1.bdim()
-      print 'mpo2.bdim=',mpo2.bdim()
+      print('[mpo_diff]')
+      print('mpo1.bdim=',mpo1.bdim())
+      print('mpo2.bdim=',mpo2.bdim())
    mps1 = mpo1.toMPS()
    mps2 = mpo2.toMPS()
    rr = mpslib.mps_diff(mps1,mps2,iprt)
@@ -420,7 +421,7 @@ def u1mpo(k,i,j,arg,iop=0,debug=False):
    # 1. umat[(u,d),a]	   
    if iop == 0:
       tmp = u1mat(arg)
-      if debug: print '\nucore[i,j]= (%d,%d)\n'%(i,j),tmp
+      if debug: print('\nucore[i,j]= (%d,%d)\n'%(i,j),tmp)
    else:
       # A kind of random unitary	   
       tmp = numpy.random.uniform(-1,1,(4,4))
@@ -434,11 +435,11 @@ def u1mpo(k,i,j,arg,iop=0,debug=False):
    tmp = tmp.transpose(0,3,1,2).copy()
    u1mpo.sites[j] = tmp.copy()
    if debug:
-      print u1mpo.sites
-      print k
-      print u1mpo.sites[0].shape
-      print u1mpo.sites[1].shape
-      print u1mpo.toMat()
+      print(u1mpo.sites)
+      print(k)
+      print(u1mpo.sites[0].shape)
+      print(u1mpo.sites[1].shape)
+      print(u1mpo.toMat())
    return u1mpo
 
 #
@@ -517,7 +518,7 @@ def genHmpo1(h1e,thresh=1.e-10):
 	 op1.compress()
          #print 'bdim',j,op1.bdim()
    if idx == 0:
-      print 'warning: no mpo generated in genHmpo1 with thresh=',thresh
+      print('warning: no mpo generated in genHmpo1 with thresh=',thresh)
       op1 = nullmpo(nb)
    return op1 
 
@@ -552,7 +553,7 @@ def genHmpo2(h2e,thresh=1.e-10):
          op1.compress()
          #print 'bdim',j,op1.bdim()
    if idx == 0:
-      print 'error: no mpo generated in genHmpo2 with thresh=',thresh
+      print('error: no mpo generated in genHmpo2 with thresh=',thresh)
       op1 = nullmpo(nb)
    return op1
 
@@ -563,8 +564,8 @@ def testRandomUrot(nb,i,j,arg,op1,thresh=1.e-10):
    hmpo = op1
    bdim0 = hmpo.bdim()
    u1 = u1mpo(nb,i,j,arg,debug=True)
-   print 'u1mpo',u1.bdim()
-   print u1.HSnorm()
+   print('u1mpo',u1.bdim())
+   print(u1.HSnorm())
    u1t  = u1.T()
    u1th = u1t.prod(hmpo)
    #u1th.compress()
@@ -582,17 +583,17 @@ def testRandomUrot(nb,i,j,arg,op1,thresh=1.e-10):
    u1mat = u1.toMat()
    opmat = op1.toMat()
    trans = reduce(numpy.dot,(u1mat.T,opmat,u1mat))
-   print 'trans\n',trans
+   print('trans\n',trans)
    return uthu,bdim0,bdimt,bdim1,bdim2
 
 def printUrot(i,j,arg,res): 
    bdim0,bdimt,bdim1,bdim2 = res[1:]
-   print
-   print 'i,j',i,j,'arg=',arg,'bdims=',bdim0[i],bdim0[i]*16
-   print 'bdim0(   h  ) =',bdim0
-   print 'bdimt(ut*h  ) =',bdimt
-   print 'bdim1(ut*h*u) =',bdim1
-   print 'bdim2(cmprss) =',bdim2
+   print()
+   print('i,j',i,j,'arg=',arg,'bdims=',bdim0[i],bdim0[i]*16)
+   print('bdim0(   h  ) =',bdim0)
+   print('bdimt(ut*h  ) =',bdimt)
+   print('bdim1(ut*h*u) =',bdim1)
+   print('bdim2(cmprss) =',bdim2)
    return 0
 
 #
@@ -601,9 +602,9 @@ def printUrot(i,j,arg,res):
 def BCHtransform(hmpo,kmpo):
    thmpo = copy.deepcopy(hmpo)
    norm = thmpo.HSnorm()
-   print thmpo.prt()
-   print 'i,bdim1=',0,thmpo.bdim()
-   print 'i,norm1=',0,norm
+   print(thmpo.prt())
+   print('i,bdim1=',0,thmpo.bdim())
+   print('i,norm1=',0,norm)
    # [k,H] = k*H - H*k
    seed = copy.deepcopy(hmpo)
    for i in range(1,100):
@@ -616,7 +617,7 @@ def BCHtransform(hmpo,kmpo):
       norm = seed.HSnorm()
       thmpo = thmpo.add(seed)
       thmpo.compress()
-      print 'i,bdim1=',i,thmpo.bdim(),norm,thmpo.HSnorm()
+      print('i,bdim1=',i,thmpo.bdim(),norm,thmpo.HSnorm())
    return thmpo
 
 #
@@ -644,7 +645,7 @@ def s2projmpo(k,sval,sz,npoints=100):
       expm[3,3] = 1.0
       return expm
    # Weights
-   from tools import smalld
+   from .tools import smalld
    def wfun(phi,sval,sz):
       wt = (2.*sval+1.)/2.0*math.sin(phi)*smalld.value(sval,sz,sz,phi)
       return wt
@@ -666,8 +667,8 @@ def s2projmpo(k,sval,sz,npoints=100):
    wts = wts*numpy.pi/(3.0*npoints)
    # Sites
    xdata = numpy.linspace(0,numpy.pi,num=npts)
-   wts = wts*numpy.array(map(lambda x:wfun(x,sval,sz),xdata))
-   expm1 = numpy.array(map(lambda x:rfun(x),xdata))
+   wts = wts*numpy.array([wfun(x,sval,sz) for x in xdata])
+   expm1 = numpy.array([rfun(x) for x in xdata])
    expm0 = numpy.array([wts[i]*expm1[i] for i in range(npts)])
    # MPO
    op = class_mpo(k)
@@ -675,9 +676,9 @@ def s2projmpo(k,sval,sz,npoints=100):
    op.sites[0][0] = expm0
    for isite in range(1,k-1):
       op.sites[isite] = numpy.zeros((npts,npts,4,4))
-      op.sites[isite][range(npts),range(npts)] = expm1
+      op.sites[isite][list(range(npts)),list(range(npts))] = expm1
    op.sites[k-1] = numpy.zeros((npts,1,4,4))
-   op.sites[k-1][range(npts),0] = expm1
+   op.sites[k-1][list(range(npts)),0] = expm1
    return op
 
 def occmpo(k):
@@ -742,14 +743,14 @@ def genUmpo(k,i,j,arg,targ=1.e-10,tcomp=1.e-10,debug=False):
 	 if norm < 1.e-12: iconv=True; break
          umpo = umpo.add(smpo)
          umpo.compress(thresh=tcomp)
-	 if debug: print 'i,bdim1=',i,umpo.bdim(),norm,umpo.HSnorm()
+	 if debug: print('i,bdim1=',i,umpo.bdim(),norm,umpo.HSnorm())
 	 #print smpo.toMat()
 	 #print umpo.toMat()
       if iconv == False:
-         print 'Umpo not converged!'
+         print('Umpo not converged!')
          exit()
       else:
-         print 'Umpo generated with maxsteps=',i
+         print('Umpo generated with maxsteps=',i)
       #umat = umpo.toMat()
       #print umat
       #print umat.T.dot(umat)
@@ -805,7 +806,7 @@ def genU1mpo(k,i,j,arg,thresh_arg=1.e-10):
    return umpo
 
 def testOneBodyU():
-   print '\n[testOneBodyU]'
+   print('\n[testOneBodyU]')
    k = 20 # LARGE k = 30 -> THE NUMERICAL ERROR GROWS WITH k !!!
    i = 4
    j = 15
@@ -815,9 +816,9 @@ def testOneBodyU():
    umpo2 = genU1mpo(k,i,j,arg)
    rr = mpo_diff(umpo1,umpo2)
    umpo1.compress(iprt=1,thresh=1.e-8)
-   print 'umpo1',umpo1.bdim()
-   print 'umpo2',umpo2.bdim()
-   print 'diff=',rr
+   print('umpo1',umpo1.bdim())
+   print('umpo2',umpo2.bdim())
+   print('diff=',rr)
    # The result should be:
    #umpo1 [1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1]
    #umpo2 [1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1]
@@ -847,7 +848,7 @@ def testOneBodyU():
 #   return tmps
 
 def testAtA(nb=8):
-   print '\n[testAtA]'
+   print('\n[testAtA]')
    # Integrals
    numpy.random.seed(2)
    h1e = 10*numpy.random.uniform(-1,1,nb**2).reshape(nb,nb)
@@ -862,9 +863,9 @@ def testAtA(nb=8):
    bdim1 = op2.bdim()
    op2.compress()
    bdim2 = op2.bdim()
-   print 'bdim0=',bdim0
-   print 'bdim1=',bdim1
-   print 'bdim2=',bdim2
+   print('bdim0=',bdim0)
+   print('bdim1=',bdim1)
+   print('bdim2=',bdim2)
 
    op1b = genHmpo1(h1e2)
    bdim0 = op1b.bdim()
@@ -872,23 +873,23 @@ def testAtA(nb=8):
    bdim1 = op2b.bdim()
    op2b.compress()
    bdim2 = op2b.bdim()
-   print
-   print 'bdim0b=',bdim0
-   print 'bdim1b=',bdim1
-   print 'bdim2b=',bdim2
+   print()
+   print('bdim0b=',bdim0)
+   print('bdim1b=',bdim1)
+   print('bdim2b=',bdim2)
 
    op3 = op2.add(op2b).add(op2.T().add(op2b))
    bdim3 = op3.bdim()
    op3.compress()
    bdim3b= op3.bdim()
-   print
-   print 'bdim3 =',bdim3
-   print 'bdim3b=',bdim3b
+   print()
+   print('bdim3 =',bdim3)
+   print('bdim3b=',bdim3b)
 
    op4 = genHmpo2(h2e)
    bdim4 = op4.bdim()
-   print
-   print 'bdim4=',bdim4
+   print()
+   print('bdim4=',bdim4)
    #
    #No significant saving on bond dimensions
    #Better for parallelization? H-MPO O(K^5)? 
@@ -911,10 +912,10 @@ def testAtA(nb=8):
 
 
 def detToMPS(vmat1):
-   print '\n[detToMPS]'
+   print('\n[detToMPS]')
    nb,nelec = vmat1.shape
    civec2=numpy.zeros(misc.binomial(nb,nelec))
-   for strAB in itools.combinations(range(nb),nelec):
+   for strAB in itools.combinations(list(range(nb)),nelec):
       addr=tensorRep.str2addr_o1(nb,nelec,tensorRep.string2bit(strAB))
       civec2[addr]=numpy.linalg.det(vmat1[list(strAB),:])
    # Fock-space representation
@@ -940,20 +941,20 @@ def makeRDM1(mps):
    rdm1 = numpy.zeros((nb,nb))
    for i in range(nb):
       for j in range(nb):
-	 print 'rdm[i,j] (i,j)=',i,j  
+	 print('rdm[i,j] (i,j)=',i,j)  
          ci = mpo_r1(nb,i,1)
          aj = mpo_r1(nb,j,0)
          Aij = mpo_r1mul(ci,aj)
          op = class_mpo(nb)
          op.fromRank1(Aij)
 	 rdm1[i,j] = mpslib.mps_dot(mps,op.dot(mps))
-   print 'Hermicity=',numpy.linalg.norm(rdm1-rdm1.T)
+   print('Hermicity=',numpy.linalg.norm(rdm1-rdm1.T))
    return rdm1
 
 
 def testDet(nb=12,nelec=6):
    import jacobi
-   print '\n[testDet]'
+   print('\n[testDet]')
    # Init   
    numpy.random.seed(2)
    h=numpy.random.uniform(-1,1,nb*nb)
@@ -965,7 +966,7 @@ def testDet(nb=12,nelec=6):
    bdim0 = mpslib.mps_bdim(mps)
    rdm1 = makeRDM1(mps)
    diff = numpy.linalg.norm(rdm1-vmat1.dot(vmat1.T))
-   print 'RDMdiff=',diff
+   print('RDMdiff=',diff)
    if diff > 1.e-10: exit()
    #-----------------------------------------------------#
    # Try to convert MPS(in AO basis) to MPS(in MO basis) #
@@ -976,27 +977,27 @@ def testDet(nb=12,nelec=6):
    for idx,rot in enumerate(givens):
       k,l,arg = rot
       if abs(arg)<1.e-10: continue
-      print '>>> idx=',idx,'/',ngivens,' arg=',arg,math.cos(arg),math.sin(arg)
+      print('>>> idx=',idx,'/',ngivens,' arg=',arg,math.cos(arg),math.sin(arg))
       umpo = genU1mpo(nb,k,l,-arg)
       mps1 = copy.deepcopy(umpo.dot(mps1))
-      print 'mps.bdim = ',mpslib.mps_bdim(mps1)
+      print('mps.bdim = ',mpslib.mps_bdim(mps1))
       mpslib.mps_compress(mps1)
    # Print  
    bdim0 = mpslib.mps_bdim(mps)
    bdim1 = mpslib.mps_bdim(mps1)
-   print 'bdim0',bdim0
-   print 'bdim1',bdim1
+   print('bdim0',bdim0)
+   print('bdim1',bdim1)
    # Comparison
    dmps = mpslib.detmps(nb,nelec)
    rr = mpslib.mps_diff(dmps,mps1,iprt=1)
-   print 'diff=',rr
+   print('diff=',rr)
    nmpo = occmpo(nb)
    nelec1 = mpslib.mps_dot(dmps,nmpo.dot(dmps))
    nelec2 = mpslib.mps_dot(mps1,nmpo.dot(mps1))
-   print 'Check nelec:'
-   print 'nelec =',nelec
-   print 'nelec1=',nelec1
-   print 'nelec2=',nelec2
+   print('Check nelec:')
+   print('nelec =',nelec)
+   print('nelec1=',nelec1)
+   print('nelec2=',nelec2)
    #
    # bdim0 [2, 4, 8, 16, 32, 64, 128, 256, 128, 64, 32, 16, 8, 4, 2]
    # bdim1 [2, 3, 3, 3, 3, 3, 4, 4, 4, 3, 2, 2, 2, 1, 1]
@@ -1019,7 +1020,7 @@ def testDet(nb=12,nelec=6):
 # Test for local/non-local unitary rotations - NOT FINISHED YET!
 # 
 def testUdis(nb=10):
-   print '\n[testUdis]'
+   print('\n[testUdis]')
    nb = 10
    numpy.random.seed(2)
    # Integrals
@@ -1029,9 +1030,9 @@ def testUdis(nb=10):
    h1e2= h1e2+h1e2.T
    t1e = 10*numpy.random.uniform(-1,1,nb**3).reshape(nb,nb,nb)
    h2e = 10*numpy.random.uniform(-1,1,nb**4).reshape(nb,nb,nb,nb)
-   print '--------------------'
-   print ' MPO representation '
-   print '--------------------'
+   print('--------------------')
+   print(' MPO representation ')
+   print('--------------------')
    #
    # hij*ai^+*aj
    #
@@ -1047,10 +1048,10 @@ def testUdis(nb=10):
    # [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4]
    #
    # h[i,j]ai^+ aj
-   print 'Test for simple one-body non-local rotations'
+   print('Test for simple one-body non-local rotations')
    op1 = genHmpo1(h1e)
    bdim0 = op1.bdim()
-   print '\nbdim0=',bdim0
+   print('\nbdim0=',bdim0)
    #
    # Local: MPO transform
    #
@@ -1059,35 +1060,35 @@ def testUdis(nb=10):
    arg1 = numpy.random.uniform(-1,1)
    res1 = testRandomUrot(nb,i1,j1,arg1,op1)
    uthu = res1[0]
-   print 'bdim0',op1.bdim()
-   print 'uthu ',uthu.bdim()
+   print('bdim0',op1.bdim())
+   print('uthu ',uthu.bdim())
    #
    # Transform integrals
    #
    umat = ukmat(nb,i1,j1,arg1)
    th1e = reduce(numpy.dot,(umat.T,h1e,umat))
    top1 = genHmpo1(th1e)
-   print
-   print 'bdim0',op1.bdim()
-   print 'uthu ',uthu.bdim()
-   print 'top1 ',top1.bdim()
+   print()
+   print('bdim0',op1.bdim())
+   print('uthu ',uthu.bdim())
+   print('top1 ',top1.bdim())
    mat1=uthu.toMat()
    mat2=top1.toMat()
    e1,v1 =scipy.linalg.eigh(mat1)
    e2,v2 =scipy.linalg.eigh(mat2)
-   print 'e1',e1
-   print 'e2',e2
-   print 'h1e =\n',h1e
-   print 'umat=\n',umat
-   print 'th1e=\n',th1e
-   print 'mat1=\n',mat1
-   print 'mat2=\n',mat2
-   print 'mdif=',numpy.linalg.norm(mat1-mat2)
+   print('e1',e1)
+   print('e2',e2)
+   print('h1e =\n',h1e)
+   print('umat=\n',umat)
+   print('th1e=\n',th1e)
+   print('mat1=\n',mat1)
+   print('mat2=\n',mat2)
+   print('mdif=',numpy.linalg.norm(mat1-mat2))
    diff = mpo_diff(uthu,top1)
-   print 'diff=',diff
-   print op1.HSnorm()
-   print uthu.HSnorm()
-   print top1.HSnorm()
+   print('diff=',diff)
+   print(op1.HSnorm())
+   print(uthu.HSnorm())
+   print(top1.HSnorm())
    #
    # Nonlocal: MPO transform - WRONG !
    #
@@ -1096,23 +1097,23 @@ def testUdis(nb=10):
    arg2 = numpy.random.uniform(-1,1)
    res2 = testRandomUrot(nb,i2,j2,arg2,op1)
    uthu = res2[0]
-   print 'bdim0',op1.bdim()
-   print 'uthu ',uthu.bdim()
+   print('bdim0',op1.bdim())
+   print('uthu ',uthu.bdim())
    #
    # Transform integrals
    #
    umat = ukmat(nb,i2,j2,arg2)
    th1e = reduce(numpy.dot,(umat.T,h1e,umat))
    top1 = genHmpo1(th1e)
-   print
-   print 'bdim0',op1.bdim()
-   print 'uthu ',uthu.bdim()
-   print 'top1 ',top1.bdim()
+   print()
+   print('bdim0',op1.bdim())
+   print('uthu ',uthu.bdim())
+   print('top1 ',top1.bdim())
    mat1=uthu.toMat()
    mat2=top1.toMat()
-   print 'mdif=',numpy.linalg.norm(mat1-mat2)
+   print('mdif=',numpy.linalg.norm(mat1-mat2))
    diff = mpo_diff(uthu,top1)
-   print 'diff=',diff
+   print('diff=',diff)
    #
    # Nonlocal: New scheme
    # KappaMPO=[1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -1120,35 +1121,35 @@ def testUdis(nb=10):
    kmpo = k1mpo(nb,i2,j2,arg2)
    top2 = BCHtransform(op1,kmpo)
    tmat = top2.toMat()
-   print mat2
-   print tmat
-   print 'th1e=',th1e
-   print 'th1e=',h1e
-   print 'mdif2=',numpy.linalg.norm(mat2-tmat)
-   print top1.HSnorm()
+   print(mat2)
+   print(tmat)
+   print('th1e=',th1e)
+   print('th1e=',h1e)
+   print('mdif2=',numpy.linalg.norm(mat2-tmat))
+   print(top1.HSnorm())
    
    umpo = genUmpo(nb,i2,j2,arg2)
-   print umpo.bdim()
+   print(umpo.bdim())
    exit()
 
    umat = umpo.toMat()
   
    kmat = kmpo.toMat()
-   print 'kmpo_toMat=',kmat
-   print scipy.linalg.expm(-kmat)
-   print 'umat=',umat
+   print('kmpo_toMat=',kmat)
+   print(scipy.linalg.expm(-kmat))
+   print('umat=',umat)
 
    diff = mpo_diff(top2,top1)
-   print 'diff2=',diff
+   print('diff2=',diff)
 
    tmp0 = umpo.T().prod(op1)
    top3 = tmp0.prod(umpo)
    diff = mpo_diff(top3,top1)
-   print 'diff3=',diff
+   print('diff3=',diff)
 
-   print top1.bdim()
-   print top2.bdim()
-   print top3.bdim()
+   print(top1.bdim())
+   print(top2.bdim())
+   print(top3.bdim())
    top3.compress()
    exit()
 
@@ -1159,9 +1160,9 @@ def testUdis(nb=10):
    op2 = op1.prod(op1t)
    bdim0 = op2.bdim()
    op2.compress()
-   print
-   print bdim0
-   print op2.bdim()
+   print()
+   print(bdim0)
+   print(op2.bdim())
    exit()
    return 0
 
@@ -1187,7 +1188,7 @@ def testBdim2(h1e,itype,jtype,thresh=1.e-10):
       if op1 is not None:
 	 op1.compress()
    if idx == 0:
-      print 'error: no mpo generated in testBdim2 with thresh=',thresh
+      print('error: no mpo generated in testBdim2 with thresh=',thresh)
       exit()
    return op1 
 
@@ -1200,7 +1201,7 @@ def testBdim3(t1e,itype,jtype,ktype,thresh=1.e-10):
       for j in range(nb):
          for k in range(nb):
 	    if abs(t1e[i,j,k])<thresh: continue
-            print '(i,j,k)=',i,j,k,t1e[i,j,k]
+            print('(i,j,k)=',i,j,k,t1e[i,j,k])
             ci = mpo_r1(nb,i,itype)
             cj = mpo_r1(nb,j,jtype)
             ck = mpo_r1(nb,k,ktype)
@@ -1216,9 +1217,9 @@ def testBdim3(t1e,itype,jtype,ktype,thresh=1.e-10):
                op1 = op1.add(op)		
       if op1 is not None:
 	 op1.compress(thresh=1.e-8)
-	 print 'bdim=',op1.bdim()
+	 print('bdim=',op1.bdim())
    if idx == 0:
-      print 'error: no mpo generated in testBdim3 with thresh=',thresh
+      print('error: no mpo generated in testBdim3 with thresh=',thresh)
       exit()
    return op1
 
@@ -1228,8 +1229,8 @@ def testBdims(nb):
    t1e = 10*numpy.random.uniform(-1,1,nb**3).reshape(nb,nb,nb)
    op2 = testBdim2(h1e,1,0)
    op3 = testBdim3(t1e,1,0,0)
-   print op2.bdim()
-   print op3.bdim()
+   print(op2.bdim())
+   print(op3.bdim())
    #
    # nb = 16
    # [4, 6, 9, 11, 12, 14, 16, 18, 16, 14, 12, 10, 8, 6, 4]
@@ -1327,10 +1328,10 @@ def genHmpo1d(h1e,thresh=1.e-10,ifcomp=False):
       mpo = mpo.add(t1)
    
    # Print
-   print 'BEFORE:',mpo.bdim()
+   print('BEFORE:',mpo.bdim())
    # Only compress once
    if ifcomp: mpo.compress()
-   print 'AFTER:',mpo.bdim()
+   print('AFTER:',mpo.bdim())
    return mpo 
 
 

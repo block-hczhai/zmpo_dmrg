@@ -131,7 +131,7 @@ def symScreen(isite,nsite,rotL,qred,sigs,ne,sval,debug=True,status='L',ifscreen=
    # when isite=1, there should be one left.
    elif status == 'R':
       kres = isite 
-   if debug: print '\n[mpo_dmrg_conversion.symScreen] dimt=',len(sigs),' (kres,ne,sval)=',(kres,ne,sval)
+   if debug: print('\n[mpo_dmrg_conversion.symScreen] dimt=',len(sigs),' (kres,ne,sval)=',(kres,ne,sval))
    dic = {}
    for idx,val in enumerate(qred):
       dic.setdefault(str(val),[]).append(idx)
@@ -161,8 +161,8 @@ def symScreen(isite,nsite,rotL,qred,sigs,ne,sval,debug=True,status='L',ifscreen=
 	    ifcouple = ifpermit(kres,nres,sval,s1)
 
 	 if not debug:
-	    print ' idx=',idx,'item=',item,'dim=',len(dic[key]),\
-	          ' sigs=',wt,'pop=',pop,'ifcouple=',ifcouple
+	    print(' idx=',idx,'item=',item,'dim=',len(dic[key]),\
+	          ' sigs=',wt,'pop=',pop,'ifcouple=',ifcouple)
 	 key_current = key
 	 idx += 1 
 	 # Save for permitted case
@@ -172,41 +172,41 @@ def symScreen(isite,nsite,rotL,qred,sigs,ne,sval,debug=True,status='L',ifscreen=
    # Update
    qnumsl = numpy.array(qr)
    rotLnew = rotL[:,indx].copy() 
-   if debug: print ' Screend from',rotL.shape[-1],'to',rotLnew.shape[-1]
+   if debug: print(' Screend from',rotL.shape[-1],'to',rotLnew.shape[-1])
    return qnumsl,rotLnew
 
 if __name__ == '__main__':
    qr1 = numpy.array([[0,0.,1]])
    qr2 = numpy.array([[0,0.,1],[1,0.5,1],[2,0.,1]])
    qr12 = dpt_red(qr1,qr2)
-   print qr12
-   print dim_ful(qr12)
+   print(qr12)
+   print(dim_ful(qr12))
    qr12 = dpt_red(qr12,qr2)
-   print qr12
-   print dim_ful(qr12)
+   print(qr12)
+   print(dim_ful(qr12))
    qr12 = dpt_red(qr12,qr2)
-   print qr12
-   print dim_ful(qr12)
+   print(qr12)
+   print(dim_ful(qr12))
 
    qred = [[1.0, 0.5], [1.0, 0.5], [2.0, 0.0], [2.0, 0.0], [2.0, 0.0], [2.0, 1.0], [3.0, 0.5], [3.0, 0.5]]
-   print
-   print len(qred)
-   print qred
-   print collect(qred)
+   print()
+   print(len(qred))
+   print(qred)
+   print(collect(qred))
    
    qr2 = numpy.array([[0,0.,1],[1,0.5,1],[2,0.,1]])
-   print
-   print qr2
-   print expandSM(qr2)
+   print()
+   print(qr2)
+   print(expandSM(qr2))
 
    qr2 = numpy.array([[ 1., 0.5, 2. ],[ 2., 0. , 3. ],\
 	     	      [ 2.,  1., 1. ],[ 3., 0.5, 2. ]])
-   print 
-   print qr2
-   print expandSM(qr2)
+   print() 
+   print(qr2)
+   print(expandSM(qr2))
 
-   print
-   print ifpermissible(2,1,1)
-   print ifpermissible(2,1,0)
-   print ifpermissible(2,1,0.5)
-   print ifpermissible(3,4,1)
+   print()
+   print(ifpermissible(2,1,1))
+   print(ifpermissible(2,1,0))
+   print(ifpermissible(2,1,0.5))
+   print(ifpermissible(3,4,1))

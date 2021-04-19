@@ -17,19 +17,19 @@ from zmpo_dmrg.source import mpo_dmrg_init
 from zmpo_dmrg.source import mpo_dmrg_opers
 
 def diag(dmrg,fbmps,debug=False):
-   print '\n[mpo_dmrg_rdm.diag]'
+   print('\n[mpo_dmrg_rdm.diag]')
    if not dmrg.ifs2proj:
       fname = dmrg.path+'/rdm_diag'
       mpo_dmrg_init.genSops(dmrg,fbmps,fbmps,fname+'L','L',debug)
       mpo_dmrg_init.genSops(dmrg,fbmps,fbmps,fname+'R','R',debug)
       if dmrg.ifQt:
-         print 'error'
+         print('error')
          exit()
          #nii = diagQt(dmrg,fbmps,fname,debug)
       else:   
          nii = diagNQt(dmrg,fbmps,fname,debug)
    else:
-      print 'error'
+      print('error')
       exit()
       #mpo_dmrg_init.genPops(dmrg,fbmps,fbmps,fname,'R',debug)
    return nii
@@ -63,8 +63,8 @@ def diagNQt(dmrg,fbmps,fname,debug=False):
       fL.close()
       fR.close()
    # Final
-   print ' sum of nii =',numpy.sum(nii)
-   print ' nii =',nii
+   print(' sum of nii =',numpy.sum(nii))
+   print(' nii =',nii)
    t1=time.time()
-   print ' time for diagNQt = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank
+   print(' time for diagNQt = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
    return nii

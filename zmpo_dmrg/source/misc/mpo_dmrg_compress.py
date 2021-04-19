@@ -17,7 +17,7 @@ from zmpo_dmrg.source.mpsmpo import mps_class
 # Load & Compress & Dump of a MPS on file
 def cMPS(fmps0,fmps1,icase=1,thresh=-1,Dcut=-1,debug=False):
    nsite = fmps0['nsite'].value
-   print '\n[mpo_dmrg_compress.cMPS] icase =',icase,' nsite=',nsite
+   print('\n[mpo_dmrg_compress.cMPS] icase =',icase,' nsite=',nsite)
    # No symmetry - mpslst as a list
    if icase == 0:
       mps = objectMPS(fmps0,icase)

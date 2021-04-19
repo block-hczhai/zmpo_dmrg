@@ -15,7 +15,7 @@ def cdDiag(mol,intor,shells=None,ifsym=True):
     ioff= 0
     # (i>=j)
     lst = []
-    if shells is None: shells=range(mol.nbas)
+    if shells is None: shells=list(range(mol.nbas))
     nbas = 0
     for i in shells:
        for j in shells:
@@ -56,20 +56,20 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
     mem = (nao*nao)*Dij*numpy.zeros(1).itemsize/1024.0**2 #"M"
     mem = max(mem,100.0)
     # Print info 
-    if shells is None: shells=range(mol.nbas)
+    if shells is None: shells=list(range(mol.nbas))
     nshl = len(shells)
     if ifsym:
        npair = nshl*(nshl+1)/2	   
     else:
        npair = nshl*nshl
     if debug:
-       print "\nINFORMATION for Cholesky Decomposition:"
-       print "nshl =",nshl
-       print "npair=",npair
+       print("\nINFORMATION for Cholesky Decomposition:")
+       print("nshl =",nshl)
+       print("npair=",npair)
        for ij in range(npair):
-           print "ij-shell pair=",ij
-           print Qij[ij]
-       print "\nBegin Cholesky Decomposition:"
+           print("ij-shell pair=",ij)
+           print(Qij[ij])
+       print("\nBegin Cholesky Decomposition:")
     # 
     # LOOP over shells |IJ)
     #
@@ -87,9 +87,9 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
 	# 1. COMPUTE [kl|ji] - Nbas*Nbas*const
 	#
 	dmax = Qij[indx][2]
-	if debug: print '\n>>> ij=',ij,'/',npair,'i=',ishl,'j=',jshl,' dmax=',dmax
+	if debug: print('\n>>> ij=',ij,'/',npair,'i=',ishl,'j=',jshl,' dmax=',dmax)
 	if dmax < thresh:
-	   if debug: print "    Skipped based on Dmax:",ij,ijshl,dmax
+	   if debug: print("    Skipped based on Dmax:",ij,ijshl,dmax)
 	   continue
   	   # Actually, it is safe to break here when Qij is ordered
 	   #break
@@ -125,10 +125,10 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
 	    # Check diagonal of L
 	    vdiag = diag[idx][1]
 	    if abs(vdiag.imag) > 1.e-10:
-	       print "ERROR: Imaginary part is larger than 1.e-10 !"
+	       print("ERROR: Imaginary part is larger than 1.e-10 !")
 	       exit(1)
 	    if vdiag.real < thresh:
-	       if debug: print "    Skipped based on vdiag=",i,diag
+	       if debug: print("    Skipped based on vdiag=",i,diag)
 	       break
 	    lij  = math.sqrt(vdiag.real)
       	    #======================================== 
@@ -176,7 +176,7 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
 	      for i in range(len(cdvec)):
 	         qdiag[j]=qdiag[j]-cdvec[i][qaddr]*numpy.conj(cdvec[i][qaddr])
 		 if qdiag[j]<-0.1: 
-		    print "ERROR diag < 0.0",ijp,j,qdiag[j]
+		    print("ERROR diag < 0.0",ijp,j,qdiag[j])
 		    exit(1)     
 	   Qij[ijp][2]=numpy.amax(qdiag)
 	   Qij[ijp][3]=qdiag.copy()
@@ -188,8 +188,8 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
 	cdbuf = cdbuf + cdvec
 	size  = len(cdbuf)*cdbuf[0].nbytes/1024.0**2
 	if debug: 
-           print "    di*dj=",di*dj," lencdvec=",len(cdvec)," lenbuf=",len(cdbuf),\
-	   	 " MEM(M)=",size
+           print("    di*dj=",di*dj," lencdvec=",len(cdvec)," lenbuf=",len(cdbuf),\
+	   	 " MEM(M)=",size)
 	if size > mem:
  	   sblk = "block"+str(nblk)
 	   nblk = nblk + 1
@@ -205,19 +205,19 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
        cdbuf = []
     blks[0] = nblk
     # CHECK
-    print "\nCholesky Decomposition:"
-    print 'nblk =',nblk
-    print "NBAS =",nbas
-    print "NPAIR=",nbas*(nbas+1)/2 # NOT EXACTLY IN SYM-CASE
+    print("\nCholesky Decomposition:")
+    print('nblk =',nblk)
+    print("NBAS =",nbas)
+    print("NPAIR=",nbas*(nbas+1)/2) # NOT EXACTLY IN SYM-CASE
     for name in f:
-	print name,'shape =',f[name].shape
+	print(name,'shape =',f[name].shape)
     # CLOSE
     f.close()
     return nbas,cdbas
 
 
 def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
-    if shells is None: shells=range(mol.nbas)
+    if shells is None: shells=list(range(mol.nbas))
     atm = numpy.array(mol._atm, dtype=numpy.int32)
     bas = numpy.array(mol._bas, dtype=numpy.int32)
     env = numpy.array(mol._env)
@@ -245,8 +245,8 @@ def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
  	     mat = buff.copy()
 	  else:
 	     mat = numpy.hstack((mat,buff))
-    print "\nCDcheck:"
-    print "mat_sym  =",numpy.linalg.norm(mat-mat.T.conj())
+    print("\nCDcheck:")
+    print("mat_sym  =",numpy.linalg.norm(mat-mat.T.conj()))
     eri=mat
 
     #
@@ -256,11 +256,11 @@ def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
     eri3 = numpy.zeros((nb,nb,nb,nb))
     fill(mol,eri3,'cint2e_sph')
     eri3 = eri3.reshape((nb**2,nb**2))
-    print 'diff0[before reorgblk2d] =',numpy.linalg.norm(eri3-eri)
+    print('diff0[before reorgblk2d] =',numpy.linalg.norm(eri3-eri))
     # reorganize 2D
     indx = reorgblk2d(mol)
     eri4 = mat[numpy.ix_(indx,indx)]
-    print 'diff1[after reorgblk2d] = ',numpy.linalg.norm(eri3-eri4)
+    print('diff1[after reorgblk2d] = ',numpy.linalg.norm(eri3-eri4))
     #
     # Load
     #
@@ -271,7 +271,7 @@ def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
     for iblk in range(nblk):
  	sblk = "block"+str(iblk)
 	nvec = f[sblk].shape[0]
-	print sblk,'shape=',f[sblk].shape 
+	print(sblk,'shape=',f[sblk].shape) 
 	for j in range(nvec):
 	   l=f[sblk][j]
 	   lvec.append(l)
@@ -279,16 +279,16 @@ def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
     lvec=numpy.array(lvec)
     # L[mu,vec]*L[mu,vec]^* in such case
     eri2=numpy.dot(lvec.T,lvec.conj())
-    print "Norm(Mat)=",numpy.linalg.norm(eri)
-    print "Norm(LtL)=",numpy.linalg.norm(eri2)
+    print("Norm(Mat)=",numpy.linalg.norm(eri))
+    print("Norm(LtL)=",numpy.linalg.norm(eri2))
     eri2 = eri2 - eri
-    print "ERI_DIFF(cd-exact)=",numpy.linalg.norm(eri2)
+    print("ERI_DIFF(cd-exact)=",numpy.linalg.norm(eri2))
     #
     # Further check
     #
     eri  = numpy.dot(lvec[:,indx].T,lvec[:,indx].conj())
     eri2 = mol.intor('cint2e_sph',aosym='s1').reshape(nb*nb,nb*nb)
-    print 'diff[reorgblk2d]=',numpy.linalg.norm(eri-eri2)
+    print('diff[reorgblk2d]=',numpy.linalg.norm(eri-eri2))
     return 0
 
 
@@ -339,5 +339,5 @@ def reorgblk2d(mol):
 	       idx +=1
          pl += lbas    	
       pk += kbas
-   nindx = map(lambda x:x[2],sorted(indx))
+   nindx = [x[2] for x in sorted(indx)]
    return numpy.array(nindx)
