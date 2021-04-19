@@ -29,16 +29,16 @@ class class_mps:
       if sites is None:
          self.sites=[0]*k
       elif iop == 0:
-	 # rk2
-	 self.sites = copy.deepcopy(sites)
-	 mpslib.mps_mps2rank3(0,self.sites)
+         # rk2
+         self.sites = copy.deepcopy(sites)
+         mpslib.mps_mps2rank3(0,self.sites)
       elif iop == 1:
-	 # rk3
-	 self.sites = copy.deepcopy(sites)
+         # rk3
+         self.sites = copy.deepcopy(sites)
       # Quantum numbers on physical dimensions
       self.qphys = None
       if qphys is not None: 
-	 self.qphys = copy.deepcopy(qphys)
+         self.qphys = copy.deepcopy(qphys)
       elif isym != 0:
          self.qphys = mpo_qphys.init(k,isym) 
       #
@@ -56,29 +56,29 @@ class class_mps:
       if len(occ) == 0: #None:
          pocc = [0]*self.nsite 
          for i in range(n):
-            pocc[i] = 1		 
+            pocc[i] = 1          
       else:
-	 pocc = copy.deepcopy(occ)
-      # assign occupation	 
+         pocc = copy.deepcopy(occ)
+      # assign occupation        
       for i in range(self.nsite):
          tmp = numpy.zeros((1,2,1))
-	 # occupied
-	 if pocc[i] == 1:
-	    tmp[0,1,0] = 1.0
+         # occupied
+         if pocc[i] == 1:
+            tmp[0,1,0] = 1.0
          else:
-	    tmp[0,0,0] = 1.0
-	 sites[i] = tmp.copy()
+            tmp[0,0,0] = 1.0
+         sites[i] = tmp.copy()
       # rank-3
       self.sites = copy.deepcopy(sites)
       #--------------------------------------------
       # ZL20160205: set up quantum numbers ?
-      #		    all the bond dimensions are 1
-      #		    for simplicity, only particle 
-      #		    number is implemented.
+      #             all the bond dimensions are 1
+      #             for simplicity, only particle 
+      #             number is implemented.
       # Directed graphs: (0)->|->|->|->(N)
       #--------------------------------------------
       if self.qphys is not None:
-	 self.qnums = [0]*self.nsite
+         self.qnums = [0]*self.nsite
          qnumber = numpy.array(self.qphys[0][0],dtype=numpy.float_)
          for ibond in range(self.nsite):
             iphys = pocc[ibond]
@@ -107,26 +107,26 @@ class class_mps:
       icounter = 0
       # Complex algebra is mandatory in order to use the separability of exp(iNx)
       def fx(x,mps,refdet,n):
-	 global icounter
-	 icounter += 1
+         global icounter
+         icounter += 1
          nsite = len(refdet)
          sites1 = mps.torank2()
          sites2 = []
-	 for isite in range(nsite):
-	    if refdet[isite] == 0:
-	       ntmp = numpy.array([[1.,0.],[0.,cmath.exp(1.j*x)]])
-	    else:
-	       ntmp = numpy.array([[cmath.exp(1.j*x),0.],[0.,1.]])
-	    if isite == 0:
-	       tmp = numpy.einsum('ij,ja->ia',ntmp,sites1[isite])
-	    elif isite == nsite-1:
-	       tmp = numpy.einsum('ij,aj->ai',ntmp,sites1[isite])
-	    else:
-	       tmp = numpy.einsum('ij,ajb->aib',ntmp,sites1[isite])
-	    sites2.append(tmp)
+         for isite in range(nsite):
+            if refdet[isite] == 0:
+               ntmp = numpy.array([[1.,0.],[0.,cmath.exp(1.j*x)]])
+            else:
+               ntmp = numpy.array([[cmath.exp(1.j*x),0.],[0.,1.]])
+            if isite == 0:
+               tmp = numpy.einsum('ij,ja->ia',ntmp,sites1[isite])
+            elif isite == nsite-1:
+               tmp = numpy.einsum('ij,aj->ai',ntmp,sites1[isite])
+            else:
+               tmp = numpy.einsum('ij,ajb->aib',ntmp,sites1[isite])
+            sites2.append(tmp)
          val = mpslib.mps_dot(sites1,sites2)
-	 val = val*cmath.exp(-1.j*n*x)/(2.0*numpy.pi)
-	 val = val.real
+         val = val*cmath.exp(-1.j*n*x)/(2.0*numpy.pi)
+         val = val.real
          return val
       # First normalize and compress to accelerate the analysis
       norm = self.norm()
@@ -143,14 +143,14 @@ class class_mps:
       maxNoQuasiParticles = 2*(min(nelec,k-nelec)+1)
       for n in range(maxNoQuasiParticles):
         # for particle number conserving Hamiltonian,
-	# only pair of p-h can apper
+        # only pair of p-h can apper
         if n%2 == 1: continue 
         # Roughly 100 points per each integral
         # https://en.wikipedia.org/wiki/QUADPACK
-	# http://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.integrate.quad.html
-	y,err = quad(fx,0,2*numpy.pi,args=(mps,refdet,n))#epsrel=1.e-1)
+        # http://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.integrate.quad.html
+        y,err = quad(fx,0,2*numpy.pi,args=(mps,refdet,n))#epsrel=1.e-1)
         print(' n = %3d'%n,' erank=',n/2,' y=',y,' err=',err,' icounter=',icounter)
-	psum += y
+        psum += y
       print(' Total population =',psum)
       return 0 
 
@@ -173,25 +173,25 @@ class class_mps:
       icounter = 0
       # Complex algebra is mandatory in order to use the separability of exp(iNx)
       def fx(xdata,mps,refdet):
-	 global icounter
-	 icounter += 1
+         global icounter
+         icounter += 1
          nsite = len(refdet)
          sites1 = mps.torank2()
-	 ydata = numpy.zeros(xdata.shape,dtype=numpy.complex_)
-	 for i,x in enumerate(xdata):
+         ydata = numpy.zeros(xdata.shape,dtype=numpy.complex_)
+         for i,x in enumerate(xdata):
             sites2 = []
-	    for isite in range(nsite):
-	       if refdet[isite] == 0:
-	          ntmp = numpy.array([[1.,0.],[0.,cmath.exp(1.j*x)]])
-	       else:
-	          ntmp = numpy.array([[cmath.exp(1.j*x),0.],[0.,1.]])
-	       if isite == 0:
-	          tmp = numpy.einsum('ij,ja->ia',ntmp,sites1[isite])
-	       elif isite == nsite-1:
-	          tmp = numpy.einsum('ij,aj->ai',ntmp,sites1[isite])
-	       else:
-	          tmp = numpy.einsum('ij,ajb->aib',ntmp,sites1[isite])
-	       sites2.append(tmp)
+            for isite in range(nsite):
+               if refdet[isite] == 0:
+                  ntmp = numpy.array([[1.,0.],[0.,cmath.exp(1.j*x)]])
+               else:
+                  ntmp = numpy.array([[cmath.exp(1.j*x),0.],[0.,1.]])
+               if isite == 0:
+                  tmp = numpy.einsum('ij,ja->ia',ntmp,sites1[isite])
+               elif isite == nsite-1:
+                  tmp = numpy.einsum('ij,aj->ai',ntmp,sites1[isite])
+               else:
+                  tmp = numpy.einsum('ij,ajb->aib',ntmp,sites1[isite])
+               sites2.append(tmp)
             ydata[i] = mpslib.mps_dot(sites1,sites2)/(2.0*numpy.pi)
          return ydata
       # First normalize and compress to accelerate the analysis
@@ -213,11 +213,11 @@ class class_mps:
       psum = 0.0
       for n in range(maxNoQuasiParticles):
          if n%2 == 1: continue
-	 ydata2 = [cmath.exp(-1.j*n*x) for x in xdata]
-	 ydata2 = (ydata2*ydata).real
-	 y = simps(ydata2,xdata)
+         ydata2 = [cmath.exp(-1.j*n*x) for x in xdata]
+         ydata2 = (ydata2*ydata).real
+         y = simps(ydata2,xdata)
          print(' n = %3d'%n,' erank=',n/2,' y=',y,' icounter=',icounter)
-	 psum += y
+         psum += y
       print(' Total population =',psum)
       return 0 
 
@@ -226,84 +226,84 @@ class class_mps:
    #--------------------------------
    def quadfun(self,case,refdet=None):
       dic = {'n':0,\
-	     'omega':1,\
-	     'ph':2,\
-	     'sz':3,\
-	     's2':4}
+             'omega':1,\
+             'ph':2,\
+             'sz':3,\
+             's2':4}
       icase = dic[case]
       # particle number 
       if icase == 0:
          def rfun(phi):
-	    expm = numpy.zeros((4,4),dtype=numpy.complex_)
-	    expm[0,0] = 1.0
-	    expm[1,1] = cmath.exp(1.j*phi)
-	    expm[2,2] = cmath.exp(1.j*phi)
-	    expm[3,3] = cmath.exp(2.j*phi)
-	    return expm
+            expm = numpy.zeros((4,4),dtype=numpy.complex_)
+            expm[0,0] = 1.0
+            expm[1,1] = cmath.exp(1.j*phi)
+            expm[2,2] = cmath.exp(1.j*phi)
+            expm[3,3] = cmath.exp(2.j*phi)
+            return expm
          def wfun(phi,qnum):
-	    wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
- 	    return wt
+            wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
+            return wt
       # singly occupancy
       elif icase == 1:
          def rfun(phi):
-	    expm = numpy.zeros((4,4),dtype=numpy.complex_)
-	    expm[0,0] = 1.0
-	    expm[1,1] = cmath.exp(1.j*phi)
-	    expm[2,2] = cmath.exp(1.j*phi)
-	    expm[3,3] = 1.0
-	    return expm
+            expm = numpy.zeros((4,4),dtype=numpy.complex_)
+            expm[0,0] = 1.0
+            expm[1,1] = cmath.exp(1.j*phi)
+            expm[2,2] = cmath.exp(1.j*phi)
+            expm[3,3] = 1.0
+            return expm
          def wfun(phi,qnum):
-	    wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
- 	    return wt
+            wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
+            return wt
       # particle-hole excitations
       elif icase == 2:
          def rfun(phi,iocc):
-	    # Exp(x*(n1+n2))=Exp(x*n1)\otimesExp(x*n2)
- 	    occ = numpy.zeros((2,2,2),dtype=numpy.complex_)
-	    occ[0] = numpy.array([[1.,0.],[0.,cmath.exp(1.j*phi)]])
-	    occ[1] = numpy.array([[cmath.exp(1.j*phi),0.],[0.,1.]])
-	    expm = numpy.kron(occ[iocc[0]],occ[iocc[1]])
-	    return expm
+            # Exp(x*(n1+n2))=Exp(x*n1)\otimesExp(x*n2)
+            occ = numpy.zeros((2,2,2),dtype=numpy.complex_)
+            occ[0] = numpy.array([[1.,0.],[0.,cmath.exp(1.j*phi)]])
+            occ[1] = numpy.array([[cmath.exp(1.j*phi),0.],[0.,1.]])
+            expm = numpy.kron(occ[iocc[0]],occ[iocc[1]])
+            return expm
          def wfun(phi,qnum):
-	    wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
- 	    return wt
+            wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
+            return wt
       # [i*alpha_k*Sz] 
       elif icase == 3:
          def rfun(phi):
-	    expm = numpy.zeros((4,4),dtype=numpy.complex_)
-	    expm[0,0] = 1.0
-	    expm[1,1] = cmath.exp(-0.5j*phi)
-	    expm[2,2] = cmath.exp(0.5j*phi)
-	    expm[3,3] = 1.0
-	    return expm
+            expm = numpy.zeros((4,4),dtype=numpy.complex_)
+            expm[0,0] = 1.0
+            expm[1,1] = cmath.exp(-0.5j*phi)
+            expm[2,2] = cmath.exp(0.5j*phi)
+            expm[3,3] = 1.0
+            return expm
          def wfun(phi,qnum):
-	    wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
- 	    return wt
+            wt = cmath.exp(-1.j*qnum*phi)/(2.*numpy.pi)
+            return wt
       # exp(-i*beta_k*Sy) -> Percus-Rotenberg (1962) 
       elif icase == 4:
          def rfun(phi):
-	    expm = numpy.zeros((4,4),dtype=numpy.float_)
-	    expm[0,0] = 1.0
-	    #
-	    # [-i]*[sigma_y] = [-i]*[[0,-i],  = [[0,-1],
-	    #		  	     [i, 0]]     [1, 0]]
-	    #
-	    # MPO site:
-	    # 0
-	    # b [ cos(b/2), sin(b/2)]
-	    # a [-sin(b/2), cos(b/2)]
-	    # 2 
-	    c = math.cos(0.5*phi)
-	    s = math.sin(0.5*phi)
-	    expm[1,1] = c 
-	    expm[1,2] = s 
-	    expm[2,1] = -s 
-	    expm[2,2] = c 
-	    expm[3,3] = 1.0
-	    return expm
+            expm = numpy.zeros((4,4),dtype=numpy.float_)
+            expm[0,0] = 1.0
+            #
+            # [-i]*[sigma_y] = [-i]*[[0,-i],  = [[0,-1],
+            #                        [i, 0]]     [1, 0]]
+            #
+            # MPO site:
+            # 0
+            # b [ cos(b/2), sin(b/2)]
+            # a [-sin(b/2), cos(b/2)]
+            # 2 
+            c = math.cos(0.5*phi)
+            s = math.sin(0.5*phi)
+            expm[1,1] = c 
+            expm[1,2] = s 
+            expm[2,1] = -s 
+            expm[2,2] = c 
+            expm[3,3] = 1.0
+            return expm
          def wfun(phi,qnum,sz):
-	    wt = (2.*qnum+1.)/2.0*math.sin(phi)*smalld.value(qnum,sz,sz,phi)
- 	    return wt
+            wt = (2.*qnum+1.)/2.0*math.sin(phi)*smalld.value(qnum,sz,sz,phi)
+            return wt
       return rfun,wfun
 
    def analyzer(self,case,refdet=None,npoints=1000,args=None):
@@ -312,28 +312,28 @@ class class_mps:
       # Complex algebra is mandatory in order to use the separability of exp(iNx)
       def fx(xdata,mps,rfun,args=None,dtype=numpy.complex_):
          nsite = mps.nsite
-	 sites1 = mps.torank2()
+         sites1 = mps.torank2()
          ydata = numpy.zeros(xdata.shape,dtype=dtype)
          for i,x in enumerate(xdata):
             sites2 = []
             for isite in range(nsite):
-	       if args is None:	    
+               if args is None:     
                   ntmp = rfun(x)
-	       else:
-		  occ = [args[2*isite],args[2*isite+1]] 
+               else:
+                  occ = [args[2*isite],args[2*isite+1]] 
                   ntmp = rfun(x,occ)
                if isite == 0:
                   #tmp = numpy.einsum('ij,ja->ia',ntmp,sites1[isite])
-		  tmp = numpy.dot(ntmp,sites1[isite])
+                  tmp = numpy.dot(ntmp,sites1[isite])
                elif isite == nsite-1:
                   #tmp = numpy.einsum('ij,aj->ai',ntmp,sites1[isite])
-		  tmp = numpy.dot(sites1[isite],ntmp.T)
+                  tmp = numpy.dot(sites1[isite],ntmp.T)
                else:
                   #tmp = numpy.einsum('ij,ajb->aib',ntmp,sites1[isite])
-		  # ajb,ij->abi
-		  tmp = numpy.tensordot(sites1[isite],ntmp,axes=([1],[1]))
-		  # abi->aib
-		  tmp = tmp.transpose(0,2,1).copy() 
+                  # ajb,ij->abi
+                  tmp = numpy.tensordot(sites1[isite],ntmp,axes=([1],[1]))
+                  # abi->aib
+                  tmp = tmp.transpose(0,2,1).copy() 
                sites2.append(tmp)
             ydata[i] = mpslib.mps_dot(sites1,sites2)
          return ydata
@@ -353,77 +353,77 @@ class class_mps:
       # Partilce number
       if case == 'n':
          b = 2*numpy.pi
-	 xdata = numpy.linspace(0,b,num=npoints)
+         xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
-	 for n in range(2*k+1):
+         for n in range(2*k+1):
             ydata2 = [wfun(x,n) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
-	    expval += y*n
-	    print(' n =%3d'%n,' p[n] =%10.5f'%y)
+            expval += y*n
+            print(' n =%3d'%n,' p[n] =%10.5f'%y)
  
       elif case == 'sz':
          b = 2*numpy.pi
-	 xdata = numpy.linspace(0,b,num=npoints)
+         xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
-	 for sz in numpy.arange(-0.5*k,0.5*k+0.1,0.5):
+         for sz in numpy.arange(-0.5*k,0.5*k+0.1,0.5):
             ydata2 = [wfun(x,sz) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
-	    expval += y*sz
-	    print(' sz =%5.1f'%sz,' p[n] =%10.5f'%y)
+            expval += y*sz
+            print(' sz =%5.1f'%sz,' p[n] =%10.5f'%y)
       
       elif case == 'omega': 
          b = 2*numpy.pi
-	 xdata = numpy.linspace(0,b,num=npoints)
+         xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
-	 # No. of unpair electrons
-	 for omega in range(0,k+1):
+         # No. of unpair electrons
+         for omega in range(0,k+1):
             ydata2 = [wfun(x,omega) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
-	    expval += y*omega
-	    # omega is even if n is even.
-	    # omega is odd if n is odd.
-	    print(' omega =%3d'%omega,' p[n] =%10.5f'%y)
+            expval += y*omega
+            # omega is even if n is even.
+            # omega is odd if n is odd.
+            print(' omega =%3d'%omega,' p[n] =%10.5f'%y)
  
       elif case == 'ph':
-	 if refdet is None:
-	    print('error: there must be a reference determinant')
-	    exit(1)
+         if refdet is None:
+            print('error: there must be a reference determinant')
+            exit(1)
          nelec = sum(refdet)
-	 print(' refdet =',refdet) 
-	 print(' nelec of refdet =',nelec)
+         print(' refdet =',refdet) 
+         print(' nelec of refdet =',nelec)
          maxNoQuasiParticles = 2*(min(nelec,2*k-nelec))
          b = 2*numpy.pi
-	 xdata = numpy.linspace(0,b,num=npoints)
+         xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun,args=refdet)
-	 # No. of quasiparticles
-	 for nQ in range(maxNoQuasiParticles+1):
+         # No. of quasiparticles
+         for nQ in range(maxNoQuasiParticles+1):
             ydata2 = [wfun(x,nQ) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
-	    expval += y*nQ
-	    print(' nQ =%3d'%nQ,' p[n] =%10.5f'%y)
+            expval += y*nQ
+            print(' nQ =%3d'%nQ,' p[n] =%10.5f'%y)
  
       elif case == 's2':
          if args is None:
- 	    print('error: a Sz value of the reference must be provide!')
-	    exit(1)
+            print('error: a Sz value of the reference must be provide!')
+            exit(1)
          b = numpy.pi
-	 xdata = numpy.linspace(0,b,num=npoints)
+         xdata = numpy.linspace(0,b,num=npoints)
          ydata = fx(xdata,mps,rfun)
-	 for stot in numpy.arange(0,0.5*k+0.1,0.5):
+         for stot in numpy.arange(0,0.5*k+0.1,0.5):
             ydata2 = [wfun(x,stot,args) for x in xdata]
             ydata2 = (ydata2*ydata).real
             y = simps(ydata2,xdata)
             psum += y
-	    expval += y*stot*(stot+1)
-	    print(' stot =%5.1f'%stot,' p[n] =',y)
+            expval += y*stot*(stot+1)
+            print(' stot =%5.1f'%stot,' p[n] =',y)
          print(' S[eff] =',seff(expval))
       
       # Final print
@@ -438,9 +438,9 @@ class class_mps:
       tmps = class_mps(self.nsite)
       tmps.sites = copy.deepcopy(self.sites)
       if self.qnums is not None:
-	 tmps.qnums = copy.deepcopy(self.qnums)
+         tmps.qnums = copy.deepcopy(self.qnums)
       if self.qphys is not None:
-	 tmps.qphys = copy.deepcopy(self.qphys)
+         tmps.qphys = copy.deepcopy(self.qphys)
       return tmps
 
    def torank2(self):
@@ -460,14 +460,14 @@ class class_mps:
 
    def prt(self,ifqnums=False):
       print("\nMPSinfo:")
-      print(" nsite = ",self.nsite)	  
+      print(" nsite = ",self.nsite)       
       for i in range(self.nsite):
          print(" Site : ",i," Shape : ",self.sites[i].shape,\
-	       " Val = ",numpy.linalg.norm(self.sites[i]))
+               " Val = ",numpy.linalg.norm(self.sites[i]))
       if self.qphys is not None:
-	 mpo_qphys.prt(self.qphys)
+         mpo_qphys.prt(self.qphys)
       if self.qnums is not None and ifqnums:
-	 self.prtQnums()
+         self.prtQnums()
       print("End of MPSinfo\n")
       return 0
    
@@ -476,8 +476,8 @@ class class_mps:
       print('-'*60)
       print(" quantum numbers on bonds:")
       for i in range(self.nsite):
-	 print(" Bond : ",i," bdim[i] =",len(self.qnums[i]))
-	 print(" Qnums[i] =",self.qnums[i])
+         print(" Bond : ",i," bdim[i] =",len(self.qnums[i]))
+         print(" Qnums[i] =",self.qnums[i])
       print('-'*60)
       return 0
 
@@ -488,14 +488,14 @@ class class_mps:
    def toMat(self):
       N = self.nsite
       for i in range(N):
-	 if i == 0:
-	    t1 = self.sites[0]
+         if i == 0:
+            t1 = self.sites[0]
          else:
             t2 = self.sites[i]
-	    # t1[l,r,nu,nd]*t2[l,r,nu',nd']
-	    tmp = numpy.einsum('aib,bkc->aikc',t1,t2)
-	    s = tmp.shape
-	    t1 = tmp.reshape((s[0],s[1]*s[2],s[3]))
+            # t1[l,r,nu,nd]*t2[l,r,nu',nd']
+            tmp = numpy.einsum('aib,bkc->aikc',t1,t2)
+            s = tmp.shape
+            t1 = tmp.reshape((s[0],s[1]*s[2],s[3]))
       s = tmp.shape
       assert s[0]==1 and s[2]==1
       t1 = t1.reshape(s[1])
@@ -510,8 +510,8 @@ class class_mps:
       mpslib.mps_compress(t2,thresh=thresh,iprt=iprt)
       rr = mpslib.mps_diff(t1,t2,iprt=0)
       if rr > 1.e-5:
-	 print('error: compression error is too large! rr=',rr)
-	 exit()
+         print('error: compression error is too large! rr=',rr)
+         exit()
       mpslib.mps_mps2rank3(0,t2)
       self.sites = copy.deepcopy(t2)
       return 0
@@ -539,18 +539,18 @@ class class_mps:
       # Preparation step: 
       mps = self.copy()
       if qphys is not None:
-	 mps.qphys = copy.deepcopy(qphys)
+         mps.qphys = copy.deepcopy(qphys)
       if mps.qphys is None:
-	 print('error: qphys cannot be NONE!')
-	 exit(1)
+         print('error: qphys cannot be NONE!')
+         exit(1)
       # Check physical dimensions
       dphys1 = mps.pdim()
       dphys2 = [len(x) for x in mps.qphys]
       if dphys1 != dphys2:
-	 print('error: physical dimensions must be consistent!')
-	 print('mps.pdim() =',dphys1)
-	 print('mps.qphys  =',dphys2)
-	 exit(1)
+         print('error: physical dimensions must be consistent!')
+         print('mps.pdim() =',dphys1)
+         print('mps.qphys  =',dphys2)
+         exit(1)
       # M*M*M => L*L*L such that the latter Schmidt values = 1.
       mps.qleftCanon(debug=debug)
       # Compression step:
@@ -579,12 +579,12 @@ class class_mps:
    def leftCanon(self,thresh=-1.e-12,Dcut=-1,debug=False):
       if debug:
          print('[mps_class.leftCanon]')
-	 print(' Bdim before: ',self.bdim())
+         print(' Bdim before: ',self.bdim())
       try:
-	 assert abs(self.norm()-1.0)<1.e-8
+         assert abs(self.norm()-1.0)<1.e-8
       except AssertionError:
-	 print(' norm = ',self.norm())
-	 exit()
+         print(' norm = ',self.norm())
+         exit()
       sites = self.sites
       nsite = len(sites)
       tsite = sites[0].copy()
@@ -594,26 +594,26 @@ class class_mps:
       # rk3
       for isite in range(nsite-1):
          s = tsite.shape
-	 d1 = s[0]*s[1]
-	 d2 = s[2]
+         d1 = s[0]*s[1]
+         d2 = s[2]
          mat = tsite.reshape((d1,d2)).copy() 
-	 u,sigs,vt = mpslib.mps_svd_cut(mat,thresh,Dcut)
-	 bdim = len(sigs)
-	 if debug:
-	    print('-'*80)	 
-	    print(' Results[i]:',isite)
-	    print('-'*80)	 
-	    print(' dimension:',(d1,d2),'->',bdim)
-	    sum2 = numpy.sum(numpy.array(sigs)**2)
-	    dwts = 1.0-sum2
-	    print(' sum of sigs2:',sum2,' dwts:',dwts)
-	    print(' sigs:\n',sigs)
-	 sval[isite] = sigs.copy()
-	 lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
-	 tmp = numpy.diag(sigs).dot(vt)
-	 link[isite] = tmp.copy()
-	 #tsite = numpy.einsum('sl,lur->sur',tmp,sites[isite+1])
-	 tsite = numpy.tensordot(tmp,sites[isite+1],axes=([1],[0]))
+         u,sigs,vt = mpslib.mps_svd_cut(mat,thresh,Dcut)
+         bdim = len(sigs)
+         if debug:
+            print('-'*80)        
+            print(' Results[i]:',isite)
+            print('-'*80)        
+            print(' dimension:',(d1,d2),'->',bdim)
+            sum2 = numpy.sum(numpy.array(sigs)**2)
+            dwts = 1.0-sum2
+            print(' sum of sigs2:',sum2,' dwts:',dwts)
+            print(' sigs:\n',sigs)
+         sval[isite] = sigs.copy()
+         lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
+         tmp = numpy.diag(sigs).dot(vt)
+         link[isite] = tmp.copy()
+         #tsite = numpy.einsum('sl,lur->sur',tmp,sites[isite+1])
+         tsite = numpy.tensordot(tmp,sites[isite+1],axes=([1],[0]))
       norm = numpy.linalg.norm(tsite)
       lmps[nsite-1] = tsite/norm
       # Final
@@ -625,12 +625,12 @@ class class_mps:
    def rightCanon(self,thresh=-1.e-12,Dcut=-1,debug=False):
       if debug:
          print('[mps_class.rightCanon]')
-	 print(' Bdim before: ',self.bdim())
+         print(' Bdim before: ',self.bdim())
       try:
-	 assert abs(self.norm()-1.0)<1.e-8
+         assert abs(self.norm()-1.0)<1.e-8
       except AssertionError:
-	 print(' norm = ',self.norm())
-	 exit()
+         print(' norm = ',self.norm())
+         exit()
       sites = self.sites
       nsite = len(sites)
       tsite = sites[nsite-1].copy()
@@ -640,28 +640,28 @@ class class_mps:
       # rk3
       for isite in range(nsite-1,0,-1):
          s = tsite.shape
-	 d1 = s[0]
-	 d2 = s[1]*s[2]
+         d1 = s[0]
+         d2 = s[1]*s[2]
          mat = tsite.reshape((d1,d2)).copy()
-	 # C=U s Vd => Ct=V* s Ut 
+         # C=U s Vd => Ct=V* s Ut 
          u,sigs,vt = mpslib.mps_svd_cut(mat.T,thresh,Dcut)
-	 bdim = len(sigs)
-	 if debug:
-	    print('-'*80)	 
-	    print(' Results[i]:',isite)
-	    print('-'*80)	 
-	    print(' dimension:',(d1,d2),'->',bdim)
-	    sum2 = numpy.sum(numpy.array(sigs)**2)
-	    dwts = 1.0-sum2
-	    print(' sum of sigs2:',sum2,' dwts:',dwts)
-	    print(' sigs:\n',sigs)
-	 sval[isite-1] = sigs.copy()
-	 # u = V* ---> (Vd)[alpha,n*r]
-	 rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
-	 tmp = numpy.diag(sigs).dot(vt).T.copy()
-	 link[isite-1] = tmp.copy()
-	 #tsite = numpy.einsum('lur,rs->lus',sites[isite-1],tmp)
-	 tsite = numpy.tensordot(sites[isite-1],tmp,axes=([2],[0]))
+         bdim = len(sigs)
+         if debug:
+            print('-'*80)        
+            print(' Results[i]:',isite)
+            print('-'*80)        
+            print(' dimension:',(d1,d2),'->',bdim)
+            sum2 = numpy.sum(numpy.array(sigs)**2)
+            dwts = 1.0-sum2
+            print(' sum of sigs2:',sum2,' dwts:',dwts)
+            print(' sigs:\n',sigs)
+         sval[isite-1] = sigs.copy()
+         # u = V* ---> (Vd)[alpha,n*r]
+         rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
+         tmp = numpy.diag(sigs).dot(vt).T.copy()
+         link[isite-1] = tmp.copy()
+         #tsite = numpy.einsum('lur,rs->lus',sites[isite-1],tmp)
+         tsite = numpy.tensordot(sites[isite-1],tmp,axes=([2],[0]))
       norm = numpy.linalg.norm(tsite)
       rmps[0] = tsite/norm
       # Final
@@ -690,44 +690,44 @@ class class_mps:
       # rk3
       for isite in range(nsite): 
          s = tsite.shape
-	 d1 = s[0]*s[1]
-	 d2 = s[2]
-	 # Combine quantum numbers
-	 qphys_isite = qphys[isite]
-	 qnum1 = mpo_qphys.dpt(qnuml,qphys_isite)
+         d1 = s[0]*s[1]
+         d2 = s[2]
+         # Combine quantum numbers
+         qphys_isite = qphys[isite]
+         qnum1 = mpo_qphys.dpt(qnuml,qphys_isite)
          mat = tsite.reshape((d1,d2)).copy() 
          classes = qnum1 
          if isite != nsite-1:
-	    dwts,qred,u,sigs,vt = qparser.row_svd(mat,classes,thresh,Dcut)
-	    bdim = len(sigs)
-	    print(' isite/bdim=',isite,bdim)
-	    lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
-	    qnuml = numpy.array(copy.deepcopy(qred))
-	    qnums[isite] = qnuml.copy()
-	    # Update next tsite
-	    tmp = numpy.diag(sigs).dot(vt)
-	    link[isite] = tmp.copy()
-	    #tsite = numpy.einsum('sl,lur->sur',tmp,sites[isite+1])
-	    tsite = numpy.tensordot(tmp,sites[isite+1],axes=([1],[0]))
-	    sval[isite] = sigs.copy()
+            dwts,qred,u,sigs,vt = qparser.row_svd(mat,classes,thresh,Dcut)
+            bdim = len(sigs)
+            print(' isite/bdim=',isite,bdim)
+            lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
+            qnuml = numpy.array(copy.deepcopy(qred))
+            qnums[isite] = qnuml.copy()
+            # Update next tsite
+            tmp = numpy.diag(sigs).dot(vt)
+            link[isite] = tmp.copy()
+            #tsite = numpy.einsum('sl,lur->sur',tmp,sites[isite+1])
+            tsite = numpy.tensordot(tmp,sites[isite+1],axes=([1],[0]))
+            sval[isite] = sigs.copy()
          else:
-	    # Otherwise the MPS is zero, or have multiple qnumbers 
-	    # (particle number breaking!)
-	    dwts,qred,u,sigs,vt = qparser.row_svd(mat,classes,thresh,1)
-	    bdim = len(sigs)
-	    print(' isite/bdim=',isite,bdim)
-	    assert bdim == 1
-	    lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
-	    qnuml = numpy.array(copy.deepcopy(qred))
-	    qnums[isite] = qnuml.copy()
-	 if debug:
-	    print('-'*80)	 
-	    print(' Results[i]:',isite)
-	    print('-'*80)	 
-	    print(' dimension:',(d1,d2),'->',bdim)
-	    print(' qred:',qred)
-	    print(' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts)
-	    print(' sigs:\n',sigs)
+            # Otherwise the MPS is zero, or have multiple qnumbers 
+            # (particle number breaking!)
+            dwts,qred,u,sigs,vt = qparser.row_svd(mat,classes,thresh,1)
+            bdim = len(sigs)
+            print(' isite/bdim=',isite,bdim)
+            assert bdim == 1
+            lmps[isite] = u.reshape((s[0],s[1],bdim)).copy()
+            qnuml = numpy.array(copy.deepcopy(qred))
+            qnums[isite] = qnuml.copy()
+         if debug:
+            print('-'*80)        
+            print(' Results[i]:',isite)
+            print('-'*80)        
+            print(' dimension:',(d1,d2),'->',bdim)
+            print(' qred:',qred)
+            print(' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts)
+            print(' sigs:\n',sigs)
       # Final
       self.sites = copy.deepcopy(lmps)
       self.qnums = copy.deepcopy(qnums)
@@ -754,41 +754,41 @@ class class_mps:
       # rk3
       for isite in range(nsite-1,-1,-1):
          s = tsite.shape
-	 d1 = s[0]
-	 d2 = s[1]*s[2]
-	 # Combine quantum numbers
-	 qphys_isite = qphys[isite]
-	 qnum1 = mpo_qphys.dpt(qphys_isite,qnumr)
+         d1 = s[0]
+         d2 = s[1]*s[2]
+         # Combine quantum numbers
+         qphys_isite = qphys[isite]
+         qnum1 = mpo_qphys.dpt(qphys_isite,qnumr)
          mat = tsite.reshape((d1,d2)).copy() 
          classes = qnum1
-	 if isite != 0:
-	    dwts,qred,u,sigs,vt = qparser.row_svd(mat.T.copy(),classes,thresh,Dcut)
-	    bdim = len(sigs)
-	    print(' isite/bdim=',isite,bdim)
-	    rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
-	    qnumr = numpy.array(copy.deepcopy(qred))
-	    qnums[isite-1] = qnumr.copy()
-	    # Update next tsite
-	    tmp = numpy.diag(sigs).dot(vt).T.copy()
-	    link[isite-1] = tmp.copy()
-	    #tsite = numpy.einsum('lur,rs->lus',sites[isite-1],tmp)
-	    tsite = numpy.tensordot(sites[isite-1],tmp,axes=([2],[0]))
-	    sval[isite-1] = sigs.copy()
-	 else:
-	    # Always cut the last one
-	    dwts,qred,u,sigs,vt = qparser.row_svd(mat.T.copy(),classes,thresh,1)
-	    bdim = len(sigs)
-	    print(' isite/bdim=',isite,bdim)
-	    assert bdim == 1
-	    rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
-	 if debug:
-	    print('-'*80)	 
-	    print(' Results[i]:',isite)
-	    print('-'*80)	 
-	    print(' dimension:',(d1,d2),'->',bdim)
-	    print(' qred:',qred)
-	    print(' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts)
-	    print(' sigs:\n',sigs)
+         if isite != 0:
+            dwts,qred,u,sigs,vt = qparser.row_svd(mat.T.copy(),classes,thresh,Dcut)
+            bdim = len(sigs)
+            print(' isite/bdim=',isite,bdim)
+            rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
+            qnumr = numpy.array(copy.deepcopy(qred))
+            qnums[isite-1] = qnumr.copy()
+            # Update next tsite
+            tmp = numpy.diag(sigs).dot(vt).T.copy()
+            link[isite-1] = tmp.copy()
+            #tsite = numpy.einsum('lur,rs->lus',sites[isite-1],tmp)
+            tsite = numpy.tensordot(sites[isite-1],tmp,axes=([2],[0]))
+            sval[isite-1] = sigs.copy()
+         else:
+            # Always cut the last one
+            dwts,qred,u,sigs,vt = qparser.row_svd(mat.T.copy(),classes,thresh,1)
+            bdim = len(sigs)
+            print(' isite/bdim=',isite,bdim)
+            assert bdim == 1
+            rmps[isite] = u.T.reshape((bdim,s[1],s[2])).copy()
+         if debug:
+            print('-'*80)        
+            print(' Results[i]:',isite)
+            print('-'*80)        
+            print(' dimension:',(d1,d2),'->',bdim)
+            print(' qred:',qred)
+            print(' sum of sigs2:',numpy.sum(numpy.array(sigs)**2),' dwts:',dwts)
+            print(' sigs:\n',sigs)
       # Final
       self.sites = copy.deepcopy(rmps)
       self.qnums = copy.deepcopy(qnums)
@@ -824,10 +824,10 @@ class class_mps:
       if norm > 1.e-10:
          self.mul(1.0/norm)
       else:
-	 # Set to zero     
+         # Set to zero     
          for k in range(self.nsite):
-	    shp = self.sites[k].shape
-	    self.sites[k] = numpy.zeros((1,shp[1],1)) 
+            shp = self.sites[k].shape
+            self.sites[k] = numpy.zeros((1,shp[1],1)) 
       return norm
 
    # Addition of two MPS without quantum numbers
@@ -847,15 +847,15 @@ class class_mps:
       mps.sites[i] = tmp.copy()
       # Middle
       for i in range(1,N-1):
-	 shape1 = self.sites[i].shape
+         shape1 = self.sites[i].shape
          shape2 = other.sites[i].shape
-	 dim1 = shape1[0]+shape2[0]
-	 dim2 = shape1[1]
-	 dim3 = shape1[2]+shape2[2]
-	 tmp = numpy.zeros((dim1,dim2,dim3),dtype=self.sites[i].dtype)
-	 tmp[:shape1[0],:,:shape1[2]] = self.sites[i]
-	 tmp[shape1[0]:,:,shape1[2]:] = other.sites[i]
-	 mps.sites[i] = tmp.copy()
+         dim1 = shape1[0]+shape2[0]
+         dim2 = shape1[1]
+         dim3 = shape1[2]+shape2[2]
+         tmp = numpy.zeros((dim1,dim2,dim3),dtype=self.sites[i].dtype)
+         tmp[:shape1[0],:,:shape1[2]] = self.sites[i]
+         tmp[shape1[0]:,:,shape1[2]:] = other.sites[i]
+         mps.sites[i] = tmp.copy()
       # Last site: A[a12,n,1] = {A[a1,n],A[a2,n]}
       i = N-1
       shape1 = self.sites[i].shape
@@ -904,13 +904,13 @@ class class_mps:
       rdm1 = numpy.zeros((nb,nb))
       for i in range(nb):
          for j in range(nb):
-   	    print('rdm[i,j] (i,j)=',i,j)  
+            print('rdm[i,j] (i,j)=',i,j)  
             ci = mpo_class.mpo_r1(nb,i,1)
             aj = mpo_class.mpo_r1(nb,j,0)
             Aij = mpo_class.mpo_r1mul(ci,aj)
             op = mpo_class.class_mpo(nb)
             op.fromRank1(Aij)
-   	    rdm1[i,j] = mpslib.mps_dot(mps,op.dot(mps))
+            rdm1[i,j] = mpslib.mps_dot(mps,op.dot(mps))
       print('Hermicity=',numpy.linalg.norm(rdm1-rdm1.T))
       return rdm1
 
@@ -922,15 +922,15 @@ class class_mps:
       types = [[1,0],[1,1],[0,1],[0,0]]
       for i in range(nb):
          for j in range(nb):
-   	    print('rdm[i,j] (i,j)=',i,j) 
-	    for ijtp in range(4):
-	       itp,jtp = types[ijtp]  
-	       ci = mpo_class.mpo_r1(nb,i,itp)
+            print('rdm[i,j] (i,j)=',i,j) 
+            for ijtp in range(4):
+               itp,jtp = types[ijtp]  
+               ci = mpo_class.mpo_r1(nb,i,itp)
                cj = mpo_class.mpo_r1(nb,j,jtp)
                Aij = mpo_class.mpo_r1mul(ci,cj)
                op = mpo_class.class_mpo(nb)
                op.fromRank1(Aij)
-   	       rdm1[ijtp,i,j] = mpslib.mps_dot(mps,op.dot(mps))
+               rdm1[ijtp,i,j] = mpslib.mps_dot(mps,op.dot(mps))
       rdm1q = numpy.zeros((2*nb,2*nb))
       rdm1q[:nb,:nb] = rdm1[0]
       rdm1q[:nb,nb:] = rdm1[1]
@@ -941,33 +941,33 @@ class class_mps:
 
    # many-body RDM
    def mbRDM(self,sites):
-      # l,r,u,d	   
+      # l,r,u,d    
       ones = numpy.ones(1).reshape(1,1,1,1).copy()
       rdm = ones
       # Sweep from first site
       for i in range(self.nsite):
          tmp = self.sites[i].copy()
          if i in sites:
-	    #   u  i
-	    #   |  |
-	    # 1-|==|==...
-	    #   |  |
-	    #   d  j
-	    tmp = numpy.einsum('aib,cjd->acbdij',tmp,tmp)
-	    s = tmp.shape
-	    tmp = tmp.reshape((s[0]*s[1],s[2]*s[3],s[4],s[5]))
-	 else:
-	    #   u  1
-	    #   |  |
-	    # 1-|==|==...
-	    #   |  |
-	    #   d  1
-	    tmp = numpy.einsum('aib,cid->acbd',tmp,tmp)
-	    s = tmp.shape
-	    tmp = tmp.reshape((s[0]*s[1],s[2]*s[3],1,1))
-	 rdm = numpy.einsum('lrud,rtij->ltuidj',rdm,tmp)
-	 s = rdm.shape
-	 rdm = rdm.reshape((s[0],s[1],s[2]*s[3],s[4]*s[5])).copy()
+            #   u  i
+            #   |  |
+            # 1-|==|==...
+            #   |  |
+            #   d  j
+            tmp = numpy.einsum('aib,cjd->acbdij',tmp,tmp)
+            s = tmp.shape
+            tmp = tmp.reshape((s[0]*s[1],s[2]*s[3],s[4],s[5]))
+         else:
+            #   u  1
+            #   |  |
+            # 1-|==|==...
+            #   |  |
+            #   d  1
+            tmp = numpy.einsum('aib,cid->acbd',tmp,tmp)
+            s = tmp.shape
+            tmp = tmp.reshape((s[0]*s[1],s[2]*s[3],1,1))
+         rdm = numpy.einsum('lrud,rtij->ltuidj',rdm,tmp)
+         s = rdm.shape
+         rdm = rdm.reshape((s[0],s[1],s[2]*s[3],s[4]*s[5])).copy()
       rdm = rdm[0,0]
       return rdm
 
@@ -979,36 +979,36 @@ class class_mps:
       tmps = [0]*nsite
       qnums = [0]*nsite
       for idx,item in enumerate(partition):
-	 for jdx,isite in enumerate(item):
-	    if jdx == 0:
-	       cop = self.sites[isite].copy()
+         for jdx,isite in enumerate(item):
+            if jdx == 0:
+               cop = self.sites[isite].copy()
             else:
-	       # Must be consecutive	    
-	       #   |   |
-	       # ---------
-	       tmp = self.sites[isite].copy()
-	       #tmp = numpy.einsum('lax,xbr->labr',cop,tmp)
-	       tmp = numpy.tensordot(cop,tmp,axes=([2],[0]))
-	       s = tmp.shape
-	       cop = tmp.reshape((s[0],s[1]*s[2],s[3])).copy()
+               # Must be consecutive        
+               #   |   |
+               # ---------
+               tmp = self.sites[isite].copy()
+               #tmp = numpy.einsum('lax,xbr->labr',cop,tmp)
+               tmp = numpy.tensordot(cop,tmp,axes=([2],[0]))
+               s = tmp.shape
+               cop = tmp.reshape((s[0],s[1]*s[2],s[3])).copy()
          tmps[idx] = cop.copy()
-	 # Taken the quantum numbers of the last site in each group: o---
-	 if self.qnums is not None: 
-	    qnums[idx] = self.qnums[item[-1]]
+         # Taken the quantum numbers of the last site in each group: o---
+         if self.qnums is not None: 
+            qnums[idx] = self.qnums[item[-1]]
       # Product new MPS
       if self.qphys is None:
-	 if self.qnums is None:
+         if self.qnums is None:
             tmps = class_mps(nsite,sites=tmps,iop=1)
-    	 else:
-	    tmps = class_mps(nsite,sites=tmps,iop=1,qnums=qnums)
+         else:
+            tmps = class_mps(nsite,sites=tmps,iop=1,qnums=qnums)
       else:
-	 qphys = mpo_qphys.merge(self.qphys,partition)
-	 print(' Merged qphys_new:')
-	 for idx,iqnum in enumerate(qphys):
-	    print(' idx=',idx,' iqnum=',iqnum)
-	 if self.qnums is None:
+         qphys = mpo_qphys.merge(self.qphys,partition)
+         print(' Merged qphys_new:')
+         for idx,iqnum in enumerate(qphys):
+            print(' idx=',idx,' iqnum=',iqnum)
+         if self.qnums is None:
             tmps = class_mps(nsite,sites=tmps,iop=1,qphys=qphys)
-	 else:
+         else:
             tmps = class_mps(nsite,sites=tmps,iop=1,qphys=qphys,qnums=qnums)
       return tmps
 

@@ -30,8 +30,8 @@ def tucker_prod(tucker):
       tmp=numpy.einsum("pa,ab->pb",tucker_site[i],tmp)
       tmp=tmp.transpose(1,0)
       if i<N-1:
-         tmp=tmp.reshape(shape[i+1],-1)	      
+         tmp=tmp.reshape(shape[i+1],-1)       
       else:
-    	 pindx=tucker_pdim(tucker)
+         pindx=tucker_pdim(tucker)
          tensor=tmp.reshape(pindx)
    return tensor

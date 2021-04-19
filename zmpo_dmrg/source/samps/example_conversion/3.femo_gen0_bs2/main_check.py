@@ -53,7 +53,7 @@ print('Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop))
 sop = mpo_dmrg_init.genSops(dmrg2,flmps1,flmps1,'./tmp_sop','L')
 print('sop(<Psi1|P|Psi1>)=',sop)
 
-#> # <S2>	 
+#> # <S2>        
 #> if not ifs2proj:
 #>    info=None
 #> else:

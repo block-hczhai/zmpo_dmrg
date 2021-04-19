@@ -57,63 +57,63 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 
       mpo_dmrg_init.genBopsNQt(fname,nop,-1)
       for isite in range(0,nsite):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite-1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
-	 f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,False)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,False)
-	 if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
+         f1 = h5py.File(f1name,"w")
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,False)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,False)
+         if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    cop = fop['site'+str(isite)+'/op'+str(iop)].value
-	    tmp = f0['opers'+str(iop)].value
-	    #--- kernel ---
-	    tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1]))
-	    tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
-	    tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))
-	    #--- kernel ---
-	    f1['opers'+str(iop)] = tmp
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == nsite-1: exphop[iop] = tmp[0,0,0]
-	 f0.close()
-	 f1.close()
+            if debug: print('    iop=',iop,' of nop=',nop)
+            cop = fop['site'+str(isite)+'/op'+str(iop)].value
+            tmp = f0['opers'+str(iop)].value
+            #--- kernel ---
+            tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1]))
+            tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
+            tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))
+            #--- kernel ---
+            f1['opers'+str(iop)] = tmp
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == nsite-1: exphop[iop] = tmp[0,0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
+         tf = time.time()
          if debug: print(' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
+                         ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
       mpo_dmrg_init.genBopsNQt(fname,nop,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite+1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
          f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,False)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,False)
-	 if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,False)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,False)
+         if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    cop = fop['site'+str(isite)+'/op'+str(iop)].value
-	    tmp = f0['opers'+str(iop)].value
-	    #--- kernel ---
-	    tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1]))
-	    tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
-	    tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))
-	    #--- kernel ---
-	    f1['opers'+str(iop)] = tmp
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == 0: exphop[iop] = tmp[0,0,0]
-	 f0.close()
-	 f1.close()
+            if debug: print('    iop=',iop,' of nop=',nop)
+            cop = fop['site'+str(isite)+'/op'+str(iop)].value
+            tmp = f0['opers'+str(iop)].value
+            #--- kernel ---
+            tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1]))
+            tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
+            tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))
+            #--- kernel ---
+            f1['opers'+str(iop)] = tmp
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == 0: exphop[iop] = tmp[0,0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if debug: print(' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if debug: print(' isite =',os.path.split(f1name)[-1],\
+                         ' nop =',nop,' t = %.2f s'%(tf-ti))
    
    # final
    sysutil_io.deleteDIR(path,1,debug)
@@ -123,10 +123,10 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 
 #
 # Qt Version: An important remark is that we donot use the 
-#	      symmetry template for properties, as usually
-# 	      the bond dimensions are very small. So for 
-#	      simplicity, direct qtensor.tensordot is used!
-#	      This also provides general treatments of <A|MPO|B>.
+#             symmetry template for properties, as usually
+#             the bond dimensions are very small. So for 
+#             simplicity, direct qtensor.tensordot is used!
+#             This also provides general treatments of <A|MPO|B>.
 #
 def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
    t0 = time.time()
@@ -151,38 +151,38 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
       lop = qtensor.qtensor()
       cop = qtensor.qtensor()
       for isite in range(0,nsite):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite-1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
-	 f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,True)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,True)
-	 # Lower the symmetry 
-	 if dmrg.ifs2proj:
-	    bsite = bsite.reduceQsymsToN()
-	    ksite = ksite.reduceQsymsToN()
-	 if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
-	 for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    # COP
-	    cop.load(fop,'site'+str(isite)+'/op'+str(iop))
-	    # LOP
-	    lop.load(f0,'opers'+str(iop))
-	    #--- kernel ---
-	    tmp = qtensor.tensordot(bsite,lop,axes=([0],[1]),ifc1=True)
-	    tmp = qtensor.tensordot(cop,tmp,axes=([0,2],[2,0]))
-	    tmp = qtensor.tensordot(tmp,ksite,axes=([1,3],[1,0]))
-	    #--- kernel ---
-	    tmp.dump(f1,'opers'+str(iop))
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == nsite-1: exphop[iop] = tmp.value
-	 f0.close()
-	 f1.close()
+         f1 = h5py.File(f1name,"w")
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,True)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,True)
+         # Lower the symmetry 
+         if dmrg.ifs2proj:
+            bsite = bsite.reduceQsymsToN()
+            ksite = ksite.reduceQsymsToN()
+         if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
+         for iop in range(nop):
+            if debug: print('    iop=',iop,' of nop=',nop)
+            # COP
+            cop.load(fop,'site'+str(isite)+'/op'+str(iop))
+            # LOP
+            lop.load(f0,'opers'+str(iop))
+            #--- kernel ---
+            tmp = qtensor.tensordot(bsite,lop,axes=([0],[1]),ifc1=True)
+            tmp = qtensor.tensordot(cop,tmp,axes=([0,2],[2,0]))
+            tmp = qtensor.tensordot(tmp,ksite,axes=([1,3],[1,0]))
+            #--- kernel ---
+            tmp.dump(f1,'opers'+str(iop))
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == nsite-1: exphop[iop] = tmp.value
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if debug: print(' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if debug: print(' isite =',os.path.split(f1name)[-1],\
+                         ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
@@ -190,42 +190,42 @@ def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
       rop = qtensor.qtensor()
       cop = qtensor.qtensor()
       for isite in range(nsite-1,-1,-1):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite+1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
          f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 # Lower the symmetry 
-	 if dmrg.ifs2proj:
-	    bsite = bsite.reduceQsymsToN()
-	    ksite = ksite.reduceQsymsToN()
-	 if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
-	 for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    # COP
-	    cop.load(fop,'site'+str(isite)+'/op'+str(iop))
-	    cop.qsyms[0]  = -cop.qsyms[0]
-	    cop.qsyms[1]  = -cop.qsyms[1]
-	    cop.status[0] = ~cop.status[0] 
-	    cop.status[1] = ~cop.status[1] 
-	    # ROP
-	    rop.load(f0,'opers'+str(iop))
-	    #--- kernel ---
-	    tmp = qtensor.tensordot(bsite,rop,axes=([2],[1]),ifc1=True)
-	    tmp = qtensor.tensordot(cop,tmp,axes=([1,2],[2,1]))
-	    tmp = qtensor.tensordot(tmp,ksite,axes=([1,3],[1,2]))
-	    #--- kernel ---
-	    tmp.dump(f1,'opers'+str(iop))
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == 0: exphop[iop] = tmp.value
-	 f0.close()
-	 f1.close()
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         # Lower the symmetry 
+         if dmrg.ifs2proj:
+            bsite = bsite.reduceQsymsToN()
+            ksite = ksite.reduceQsymsToN()
+         if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
+         for iop in range(nop):
+            if debug: print('    iop=',iop,' of nop=',nop)
+            # COP
+            cop.load(fop,'site'+str(isite)+'/op'+str(iop))
+            cop.qsyms[0]  = -cop.qsyms[0]
+            cop.qsyms[1]  = -cop.qsyms[1]
+            cop.status[0] = ~cop.status[0] 
+            cop.status[1] = ~cop.status[1] 
+            # ROP
+            rop.load(f0,'opers'+str(iop))
+            #--- kernel ---
+            tmp = qtensor.tensordot(bsite,rop,axes=([2],[1]),ifc1=True)
+            tmp = qtensor.tensordot(cop,tmp,axes=([1,2],[2,1]))
+            tmp = qtensor.tensordot(tmp,ksite,axes=([1,3],[1,2]))
+            #--- kernel ---
+            tmp.dump(f1,'opers'+str(iop))
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == 0: exphop[iop] = tmp.value
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if debug: print(' isite =',os.path.split(f1name)[-1],\
-	       		 ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if debug: print(' isite =',os.path.split(f1name)[-1],\
+                         ' nop =',nop,' t = %.2f s'%(tf-ti))
  
    # final
    sysutil_io.deleteDIR(path,1,debug)

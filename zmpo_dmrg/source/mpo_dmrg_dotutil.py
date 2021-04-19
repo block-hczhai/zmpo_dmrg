@@ -54,25 +54,25 @@ def initializeDPTspace(dmrg,isite,ncsite,flst,ifsym):
 def genDimensions(dmrg,isite,ncsite,fL,fR):
    if ncsite == 1:
       cdim = dmrg.dphys[isite]
-      # [*===] or [===*]	 
+      # [*===] or [===*]         
    elif ncsite == 2:
       cdim = dmrg.dphys[isite]*dmrg.dphys[isite+1]
-      # [**==] or [==**]	 
+      # [**==] or [==**]         
    if dmrg.ifQt:
       ldim = 0
       rdim = 0
       for name in fL:
-	 if 'slc' in name:
-	    ldim = fL[name].attrs['shape'][2]
-	    break
+         if 'slc' in name:
+            ldim = fL[name].attrs['shape'][2]
+            break
       for name in fR:
-	 if 'slc' in name:
-	    rdim = fR[name].attrs['shape'][2]
-	    break
+         if 'slc' in name:
+            rdim = fR[name].attrs['shape'][2]
+            break
       if ldim == 0 or rdim == 0: 
-	 print('error: ldim/rdim == 0!',ldim,rdim)
-	 exit(1)
-   else:	  
+         print('error: ldim/rdim == 0!',ldim,rdim)
+         exit(1)
+   else:          
       ldim = fL['opers0'].shape[2]
       rdim = fR['opers0'].shape[2]
    ndim = ldim*cdim*rdim
@@ -120,9 +120,9 @@ def dptSymmetry(dmrg,isite,ncsite,ifsym,debug=False):
          dmrg.qlst = [numpy.array(qsyml),numpy.array(qsymc),numpy.array(qsymr)]
       elif ncsite == 2:
          qsymc1 = dmrg.qphys[isite]
-	 qsymc2 = dmrg.qphys[isite+1]
-	 qsymc = mpo_dmrg_qphys.dpt(qsymc1,qsymc2)
- 	 qsymr = dmrg.qnumr[isite+2]
+         qsymc2 = dmrg.qphys[isite+1]
+         qsymc = mpo_dmrg_qphys.dpt(qsymc1,qsymc2)
+         qsymr = dmrg.qnumr[isite+2]
          dmrg.qlst = [numpy.array(qsyml),numpy.array(qsymc1),numpy.array(qsymc2),numpy.array(qsymr)]
       qsymt = reduce(mpo_dmrg_qphys.dpt,(qsyml,qsymc,qsymr))
       assert len(qsyml) == ldim
@@ -132,7 +132,7 @@ def dptSymmetry(dmrg,isite,ncsite,ifsym,debug=False):
       # Dictionary
       dic0 = {}
       for idx,item in enumerate(qsymt):
-	 dic0.setdefault(str(item),[]).append(idx)
+         dic0.setdefault(str(item),[]).append(idx)
    dic = {}
    for key in dic0:
       dic[floatKey(key)] = numpy.array(dic0[key])
@@ -175,10 +175,10 @@ def symmetrySpaceInfo(dmrg,qkey,ncsite,dicDPT=None):
 #>      prjmap = []
 #>      nk = eval(qkey)[0]
 #>      for ky in dicDPT:
-#>	 nd = eval(ky)[0]
-#>	 if abs(nk-nd)<1.e-8:
-#>	    prjmap += list(dicDPT[ky])
-#>	    print ' key=',ky,len(dicDPT[ky])
+#>       nd = eval(ky)[0]
+#>       if abs(nk-nd)<1.e-8:
+#>          prjmap += list(dicDPT[ky])
+#>          print ' key=',ky,len(dicDPT[ky])
 #>      ndim0 = len(prjmap)
 #>      print
 #>      #------------------------
@@ -334,7 +334,7 @@ def decimation(civecs,info,debug=False):
    else:
       # Simple noise
       if rank == 0 and dmrg.inoise == 1 and dmrg.noise >= 1.e-10: 
-	 civecs += numpy.random.uniform(-1,1,size=civecs.shape)*10.0*dmrg.noise
+         civecs += numpy.random.uniform(-1,1,size=civecs.shape)*10.0*dmrg.noise
          print(' Simple random noise with size (for civecs) =',dmrg.noise*10.0) # due to square
       # Only rank-0 will add RDM
       rdm1 = mpo_dmrg_kernel.pRDM(civecs,info)
@@ -347,14 +347,14 @@ def decimation(civecs,info,debug=False):
       trRDM = numpy.trace(rdm1)
       threshRDM = 1.e-12
       if trRDM < -threshRDM: 
-	 print('error: RDM should be positive definite! trRDM=',trRDM)
-	 exit(1)
+         print('error: RDM should be positive definite! trRDM=',trRDM)
+         exit(1)
       # if |rdm|<eps, use identity like rdm1. 
       elif trRDM > -threshRDM and trRDM < threshRDM:
-	 rdm1_dim = rdm1.shape[0]
-	 rdm1 = rdm1 + numpy.identity(rdm1_dim)/float(rdm1_dim)
+         rdm1_dim = rdm1.shape[0]
+         rdm1 = rdm1 + numpy.identity(rdm1_dim)/float(rdm1_dim)
       else:
-	 rdm1 = rdm1/trRDM
+         rdm1 = rdm1/trRDM
 
       # 2. Setup cutoff 
       Dcut = dmrg.Dmax
@@ -371,9 +371,9 @@ def decimation(civecs,info,debug=False):
       # 3. Perform decimation
       if status == 'L':
 
-	 if dmrg.Dcut is not None:
-	    Dcut = dmrg.Dcut[isite+1]
-	    print(' dmrg.Dcut =',dmrg.Dcut)
+         if dmrg.Dcut is not None:
+            Dcut = dmrg.Dcut[isite+1]
+            print(' dmrg.Dcut =',dmrg.Dcut)
          if dmrg.isym > 0:
             qsyml  = dmrg.qnuml[isite]
             qsymc  = dmrg.qphys[isite]
@@ -385,26 +385,26 @@ def decimation(civecs,info,debug=False):
             classes = copy.deepcopy(qsymlc)
          else:
             classes = [0]*lcdim
-	 # Calculate renormalized basis   
-	 if dmrg.ifsci and isite != dmrg.nsite-1 and dmrg.ncsite == 2:
- 	    dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_sci(rdm1,classes,dmrg.trsci,Dcut=-1,debug=False)
-  	 else:
- 	    dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_blkdiag(rdm1,classes,dmrg.thresh,Dcut,debug)
+         # Calculate renormalized basis   
+         if dmrg.ifsci and isite != dmrg.nsite-1 and dmrg.ncsite == 2:
+            dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_sci(rdm1,classes,dmrg.trsci,Dcut=-1,debug=False)
+         else:
+            dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_blkdiag(rdm1,classes,dmrg.thresh,Dcut,debug)
          nres = len(qred)
          site = rotL.reshape(ldim,dim,nres).copy()
          # W[a,n',r] = U[(l,n),a]*C[(l,n),n',r]
-	 srotR = numpy.empty((neig,nres,cdimc,rdim),dtype=dmrg_dtype) # Ij,aIX->ajX
-	 for ieig in range(neig):
-	    cimat = civecs[ieig].reshape(lcdim,crdim)
-	    # C=U*s*Vd, rhoL=C*Cd=U*s2*Ud, rotL=U => s*Vd=Ud*C  
-	    srotR[ieig] = numpy.dot(rotL.T.conj(),cimat).reshape(nres,cdimc,rdim)
+         srotR = numpy.empty((neig,nres,cdimc,rdim),dtype=dmrg_dtype) # Ij,aIX->ajX
+         for ieig in range(neig):
+            cimat = civecs[ieig].reshape(lcdim,crdim)
+            # C=U*s*Vd, rhoL=C*Cd=U*s2*Ud, rotL=U => s*Vd=Ud*C  
+            srotR[ieig] = numpy.dot(rotL.T.conj(),cimat).reshape(nres,cdimc,rdim)
 
       elif status == 'R':
 
-	 if dmrg.Dcut is not None:
+         if dmrg.Dcut is not None:
             jsite = isite+ncsite-1
-	    Dcut = dmrg.Dcut[jsite]
-	    print(' dmrg.Dcut =',dmrg.Dcut)
+            Dcut = dmrg.Dcut[jsite]
+            print(' dmrg.Dcut =',dmrg.Dcut)
          if dmrg.isym > 0:
             jsite = isite+ncsite-1
             qsymr = dmrg.qnumr[jsite+1]
@@ -417,22 +417,22 @@ def decimation(civecs,info,debug=False):
             classes = copy.deepcopy(qsymcr)
          else:
             classes = [0]*crdim
-	 # Calculate renormalized basis   
-	 if dmrg.ifsci and isite != 0 and dmrg.ncsite == 2:
- 	    dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_sci(rdm1,classes,dmrg.trsci,Dcut=-1,debug=False)
-  	 else:
- 	    dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_blkdiag(rdm1,classes,dmrg.thresh,Dcut,debug)
-	 nres = len(qred)
-	 # rotL=V => [V*].T => [Vd](nres,dim*rdim)
-	 site = rotL.conj().reshape(dim,rdim,nres).transpose(2,0,1).copy()
+         # Calculate renormalized basis   
+         if dmrg.ifsci and isite != 0 and dmrg.ncsite == 2:
+            dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_sci(rdm1,classes,dmrg.trsci,Dcut=-1,debug=False)
+         else:
+            dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_blkdiag(rdm1,classes,dmrg.thresh,Dcut,debug)
+         nres = len(qred)
+         # rotL=V => [V*].T => [Vd](nres,dim*rdim)
+         site = rotL.conj().reshape(dim,rdim,nres).transpose(2,0,1).copy()
          # W[l,n,a] = C[l,n,(n',r)]*V[a,(n',r)]
-	 srotR = numpy.empty((neig,ldim,cdimc,nres),dtype=dmrg_dtype) # aXI,Ij->aXj
-	 for ieig in range(neig):
-	    cimat = civecs[ieig].reshape(lcdim,crdim)
-	    # C=U*s*Vd, rhoR=Cd*C=V*s2*Vd, rotL=V => U*s=C*V  
-	    srotR[ieig] = numpy.dot(cimat,rotL).reshape(ldim,cdimc,nres)
+         srotR = numpy.empty((neig,ldim,cdimc,nres),dtype=dmrg_dtype) # aXI,Ij->aXj
+         for ieig in range(neig):
+            cimat = civecs[ieig].reshape(lcdim,crdim)
+            # C=U*s*Vd, rhoR=Cd*C=V*s2*Vd, rotL=V => U*s=C*V  
+            srotR[ieig] = numpy.dot(cimat,rotL).reshape(ldim,cdimc,nres)
 
-      # Check	
+      # Check   
       if debug:
          print(' CImat.shape[neig,L,R] = ',civecs.shape) 
          print(' Truncated sigs :',sigs.shape,' range = (%12.8e,%12.8e)'%(numpy.amax(sigs),numpy.amin(sigs)))
@@ -440,25 +440,25 @@ def decimation(civecs,info,debug=False):
          print(' Sum of sigs =',numpy.sum(sigs))
          print(' Discarded weights =',dwts)
       else:
-	 print(' Dcut =%5d  RDM-based decimation: %5d =>%5d  dwts = %7.2e'%(Dcut,dimSuperBlock,nres,dwts))
-	 tmpsigs = -numpy.sort(-sigs)
-	 nsigprt = 4
-	 sigs_frst = tmpsigs[:nsigprt]
-	 sigs_last = tmpsigs[-1:-nsigprt-1:-1][-1::-1]
-	 print(' first %d sigs2 = '%nsigprt,sigs_frst)
-	 print(' last  %d sigs2 = '%nsigprt,sigs_last)
-	 print(' von Neumann entropy =',vonNeumannEntropy(tmpsigs),\
-	       ' theoretical maxS =',numpy.log(len(tmpsigs)))	
+         print(' Dcut =%5d  RDM-based decimation: %5d =>%5d  dwts = %7.2e'%(Dcut,dimSuperBlock,nres,dwts))
+         tmpsigs = -numpy.sort(-sigs)
+         nsigprt = 4
+         sigs_frst = tmpsigs[:nsigprt]
+         sigs_last = tmpsigs[-1:-nsigprt-1:-1][-1::-1]
+         print(' first %d sigs2 = '%nsigprt,sigs_frst)
+         print(' last  %d sigs2 = '%nsigprt,sigs_last)
+         print(' von Neumann entropy =',vonNeumannEntropy(tmpsigs),\
+               ' theoretical maxS =',numpy.log(len(tmpsigs)))   
 
       # Store the norm of wavefunction at the boundary for one-site case.
       if dmrg.ifpt and ncsite == 1:
          if (status == 'L' and isite == dmrg.nsite-1) or \
             (status == 'R' and isite == 0): 
-	    assert civecs.shape[0] == 1
-	    # |ref><ref|x>
-	    ovlp = numpy.tensordot(site,civecs[0],axes=([0,1,2],[0,1,2]))
-	    site = site*ovlp
-	 
+            assert civecs.shape[0] == 1
+            # |ref><ref|x>
+            ovlp = numpy.tensordot(site,civecs[0],axes=([0,1,2],[0,1,2]))
+            site = site*ovlp
+         
       # Prepare communication
       qred = numpy.array(qred)
       dwts = numpy.array(dwts) 
@@ -500,63 +500,63 @@ def genGuess(dmrg,isite,ncsite,actlst,civecs,srotR,status):
    if ncsite == 2:
       # R: --**, -**=, **==
       if status == 'R': 
-	 # Boundary case - simply copy for the left sweep 
-	 if isite == actlst[-1]: 
-	    dmrg.psi0 = civecs.copy()
+         # Boundary case - simply copy for the left sweep 
+         if isite == actlst[-1]: 
+            dmrg.psi0 = civecs.copy()
          elif 'site'+str(isite-1) in dmrg.flmps:
-	    for ieig in range(dmrg.neig):
-	       # Move (L*Vs)*U	    
-	       #tmp = numpy.einsum('abc,cde->abde',dmrg.lmps[isite-1],srotR[ieig])
-	       tmp = mpo_dmrg_io.loadSite(dmrg.flmps,isite-1,dmrg.ifQt) 
-	       if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
-	       tmp = numpy.tensordot(tmp,srotR[ieig],axes=([2],[0]))
-	       s = numpy.prod(tmp.shape)
-	       if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
-	       dmrg.psi0[ieig] = tmp.reshape(s).copy()
+            for ieig in range(dmrg.neig):
+               # Move (L*Vs)*U      
+               #tmp = numpy.einsum('abc,cde->abde',dmrg.lmps[isite-1],srotR[ieig])
+               tmp = mpo_dmrg_io.loadSite(dmrg.flmps,isite-1,dmrg.ifQt) 
+               if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
+               tmp = numpy.tensordot(tmp,srotR[ieig],axes=([2],[0]))
+               s = numpy.prod(tmp.shape)
+               if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
+               dmrg.psi0[ieig] = tmp.reshape(s).copy()
       # L: **--, =**-, ==**
       elif status == 'L':
-	 if isite == actlst[-1]:
-	    dmrg.psi0 = civecs.copy()
+         if isite == actlst[-1]:
+            dmrg.psi0 = civecs.copy()
          elif 'site'+str(isite+2) in dmrg.frmps:
             for ieig in range(dmrg.neig):
-	       # Move U*(sV*R)	    
-	       #tmp = numpy.einsum('abc,cde->abde',srotR[ieig],dmrg.rmps[isite+2])
-	       tmp = mpo_dmrg_io.loadSite(dmrg.frmps,isite+2,dmrg.ifQt) 
-	       if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
-	       tmp = numpy.tensordot(srotR[ieig],tmp,axes=([2],[0]))
-	       s = numpy.prod(tmp.shape)
-	       if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
-	       dmrg.psi0[ieig] = tmp.reshape(s).copy()
+               # Move U*(sV*R)      
+               #tmp = numpy.einsum('abc,cde->abde',srotR[ieig],dmrg.rmps[isite+2])
+               tmp = mpo_dmrg_io.loadSite(dmrg.frmps,isite+2,dmrg.ifQt) 
+               if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
+               tmp = numpy.tensordot(srotR[ieig],tmp,axes=([2],[0]))
+               s = numpy.prod(tmp.shape)
+               if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
+               dmrg.psi0[ieig] = tmp.reshape(s).copy()
    elif ncsite == 1:
       # R: ---*, --*=, -*==, *===
       if status == 'R':
-	 # Boundary case
-	 if isite == actlst[-1]: 
-	    dmrg.psi0 = civecs.copy()
+         # Boundary case
+         if isite == actlst[-1]: 
+            dmrg.psi0 = civecs.copy()
          elif 'site'+str(isite-1) in dmrg.flmps:
-	    for ieig in range(dmrg.neig):
-	       # Move (L*Vs)*U	    
-	       #tmp = numpy.einsum('abc,cde->abde',dmrg.lmps[isite-1],srotR[ieig])
-	       tmp = mpo_dmrg_io.loadSite(dmrg.flmps,isite-1,dmrg.ifQt) 
-	       if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
-	       tmp = numpy.tensordot(tmp,srotR[ieig],axes=([2],[0]))
-	       s = numpy.prod(tmp.shape)
-	       if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
-	       dmrg.psi0[ieig] = tmp.reshape(s).copy()
+            for ieig in range(dmrg.neig):
+               # Move (L*Vs)*U      
+               #tmp = numpy.einsum('abc,cde->abde',dmrg.lmps[isite-1],srotR[ieig])
+               tmp = mpo_dmrg_io.loadSite(dmrg.flmps,isite-1,dmrg.ifQt) 
+               if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
+               tmp = numpy.tensordot(tmp,srotR[ieig],axes=([2],[0]))
+               s = numpy.prod(tmp.shape)
+               if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
+               dmrg.psi0[ieig] = tmp.reshape(s).copy()
       # L: *---, =*--, ==*-, ===*
       elif status == 'L':
-	 if isite == actlst[-1]:
-	    dmrg.psi0 = civecs.copy()
+         if isite == actlst[-1]:
+            dmrg.psi0 = civecs.copy()
          elif 'site'+str(isite+1) in dmrg.frmps:
             for ieig in range(dmrg.neig):
-	       # Move U*(sV*R)	    
-	       #tmp = numpy.einsum('abc,cde->abde',srotR[ieig],dmrg.rmps[isite+1])
-	       tmp = mpo_dmrg_io.loadSite(dmrg.frmps,isite+1,dmrg.ifQt) 
-	       if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
-	       tmp = numpy.tensordot(srotR[ieig],tmp,axes=([2],[0]))
-	       s = numpy.prod(tmp.shape)
-	       if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
-	       dmrg.psi0[ieig] = tmp.reshape(s).copy()
+               # Move U*(sV*R)      
+               #tmp = numpy.einsum('abc,cde->abde',srotR[ieig],dmrg.rmps[isite+1])
+               tmp = mpo_dmrg_io.loadSite(dmrg.frmps,isite+1,dmrg.ifQt) 
+               if dmrg.ifQt: tmp = tmp.toDenseTensor(tmp.idlst)
+               tmp = numpy.tensordot(srotR[ieig],tmp,axes=([2],[0]))
+               s = numpy.prod(tmp.shape)
+               if ieig == 0: dmrg.psi0 = numpy.zeros((dmrg.neig,s),dtype=dmrg_dtype)
+               dmrg.psi0[ieig] = tmp.reshape(s).copy()
    return 0
 
 # Setup Qtmp for pRDM

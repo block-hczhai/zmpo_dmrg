@@ -30,11 +30,11 @@ def genHenRfacSpatial(dmrg,pindx,isite,icase):
    # H[spinfree]*R 
    if ipop is not None:
       if icase == 1 or icase == 2:
-	 pop = mpo_dmrg_opers.genExpISyPhiMat(dmrg.qpts[ipop])
+         pop = mpo_dmrg_opers.genExpISyPhiMat(dmrg.qpts[ipop])
          cop = numpy.tensordot(cop,pop,axes=([3],[0]))
       else:
          print('\nerror: icase must be 1 or 2 for ifs2proj = True!')
-	 exit()
+         exit()
    return cop
 
 # Diagonal in the Fock space: O(3*K)
@@ -95,7 +95,7 @@ def genHBlkDiagfacSpatial(dmrg,porb,isite):
       tpp = pss.dot(pss)+pos.dot(pos.T)
       mat1 = (dmrg.sint1e[psite,psite] + \
           - 0.5*dmrg.sint2e[psite,psite,psite,psite])*matp \
-	  + 0.5*dmrg.sint2e[psite,psite,psite,psite]*tpp
+          + 0.5*dmrg.sint2e[psite,psite,psite,psite]*tpp
       mats = matp.copy()
    else:
       mat1 = iden.copy()

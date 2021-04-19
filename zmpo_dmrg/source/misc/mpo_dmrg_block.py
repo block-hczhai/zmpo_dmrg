@@ -30,7 +30,7 @@ def genCAops(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
    if dmrg.comm.rank == 0: print('\n[mpo_dmrg_block.genCAops] ifQt=',dmrg.ifQt)
    if dmrg.ifQt:
       print('Not implemented yet!')
-      exit()	   
+      exit()       
       #exphop = mpo_dmrg_blockQt.genCAopsQt(norder,dmrg,fbmps,fkmps,fname,status,debug)
    else:
       exphop = genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug)
@@ -69,96 +69,96 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 
       mpo_dmrg_init.genBmat(dmrg,fname,-1)
       for isite in range(0,nsite):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite-1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
-	 f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 
-	 # 0. Qnums
-	 porbs = 2*isite
-	 nqum = fkmps['qnum'+str(isite)].value[:,0]
-	 sgnl = numpy.power(-1.0,nqum)
-	 ksite2 = numpy.einsum('l,lnr->lnr',sgnl,ksite)
-	 
-	 # 1. Similar to mpo_dmrg_init.genSopsNQt: <li[A]|lj[B]>
-	 oplst = ['mat']
-	 renorm_l1(bsite,ksite,f0,f1,oplst)
+         f1 = h5py.File(f1name,"w")
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         
+         # 0. Qnums
+         porbs = 2*isite
+         nqum = fkmps['qnum'+str(isite)].value[:,0]
+         sgnl = numpy.power(-1.0,nqum)
+         ksite2 = numpy.einsum('l,lnr->lnr',sgnl,ksite)
+         
+         # 1. Similar to mpo_dmrg_init.genSopsNQt: <li[A]|lj[B]>
+         oplst = ['mat']
+         renorm_l1(bsite,ksite,f0,f1,oplst)
 
-	 # 2. Part-1: <l'n'|op|ln> = <l'|op|l>*<n'|n>  if p < 2k
-	 oplst = ['op_C_'+str(p) for p in range(porbs)]\
-	       + ['op_A_'+str(p) for p in range(porbs)]
-	 renorm_l1(bsite,ksite,f0,f1,oplst)
-	 #   Part-2: <l'n'|op|ln> = <l'|l>(-1)^l*<n'|op|n> if p = 2k,2k+1 
-	 #   	     <L'|op|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
-	 tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
-	 for ispin in range(2):
-	    tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
-	    f1['op_C_'+str(2*isite+ispin)] = tmp 
-	    tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
-	    f1['op_A_'+str(2*isite+ispin)] = tmp
-	 
-	 # 3. Part-1: <l'n'|aa(p<q)|ln> = <l'|apq|l><n'|n>  if p,q < 2k
-	 oplst = ['op_CC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]\
-	       + ['op_AA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]
-	 renorm_l1(bsite,ksite,f0,f1,oplst)
-	 #    Part-2: <l'|ap|l>*<n'|aq|n> if p < 2k and q in 2k,2k+1
-	 for p in range(porbs):
-	    # CC
-	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
-	    for ispin in range(2):
-	       tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
-	       f1['op_CC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
-	    # AA
-	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
-	    for ispin in range(2):
-	       tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
-	       f1['op_AA_'+str(p)+'_'+str(2*isite+ispin)] = tmp
-	 #    Part-3: <l'|l>*<n'|apq|n> if p,q in 2k,2k+1
-	 #   	      <L'|opq|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
-	 tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
-	 tmp  = renorm_l2_transform_nop(tmp0,cc2,ksite)
+         # 2. Part-1: <l'n'|op|ln> = <l'|op|l>*<n'|n>  if p < 2k
+         oplst = ['op_C_'+str(p) for p in range(porbs)]\
+               + ['op_A_'+str(p) for p in range(porbs)]
+         renorm_l1(bsite,ksite,f0,f1,oplst)
+         #   Part-2: <l'n'|op|ln> = <l'|l>(-1)^l*<n'|op|n> if p = 2k,2k+1 
+         #           <L'|op|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
+         tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
+         for ispin in range(2):
+            tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
+            f1['op_C_'+str(2*isite+ispin)] = tmp 
+            tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
+            f1['op_A_'+str(2*isite+ispin)] = tmp
+         
+         # 3. Part-1: <l'n'|aa(p<q)|ln> = <l'|apq|l><n'|n>  if p,q < 2k
+         oplst = ['op_CC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]\
+               + ['op_AA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]
+         renorm_l1(bsite,ksite,f0,f1,oplst)
+         #    Part-2: <l'|ap|l>*<n'|aq|n> if p < 2k and q in 2k,2k+1
+         for p in range(porbs):
+            # CC
+            tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
+            for ispin in range(2):
+               tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
+               f1['op_CC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
+            # AA
+            tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
+            for ispin in range(2):
+               tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
+               f1['op_AA_'+str(p)+'_'+str(2*isite+ispin)] = tmp
+         #    Part-3: <l'|l>*<n'|apq|n> if p,q in 2k,2k+1
+         #            <L'|opq|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
+         tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
+         tmp  = renorm_l2_transform_nop(tmp0,cc2,ksite)
          f1['op_CC_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
-	 tmp  = renorm_l2_transform_nop(tmp0,aa2,ksite)
+         tmp  = renorm_l2_transform_nop(tmp0,aa2,ksite)
          f1['op_AA_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
 
-	 # 4. Part-1: <l'n'|cp*aq|ln> = <l'|cp*aq|l><n'|n>  if p,q < 2k
-	 oplst = ['op_CA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]\
-	       + ['op_AC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]
-	 renorm_l1(bsite,ksite,f0,f1,oplst)
-	 #    Part-2: cp[l]*aq[n] or cq[n]*ap[l]=-ap[l]*cq[n]
-	 #	      ap[l]*cq[n] or aq[n]*cp[l]=-cp[l]*aq[n]
-	 #	      for p < 2*k and q in 2k,2k+1 
-	 for p in range(porbs):
-	    # CA
-	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
-	    for ispin in range(2):
-	       tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)	    
-	       f1['op_CA_'+str(p)+'_'+str(2*isite+ispin)] = tmp 
-	       f1['op_AC_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
-	    # AC
-	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
-	    for ispin in range(2):
-	       tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
-	       f1['op_AC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
-	       f1['op_CA_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
-	 #    Part-3: <l'|l>*<n'|cp*aq|n> if p,q in 2k,2k+1
-	 tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
-	 for ispin in range(2):
-	    for jspin in range(2): 
-	       tmp = renorm_l2_transform_nop(tmp0,ca2[ispin*2+jspin],ksite)
-	       f1['op_CA_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
-	       tmp = renorm_l2_transform_nop(tmp0,ac2[ispin*2+jspin],ksite)
+         # 4. Part-1: <l'n'|cp*aq|ln> = <l'|cp*aq|l><n'|n>  if p,q < 2k
+         oplst = ['op_CA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]\
+               + ['op_AC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]
+         renorm_l1(bsite,ksite,f0,f1,oplst)
+         #    Part-2: cp[l]*aq[n] or cq[n]*ap[l]=-ap[l]*cq[n]
+         #            ap[l]*cq[n] or aq[n]*cp[l]=-cp[l]*aq[n]
+         #            for p < 2*k and q in 2k,2k+1 
+         for p in range(porbs):
+            # CA
+            tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
+            for ispin in range(2):
+               tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)        
+               f1['op_CA_'+str(p)+'_'+str(2*isite+ispin)] = tmp 
+               f1['op_AC_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
+            # AC
+            tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
+            for ispin in range(2):
+               tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
+               f1['op_AC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
+               f1['op_CA_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
+         #    Part-3: <l'|l>*<n'|cp*aq|n> if p,q in 2k,2k+1
+         tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
+         for ispin in range(2):
+            for jspin in range(2): 
+               tmp = renorm_l2_transform_nop(tmp0,ca2[ispin*2+jspin],ksite)
+               f1['op_CA_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
+               tmp = renorm_l2_transform_nop(tmp0,ac2[ispin*2+jspin],ksite)
                f1['op_AC_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
 
          # final isite
-	 f0.close()
-	 f1.close()
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti))
+         f0.close()
+         f1.close()
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti))
      
    #
    # L<-R sweeps: For properties, left canonical form is assumed even for R sweeps! 
@@ -167,96 +167,96 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 
       mpo_dmrg_init.genBmat(dmrg,fname,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite+1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
          f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	
-	 # 0. Qnums
-	 porbs = 2*(isite+1)
-	 ksite2 = numpy.einsum('n,lnr->lnr',sgnn,ksite)
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+        
+         # 0. Qnums
+         porbs = 2*(isite+1)
+         ksite2 = numpy.einsum('n,lnr->lnr',sgnn,ksite)
        
-	 # 1. <ri[A]|rj[B]>
-	 oplst = ['mat']
-	 renorm_r1(bsite,ksite,f0,f1,oplst)
-	
-	 # 2. Part-1: <n'r'|op|nr> = <n'|n>(-1)^n*<r'|op|r> if p > 2k
-	 # 	      A[l',n',r']<n'|n>(-1)^n*<r'|op|r>*A[l,n,r]
-	 oplst = ['op_C_'+str(p) for p in range(porbs,sbas)]\
-	       + ['op_A_'+str(p) for p in range(porbs,sbas)]
-	 renorm_r1(bsite,ksite2,f0,f1,oplst)
-	 #    Part-2: <n'r'|op|nr> = <n'|op|n>*<r'|r> if p = 2k,2k+1
-	 #	      <l'|op|l> = A[l',n'r']*<n'|op|n>*<r'|r>*A[l,nr]
-	 tmp0 = renorm_r2_absorb_rop(ksite,f0['mat'])
-	 for ispin in range(2):
-	    tmp = renorm_r2_transform_nop(tmp0,cre[ispin],bsite)
-	    f1['op_C_'+str(2*isite+ispin)] = tmp
-	    tmp = renorm_r2_transform_nop(tmp0,ann[ispin],bsite)
-	    f1['op_A_'+str(2*isite+ispin)] = tmp
-	 
-	 # 3. Part-1: <n'r'|aa(p<q)|n'r'> = <n'|n><r'|apq|r> if p,q > 2k
-	 #	      <l'|aa(p<q)|l> = A[l',n',r']<n'|n><r'|apq|r>A[l,n,r]
-	 oplst = ['op_CC_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(p+1,porbs)]\
-	       + ['op_AA_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(p+1,porbs)]
-	 renorm_r1(bsite,ksite,f0,f1,oplst)
-	 #    Part-2: <n'r'|aa(p<q)|n'r'> = <n'|ap|n>*S*<r'|aq|r> if p in 2k,2k+1 and q > 2k
-	 #	      <l'|aa(p<q)|l> = A[l',n',r']*<n'|ap|n>S*<r'|aq|r>*A[l,n,r]	
-	 for p in range(porbs,sbas):
-	    # CC
-	    tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_C_'+str(p)])
-	    for ispin in range(2):
-               tmp = renorm_r2_transform_nop(tmp0,cre[ispin],bsite)
-	       f1['op_CC_'+str(2*isite+ispin)+'_'+str(p)] = tmp
-	    # AA
-	    tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_A_'+str(p)])
-	    for ispin in range(2):
-               tmp = renorm_r2_transform_nop(tmp0,ann[ispin],bsite)
-	       f1['op_AA_'+str(2*isite+ispin)+'_'+str(p)] = tmp
-	 #    Part-3: <n'r'|aa(p<q)|n'r'> = <n'|apq|n>*<r'|r> if p,q in 2k,2k+1 
-	 #	      <l'|aa(p<q)|l> = A[l',n',r]*<n'|apq|n>*<r'|r>*A[l,n,r]
-	 tmp0 = renorm_r2_absorb_rop(ksite,f0['mat'])
-	 tmp  = renorm_r2_transform_nop(tmp0,cc2,bsite)
-	 f1['op_CC_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
-	 tmp  = renorm_r2_transform_nop(tmp0,aa2,bsite)
-	 f1['op_AA_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
-	 
-	 # 4. Part-1: <n'r'|cp*aq|nr> = <n'|n><r'|cp*aq|r> if p,q > 2k
-	 #	      <l'|cp*aq|l> = A[l',nr']*<r'|cp*aq|r>*A[l,nr]
-	 oplst = ['op_CA_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(porbs,sbas)]\
-	       + ['op_AC_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(porbs,sbas)]
-	 renorm_r1(bsite,ksite,f0,f1,oplst)
-	 #    Part-2: <n'r'|cp*aq|nr> = <n'|cp|n>S*<r'|aq|r>
-	 for p in range(porbs,sbas):
-	    # CA
-	    tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_A_'+str(p)])
-	    for ispin in range(2):
-	       tmp  = renorm_r2_transform_nop(tmp0,cre[ispin],bsite)
-	       f1['op_CA_'+str(2*isite+ispin)+'_'+str(p)] = tmp
-	       f1['op_AC_'+str(p)+'_'+str(2*isite+ispin)] = -tmp
-	    # AA
-	    tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_C_'+str(p)])
-	    for ispin in range(2):
-               tmp  = renorm_r2_transform_nop(tmp0,ann[ispin],bsite)
-	       f1['op_AC_'+str(2*isite+ispin)+'_'+str(p)] = tmp
-	       f1['op_CA_'+str(p)+'_'+str(2*isite+ispin)] = -tmp
-	 #    Part-3: <n'r'|cp*aq|n'r'> = <n'|cp*aq|n>*<r'|r> if p,q in 2k,2k+1 
+         # 1. <ri[A]|rj[B]>
+         oplst = ['mat']
+         renorm_r1(bsite,ksite,f0,f1,oplst)
+        
+         # 2. Part-1: <n'r'|op|nr> = <n'|n>(-1)^n*<r'|op|r> if p > 2k
+         #            A[l',n',r']<n'|n>(-1)^n*<r'|op|r>*A[l,n,r]
+         oplst = ['op_C_'+str(p) for p in range(porbs,sbas)]\
+               + ['op_A_'+str(p) for p in range(porbs,sbas)]
+         renorm_r1(bsite,ksite2,f0,f1,oplst)
+         #    Part-2: <n'r'|op|nr> = <n'|op|n>*<r'|r> if p = 2k,2k+1
+         #            <l'|op|l> = A[l',n'r']*<n'|op|n>*<r'|r>*A[l,nr]
          tmp0 = renorm_r2_absorb_rop(ksite,f0['mat'])
-	 for ispin in range(2):
-	    for jspin in range(2): 
-	       tmp = renorm_r2_transform_nop(tmp0,ca2[ispin*2+jspin],bsite)
-	       f1['op_CA_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
-	       tmp = renorm_r2_transform_nop(tmp0,ac2[ispin*2+jspin],bsite)
-	       f1['op_AC_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
+         for ispin in range(2):
+            tmp = renorm_r2_transform_nop(tmp0,cre[ispin],bsite)
+            f1['op_C_'+str(2*isite+ispin)] = tmp
+            tmp = renorm_r2_transform_nop(tmp0,ann[ispin],bsite)
+            f1['op_A_'+str(2*isite+ispin)] = tmp
+         
+         # 3. Part-1: <n'r'|aa(p<q)|n'r'> = <n'|n><r'|apq|r> if p,q > 2k
+         #            <l'|aa(p<q)|l> = A[l',n',r']<n'|n><r'|apq|r>A[l,n,r]
+         oplst = ['op_CC_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(p+1,porbs)]\
+               + ['op_AA_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(p+1,porbs)]
+         renorm_r1(bsite,ksite,f0,f1,oplst)
+         #    Part-2: <n'r'|aa(p<q)|n'r'> = <n'|ap|n>*S*<r'|aq|r> if p in 2k,2k+1 and q > 2k
+         #            <l'|aa(p<q)|l> = A[l',n',r']*<n'|ap|n>S*<r'|aq|r>*A[l,n,r]        
+         for p in range(porbs,sbas):
+            # CC
+            tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_C_'+str(p)])
+            for ispin in range(2):
+               tmp = renorm_r2_transform_nop(tmp0,cre[ispin],bsite)
+               f1['op_CC_'+str(2*isite+ispin)+'_'+str(p)] = tmp
+            # AA
+            tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_A_'+str(p)])
+            for ispin in range(2):
+               tmp = renorm_r2_transform_nop(tmp0,ann[ispin],bsite)
+               f1['op_AA_'+str(2*isite+ispin)+'_'+str(p)] = tmp
+         #    Part-3: <n'r'|aa(p<q)|n'r'> = <n'|apq|n>*<r'|r> if p,q in 2k,2k+1 
+         #            <l'|aa(p<q)|l> = A[l',n',r]*<n'|apq|n>*<r'|r>*A[l,n,r]
+         tmp0 = renorm_r2_absorb_rop(ksite,f0['mat'])
+         tmp  = renorm_r2_transform_nop(tmp0,cc2,bsite)
+         f1['op_CC_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
+         tmp  = renorm_r2_transform_nop(tmp0,aa2,bsite)
+         f1['op_AA_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
+         
+         # 4. Part-1: <n'r'|cp*aq|nr> = <n'|n><r'|cp*aq|r> if p,q > 2k
+         #            <l'|cp*aq|l> = A[l',nr']*<r'|cp*aq|r>*A[l,nr]
+         oplst = ['op_CA_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(porbs,sbas)]\
+               + ['op_AC_'+str(p)+'_'+str(q) for p in range(porbs,sbas) for q in range(porbs,sbas)]
+         renorm_r1(bsite,ksite,f0,f1,oplst)
+         #    Part-2: <n'r'|cp*aq|nr> = <n'|cp|n>S*<r'|aq|r>
+         for p in range(porbs,sbas):
+            # CA
+            tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_A_'+str(p)])
+            for ispin in range(2):
+               tmp  = renorm_r2_transform_nop(tmp0,cre[ispin],bsite)
+               f1['op_CA_'+str(2*isite+ispin)+'_'+str(p)] = tmp
+               f1['op_AC_'+str(p)+'_'+str(2*isite+ispin)] = -tmp
+            # AA
+            tmp0 = renorm_r2_absorb_rop(ksite2,f0['op_C_'+str(p)])
+            for ispin in range(2):
+               tmp  = renorm_r2_transform_nop(tmp0,ann[ispin],bsite)
+               f1['op_AC_'+str(2*isite+ispin)+'_'+str(p)] = tmp
+               f1['op_CA_'+str(p)+'_'+str(2*isite+ispin)] = -tmp
+         #    Part-3: <n'r'|cp*aq|n'r'> = <n'|cp*aq|n>*<r'|r> if p,q in 2k,2k+1 
+         tmp0 = renorm_r2_absorb_rop(ksite,f0['mat'])
+         for ispin in range(2):
+            for jspin in range(2): 
+               tmp = renorm_r2_transform_nop(tmp0,ca2[ispin*2+jspin],bsite)
+               f1['op_CA_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
+               tmp = renorm_r2_transform_nop(tmp0,ac2[ispin*2+jspin],bsite)
+               f1['op_AC_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
 
-	 # final isite
-	 f0.close()
-	 f1.close()
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti))
+         # final isite
+         f0.close()
+         f1.close()
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti))
   
    # CHECK
    f = h5py.File(f1name,'r')
@@ -326,96 +326,96 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 #> 
 #>       mpo_dmrg_init.genBmat(dmrg,fname,-1)
 #>       for isite in range(0,nsite):
-#> 	 if debug: print ' isite=',isite,' of nsite=',nsite
-#> 	 ti = time.time()
-#> 	 f0 = h5py.File(prefix+str(isite-1),"r")
+#>       if debug: print ' isite=',isite,' of nsite=',nsite
+#>       ti = time.time()
+#>       f0 = h5py.File(prefix+str(isite-1),"r")
 #>          f1name = prefix+str(isite)
-#> 	 f1 = h5py.File(f1name,"w")
-#> 	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-#> 	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-#> 	 
-#> 	 # 0. Qnums
-#> 	 porbs = 2*isite
-#> 	 nqum = fkmps['qnum'+str(isite)].value[:,0]
-#> 	 sgnl = numpy.power(-1.0,nqum)
-#> 	 ksite2 = numpy.einsum('l,lnr->lnr',sgnl,ksite)
-#> 	 
-#> 	 # 1. Similar to mpo_dmrg_init.genSopsNQt: <li[A]|lj[B]>
-#> 	 oplst = ['mat']
-#> 	 renorm_l1(bsite,ksite,f0,f1,oplst)
+#>       f1 = h5py.File(f1name,"w")
+#>       bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+#>       ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+#>       
+#>       # 0. Qnums
+#>       porbs = 2*isite
+#>       nqum = fkmps['qnum'+str(isite)].value[:,0]
+#>       sgnl = numpy.power(-1.0,nqum)
+#>       ksite2 = numpy.einsum('l,lnr->lnr',sgnl,ksite)
+#>       
+#>       # 1. Similar to mpo_dmrg_init.genSopsNQt: <li[A]|lj[B]>
+#>       oplst = ['mat']
+#>       renorm_l1(bsite,ksite,f0,f1,oplst)
 #> 
-#> 	 # 2. Part-1: <l'n'|op|ln> = <l'|op|l>*<n'|n>  if p < 2k
-#> 	 oplst = ['op_C_'+str(p) for p in range(porbs)]\
-#> 	       + ['op_A_'+str(p) for p in range(porbs)]
-#> 	 renorm_l1(bsite,ksite,f0,f1,oplst)
-#> 	 #   Part-2: <l'n'|op|ln> = <l'|l>(-1)^l*<n'|op|n> if p = 2k,2k+1 
-#> 	 #   	     <L'|op|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
-#> 	 tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
-#> 	 for ispin in range(2):
-#> 	    tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
-#> 	    f1['op_C_'+str(2*isite+ispin)] = tmp 
-#> 	    tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
-#> 	    f1['op_A_'+str(2*isite+ispin)] = tmp
-#> 	 
-#> 	 # 3. Part-1: <l'n'|aa(p<q)|ln> = <l'|apq|l><n'|n>  if p,q < 2k
-#> 	 oplst = ['op_CC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]\
-#> 	       + ['op_AA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]
-#> 	 renorm_l1(bsite,ksite,f0,f1,oplst)
-#> 	 #    Part-2: <l'|ap|l>*<n'|aq|n> if p < 2k and q in 2k,2k+1
-#> 	 for p in range(porbs):
-#> 	    # CC
-#> 	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
-#> 	    for ispin in range(2):
-#> 	       tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
-#> 	       f1['op_CC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
-#> 	    # AA
-#> 	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
-#> 	    for ispin in range(2):
-#> 	       tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
-#> 	       f1['op_AA_'+str(p)+'_'+str(2*isite+ispin)] = tmp
-#> 	 #    Part-3: <l'|l>*<n'|apq|n> if p,q in 2k,2k+1
-#> 	 #   	      <L'|opq|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
-#> 	 tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
-#> 	 tmp  = renorm_l2_transform_nop(tmp0,cc2,ksite)
+#>       # 2. Part-1: <l'n'|op|ln> = <l'|op|l>*<n'|n>  if p < 2k
+#>       oplst = ['op_C_'+str(p) for p in range(porbs)]\
+#>             + ['op_A_'+str(p) for p in range(porbs)]
+#>       renorm_l1(bsite,ksite,f0,f1,oplst)
+#>       #   Part-2: <l'n'|op|ln> = <l'|l>(-1)^l*<n'|op|n> if p = 2k,2k+1 
+#>       #           <L'|op|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
+#>       tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
+#>       for ispin in range(2):
+#>          tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
+#>          f1['op_C_'+str(2*isite+ispin)] = tmp 
+#>          tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
+#>          f1['op_A_'+str(2*isite+ispin)] = tmp
+#>       
+#>       # 3. Part-1: <l'n'|aa(p<q)|ln> = <l'|apq|l><n'|n>  if p,q < 2k
+#>       oplst = ['op_CC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]\
+#>             + ['op_AA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(p+1,porbs)]
+#>       renorm_l1(bsite,ksite,f0,f1,oplst)
+#>       #    Part-2: <l'|ap|l>*<n'|aq|n> if p < 2k and q in 2k,2k+1
+#>       for p in range(porbs):
+#>          # CC
+#>          tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
+#>          for ispin in range(2):
+#>             tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
+#>             f1['op_CC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
+#>          # AA
+#>          tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
+#>          for ispin in range(2):
+#>             tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)
+#>             f1['op_AA_'+str(p)+'_'+str(2*isite+ispin)] = tmp
+#>       #    Part-3: <l'|l>*<n'|apq|n> if p,q in 2k,2k+1
+#>       #            <L'|opq|L> = A[l'n',L']*<l'|l><n'|op|n>*A[ln,L]
+#>       tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
+#>       tmp  = renorm_l2_transform_nop(tmp0,cc2,ksite)
 #>          f1['op_CC_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
-#> 	 tmp  = renorm_l2_transform_nop(tmp0,aa2,ksite)
+#>       tmp  = renorm_l2_transform_nop(tmp0,aa2,ksite)
 #>          f1['op_AA_'+str(2*isite+0)+'_'+str(2*isite+1)] = tmp
 #> 
-#> 	 # 4. Part-1: <l'n'|cp*aq|ln> = <l'|cp*aq|l><n'|n>  if p,q < 2k
-#> 	 oplst = ['op_CA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]\
-#> 	       + ['op_AC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]
-#> 	 renorm_l1(bsite,ksite,f0,f1,oplst)
-#> 	 #    Part-2: cp[l]*aq[n] or cq[n]*ap[l]=-ap[l]*cq[n]
-#> 	 #	      ap[l]*cq[n] or aq[n]*cp[l]=-cp[l]*aq[n]
-#> 	 #	      for p < 2*k and q in 2k,2k+1 
-#> 	 for p in range(porbs):
-#> 	    # CA
-#> 	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
-#> 	    for ispin in range(2):
-#> 	       tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)	    
-#> 	       f1['op_CA_'+str(p)+'_'+str(2*isite+ispin)] = tmp 
-#> 	       f1['op_AC_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
-#> 	    # AC
-#> 	    tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
-#> 	    for ispin in range(2):
-#> 	       tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
-#> 	       f1['op_AC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
-#> 	       f1['op_CA_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
-#> 	 #    Part-3: <l'|l>*<n'|cp*aq|n> if p,q in 2k,2k+1
-#> 	 tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
-#> 	 for ispin in range(2):
-#> 	    for jspin in range(2): 
-#> 	       tmp = renorm_l2_transform_nop(tmp0,ca2[ispin*2+jspin],ksite)
-#> 	       f1['op_CA_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
-#> 	       tmp = renorm_l2_transform_nop(tmp0,ac2[ispin*2+jspin],ksite)
+#>       # 4. Part-1: <l'n'|cp*aq|ln> = <l'|cp*aq|l><n'|n>  if p,q < 2k
+#>       oplst = ['op_CA_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]\
+#>             + ['op_AC_'+str(p)+'_'+str(q) for p in range(porbs) for q in range(porbs)]
+#>       renorm_l1(bsite,ksite,f0,f1,oplst)
+#>       #    Part-2: cp[l]*aq[n] or cq[n]*ap[l]=-ap[l]*cq[n]
+#>       #            ap[l]*cq[n] or aq[n]*cp[l]=-cp[l]*aq[n]
+#>       #            for p < 2*k and q in 2k,2k+1 
+#>       for p in range(porbs):
+#>          # CA
+#>          tmp0 = renorm_l2_absorb_lop(bsite,f0['op_C_'+str(p)])
+#>          for ispin in range(2):
+#>             tmp = renorm_l2_transform_nop(tmp0,ann[ispin],ksite2)        
+#>             f1['op_CA_'+str(p)+'_'+str(2*isite+ispin)] = tmp 
+#>             f1['op_AC_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
+#>          # AC
+#>          tmp0 = renorm_l2_absorb_lop(bsite,f0['op_A_'+str(p)])
+#>          for ispin in range(2):
+#>             tmp = renorm_l2_transform_nop(tmp0,cre[ispin],ksite2)
+#>             f1['op_AC_'+str(p)+'_'+str(2*isite+ispin)] = tmp
+#>             f1['op_CA_'+str(2*isite+ispin)+'_'+str(p)] = -tmp
+#>       #    Part-3: <l'|l>*<n'|cp*aq|n> if p,q in 2k,2k+1
+#>       tmp0 = renorm_l2_absorb_lop(bsite,f0['mat'])
+#>       for ispin in range(2):
+#>          for jspin in range(2): 
+#>             tmp = renorm_l2_transform_nop(tmp0,ca2[ispin*2+jspin],ksite)
+#>             f1['op_CA_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
+#>             tmp = renorm_l2_transform_nop(tmp0,ac2[ispin*2+jspin],ksite)
 #>                f1['op_AC_'+str(2*isite+ispin)+'_'+str(2*isite+jspin)] = tmp
 #> 
 #>          # final isite
-#> 	 f0.close()
-#> 	 f1.close()
-#> 	 tf = time.time()
-#> 	 if dmrg.comm.rank == 0:
-#> 	    print ' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti)
+#>       f0.close()
+#>       f1.close()
+#>       tf = time.time()
+#>       if dmrg.comm.rank == 0:
+#>          print ' isite =',os.path.split(f1name)[-1],' t = %.2f s'%(tf-ti)
 #>      
 #>    # CHECK
 #>    f = h5py.File(f1name,'r')
@@ -443,7 +443,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 # SUBROUTINES
 ##############
 
-# renorm <l'|l>d[n'n]	 
+# renorm <l'|l>d[n'n]    
 def renorm_l1(bsite,ksite,f0,f1,oplst=None):
    for op in oplst:
       tmp = f0[op].value
@@ -461,8 +461,8 @@ def renorm_r1(bsite,ksite,f0,f1,oplst=None):
    return 0
 
 #   Key Contraciton: tmp1[n',L',l] = A[l',n',L']*<l'|l>
-#	                tmp2[L',l,n] = tmp1[n',L',l]*<n'|op|n>
-#	                <L'|op|L> = tmp2[L',l,n]*A[l,n,L]	
+#                       tmp2[L',l,n] = tmp1[n',L',l]*<n'|op|n>
+#                       <L'|op|L> = tmp2[L',l,n]*A[l,n,L]       
 def renorm_l2_absorb_lop(bsite,lop):
    return numpy.tensordot(bsite,lop,axes=([0],[0]))
 
@@ -472,8 +472,8 @@ def renorm_l2_transform_nop(blop,nop,ksite):
    return tmp
 
 #   Key Contraciton: tmp1[r',R,n] = <r'|r>*A[R,n,r]
-#	                tmp2[n',r',R] = <n'|op|n>*tmp1[r',R,n]
-#	                <R'|op|R> = A[R',n,r]*tmp2[n,r,R]
+#                       tmp2[n',r',R] = <n'|op|n>*tmp1[r',R,n]
+#                       <R'|op|R> = A[R',n,r]*tmp2[n,r,R]
 def renorm_r2_absorb_rop(ksite,rop):
    return numpy.tensordot(rop,ksite,axes=([1],[2]))
 

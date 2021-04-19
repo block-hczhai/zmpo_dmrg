@@ -46,23 +46,23 @@ def genMPO_Apq(nsite,islst,fname,ifQt,debug=False):
       gname = 'site'+str(isite)
       grp = fop.create_group(gname)
       if not ifQt:
-	 # Loop over operators
-	 idx = 0
-	 for p in range(nsite):
-	    for q in range(nsite):
-	       oplst = [[2*p+is1,1],[2*q+is2,0]]
-	       cop = mpo_dmrg_opers.genElemProductSpatial(oplst,isite)
+         # Loop over operators
+         idx = 0
+         for p in range(nsite):
+            for q in range(nsite):
+               oplst = [[2*p+is1,1],[2*q+is2,0]]
+               cop = mpo_dmrg_opers.genElemProductSpatial(oplst,isite)
                grp['op'+str(idx)] = cop
-	       idx += 1
+               idx += 1
       else:
-	 # Loop over operators
-	 idx = 0
-	 for p in range(nsite):
-	    for q in range(nsite):
-	       oplst = [[2*p+is1,1],[2*q+is2,0]]
-	       cop = qtensor_opers.genElemProductSpatialQt(oplst,isite)
+         # Loop over operators
+         idx = 0
+         for p in range(nsite):
+            for q in range(nsite):
+               oplst = [[2*p+is1,1],[2*q+is2,0]]
+               cop = qtensor_opers.genElemProductSpatialQt(oplst,isite)
                cop.dump(grp,'op'+str(idx))
-	       idx += 1
+               idx += 1
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
@@ -82,27 +82,27 @@ def genMPO_Apqrs(nsite,islst,plst,fname,ifQt,debug=False):
       gname = 'site'+str(isite)
       grp = fop.create_group(gname)
       if not ifQt:
-	 # Loop over operators
-	 idx = 0
-	 for p in plst:
-	    for q in range(nsite):
-	       for r in range(nsite):
-	          for s in range(nsite):
-	             oplst = [[2*p+is1,1],[2*q+is2,1],[2*r+is3,0],[2*s+is4,0]]
-	             cop = mpo_dmrg_opers.genElemProductSpatial(oplst,isite)
+         # Loop over operators
+         idx = 0
+         for p in plst:
+            for q in range(nsite):
+               for r in range(nsite):
+                  for s in range(nsite):
+                     oplst = [[2*p+is1,1],[2*q+is2,1],[2*r+is3,0],[2*s+is4,0]]
+                     cop = mpo_dmrg_opers.genElemProductSpatial(oplst,isite)
                      grp['op'+str(idx)] = cop
-	             idx += 1
+                     idx += 1
       else:
-	 # Loop over operators
-	 idx = 0
-	 for p in plst:
-	    for q in range(nsite):
-	       for r in range(nsite):
-	          for s in range(nsite):
-	             oplst = [[2*p+is1,1],[2*q+is2,1],[2*r+is3,0],[2*s+is4,0]]
-	             cop = qtensor_opers.genElemProductSpatialQt(oplst,isite)
+         # Loop over operators
+         idx = 0
+         for p in plst:
+            for q in range(nsite):
+               for r in range(nsite):
+                  for s in range(nsite):
+                     oplst = [[2*p+is1,1],[2*q+is2,1],[2*r+is3,0],[2*s+is4,0]]
+                     cop = qtensor_opers.genElemProductSpatialQt(oplst,isite)
                      cop.dump(grp,'op'+str(idx))
-	             idx += 1
+                     idx += 1
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()
@@ -124,15 +124,15 @@ def genMPO_Epq(nsite,p,q,fname,ifQt,debug=False):
       grp = fop.create_group(gname)
       if not ifQt:
          # {pa+*qa,pb+*qb} 
-	 for is1 in [0,1]:
-	    oplst = [[2*p+is1,1],[2*q+is1,0]]
-	    cop = mpo_dmrg_opers.genElemProductSpatial(oplst,isite)
+         for is1 in [0,1]:
+            oplst = [[2*p+is1,1],[2*q+is1,0]]
+            cop = mpo_dmrg_opers.genElemProductSpatial(oplst,isite)
             grp['op'+str(is1)] = cop
       else:
          # {pa+*qa,pb+*qb} 
-	 for is1 in [0,1]:
-	    oplst = [[2*p+is1,1],[2*q+is1,0]]
-	    cop = qtensor_opers.genElemProductSpatialQt(oplst,isite)
+         for is1 in [0,1]:
+            oplst = [[2*p+is1,1],[2*q+is1,0]]
+            cop = qtensor_opers.genElemProductSpatialQt(oplst,isite)
             cop.dump(grp,'op'+str(is1))
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -152,10 +152,10 @@ def genMPO_S2Global(nsite,fname,ifQt,debug=False):
       gname = 'site'+str(isite)
       grp = fop.create_group(gname)
       if not ifQt:
-	 cop = mpo_dmrg_spinopers.genS2GlobalSpatial(nsite,isite)
+         cop = mpo_dmrg_spinopers.genS2GlobalSpatial(nsite,isite)
          grp['op'+str(0)] = cop
       else:
-	 cop = qtensor_spinopers.genS2GlobalSpatialQt(nsite,isite)
+         cop = qtensor_spinopers.genS2GlobalSpatialQt(nsite,isite)
          cop.dump(grp,'op'+str(0))
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -175,10 +175,10 @@ def genMPO_Global(nsite,key,fname,ifQt,debug=False):
       gname = 'site'+str(isite)
       grp = fop.create_group(gname)
       if not ifQt:
-	 cop = mpo_dmrg_spinopers.genGlobalSpatial(nsite,isite,key)
+         cop = mpo_dmrg_spinopers.genGlobalSpatial(nsite,isite,key)
          grp['op'+str(0)] = cop
       else:
-	 cop = qtensor_spinopers.genGlobalSpatialQt(nsite,isite,key)
+         cop = qtensor_spinopers.genGlobalSpatialQt(nsite,isite,key)
          cop.dump(grp,'op'+str(0))
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -198,10 +198,10 @@ def genMPO_Local(nsite,ig,key,fname,ifQt,debug=False):
       gname = 'site'+str(isite)
       grp = fop.create_group(gname)
       if not ifQt:
-	 cop = mpo_dmrg_spinopers.genLocalSpatial(nsite,isite,ig,key)
+         cop = mpo_dmrg_spinopers.genLocalSpatial(nsite,isite,ig,key)
          grp['op'+str(0)] = cop
       else:
-	 cop = qtensor_spinopers.genLocalSpatialQt(nsite,isite,ig,key)
+         cop = qtensor_spinopers.genLocalSpatialQt(nsite,isite,ig,key)
          cop.dump(grp,'op'+str(0))
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -222,10 +222,10 @@ def genMPO_Local2(nsite,ig,jg,ikey,jkey,fac,fname,ifQt,debug=False):
       gname = 'site'+str(isite)
       grp = fop.create_group(gname)
       if not ifQt:
-	 cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,ikey,jkey,fac)
+         cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,ikey,jkey,fac)
          grp['op'+str(0)] = cop
       else:
-	 cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,ikey,jkey,fac)
+         cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,ikey,jkey,fac)
          cop.dump(grp,'op'+str(0))
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -247,37 +247,37 @@ def genMPO_SiSj(nsite,ig,jg,fname,ifQt,debug=False):
       # vec{S}_i*vec{S}_j = 0.5*(Si+*Sj-+Si-*Sj) + Siz*Sjz 
       # (only need to put the factor on the first site)
       if not ifQt:
-	 # Sip*Sjm
-	 if isite == 0:
-	    cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sp','Sm',0.5)
+         # Sip*Sjm
+         if isite == 0:
+            cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sp','Sm',0.5)
          else:
-	    cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sp','Sm',1.0)
+            cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sp','Sm',1.0)
          grp['op'+str(0)] = cop
-	 # Sim*Sjp
-	 if isite == 0:
-	    cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sm','Sp',0.5)
+         # Sim*Sjp
+         if isite == 0:
+            cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sm','Sp',0.5)
          else:
-	    cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sm','Sp',1.0)
+            cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sm','Sp',1.0)
          grp['op'+str(1)] = cop
-	 # Siz*Sjz
-	 cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sz','Sz',1.0)
- 	 grp['op'+str(2)] = cop
+         # Siz*Sjz
+         cop = mpo_dmrg_spinopers.genLocal2Spatial(nsite,isite,ig,jg,'Sz','Sz',1.0)
+         grp['op'+str(2)] = cop
       else:
-	 # Sip*Sjm
-	 if isite == 0:
-	    cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sp','Sm',0.5)
+         # Sip*Sjm
+         if isite == 0:
+            cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sp','Sm',0.5)
          else:
-	    cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sp','Sm',1.0)
+            cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sp','Sm',1.0)
          cop.dump(grp,'op'+str(0))
-	 # Sim*Sjp
-	 if isite == 0:
-	    cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sm','Sp',0.5)
+         # Sim*Sjp
+         if isite == 0:
+            cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sm','Sp',0.5)
          else:
-	    cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sm','Sp',1.0)
+            cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sm','Sp',1.0)
          cop.dump(grp,'op'+str(1))
-	 # Siz*Sjz
-	 cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sz','Sz',1.0)
- 	 cop.dump(grp,'op'+str(2))
+         # Siz*Sjz
+         cop = qtensor_spinopers.genLocal2SpatialQt(nsite,isite,ig,jg,'Sz','Sz',1.0)
+         cop.dump(grp,'op'+str(2))
       tf = time.time()
       if debug: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
    t1 = time.time()

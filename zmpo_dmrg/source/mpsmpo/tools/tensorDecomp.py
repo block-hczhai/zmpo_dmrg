@@ -19,8 +19,8 @@ def toMPS(tensor,shape,thresh=1.e-10,**kwargs):
    print('\n[toMPS]')
    #
    # C[p1,p2,p3,p4]=U[p1,x]*s1V[d1,p2,p3,p4]
-   # 		   	   =U[d1*p2,d2]*s2V[d2,p3,p4]
-   #			   	       =U[d2,p3,d3]*s3V[d3,p4]
+   #                       =U[d1*p2,d2]*s2V[d2,p3,p4]
+   #                                   =U[d2,p3,d3]*s3V[d3,p4]
    #
    rank=len(shape)
    print('shape=',shape,' size= ',tensor.shape,' rank=',rank)
@@ -40,13 +40,13 @@ def toMPS(tensor,shape,thresh=1.e-10,**kwargs):
       print('stat=',len(numpy.argwhere(sig1>thresh)))
       if len(sig1)>len(isig1): 
          isig1=sig1
-	 isite=i
+         isite=i
       mps.append(u1)
       tensor2=numpy.diag(sig1).dot(v1)
       if i < rank-2:
          tensor2=tensor2.reshape(u1.shape[1]*shape[i+1],-1)
       else:
-	 mps.append(tensor2)   
+         mps.append(tensor2)   
    # Reshaping into lnr for latter compressing
    for i in range(1,rank-1):
       #print 'shape=',mps[i-1].shape[-1],shape[i],mps[i].shape[1]
@@ -58,7 +58,7 @@ def toMPS(tensor,shape,thresh=1.e-10,**kwargs):
    print('Maximum bond dimension: site/rank =',isite,rank)
    print('Singular value =\n',isig1)
    print('Length = ',len(isig1),' Maximum=',shape[0]**(isite+1),\
-	 ' Ratio = ',len(isig1)*1.0/shape[0]**(isite+1))
+         ' Ratio = ',len(isig1)*1.0/shape[0]**(isite+1))
    mpslib.mps_check(tensor,shape,mps)
    if kwargs.get('plot')==True:
       import matplotlib.pyplot as plt
@@ -86,8 +86,8 @@ def toHSMPS(tensor,shape,thresh=1.e-10,**kwargs):
    print('\n[toHSMPS]')
    #
    # C[p1,p2,p3,p4]=U[p1,x]*s1V[d1,p2,p3,p4]
-   # 		   	   =U[d1*p2,d2]*s2V[d2,p3,p4]
-   #			   	       =U[d2,p3,d3]*s3V[d3,p4]
+   #                       =U[d1*p2,d2]*s2V[d2,p3,p4]
+   #                                   =U[d2,p3,d3]*s3V[d3,p4]
    #
    rank=len(shape)
    print('shape=',shape,' size= ',tensor.shape,' rank=',rank)
@@ -116,9 +116,9 @@ def toHSMPS(tensor,shape,thresh=1.e-10,**kwargs):
       qsym1=[i+j for j in range(nphys)]
       if debug: print('qsym1=',qsym1)
       if i==0:
-	 qsyml = [[x,x] for x in qsym1]
-      else:	 
-	 if debug: print('qbond[i-1]',qbond[i-1])
+         qsyml = [[x,x] for x in qsym1]
+      else:      
+         if debug: print('qbond[i-1]',qbond[i-1])
          qsyml=hsmps_dpd(qbond[i-1],qsym1)
       if debug: print('qsyml=',qsyml)
       
@@ -141,41 +141,41 @@ def toHSMPS(tensor,shape,thresh=1.e-10,**kwargs):
       sigval=[]
       for j in range(nsym):
          key = keys[j]
-	 val = vals[j]
-	 if debug: print('\n i/sym_i[L] = ',i,' key=',key,' val=',val)
+         val = vals[j]
+         if debug: print('\n i/sym_i[L] = ',i,' key=',key,' val=',val)
          rows = [k for k,x in enumerate(qL) if x==key]
-	 if debug: print(' rows = ',rows) 
+         if debug: print(' rows = ',rows) 
          qrow=tensor2[rows,:]
          u, sig, v = mpslib.mps_svd_cut(qrow,thresh,-1)
-	 v = numpy.diag(sig).dot(v)
+         v = numpy.diag(sig).dot(v)
          nres=len(sig)
-	 if debug:
-	    print(' SVD for CI shape of =',qrow.shape,' -> ',len(sig))
+         if debug:
+            print(' SVD for CI shape of =',qrow.shape,' -> ',len(sig))
             print(' sigval=',sig)
-	 if sig[0]<thresh:
+         if sig[0]<thresh:
             print(' Too small sigs!')
-	    continue
+            continue
          sigval=sigval+list(sig)
-	 qinfo.append((key,val,nres))
+         qinfo.append((key,val,nres))
          qstateL.append(u)
          qstateR.append(v)
       tensor2=numpy.vstack(qstateR)
       mps.append(qstateL)
       qsym=[]
       for sym in qinfo:
-	 qsym=qsym+[sym[0]]*sym[2]
+         qsym=qsym+[sym[0]]*sym[2]
       qbond[i]=copy.deepcopy(qsym)
       if debug:
-	 print(' qbond[i]=',qbond[i])
+         print(' qbond[i]=',qbond[i])
       print(' sigvals =',sigval)
 
       if len(isig1)<len(sigval): 
          isig1=sigval
-	 isite=i
+         isite=i
       if i < rank-2:
          tensor2=tensor2.reshape(tensor2.shape[0]*shape[i+1],-1)
       else:
-	 mps.append(tensor2)
+         mps.append(tensor2)
 
 #   # Reshaping into lnr for latter compressing
 #   for i in range(1,rank-1):
@@ -204,10 +204,10 @@ def hsmps_dpd(qsym1,qsym2):
       for j in range(len(qsym2)):
          sym2=qsym2[j]
          if sym1 < sym2:
-	    qsym12.append([sym2,ic])
+            qsym12.append([sym2,ic])
          else:
-	    qsym12.append([99999,ic])
-	 ic=ic+1
+            qsym12.append([99999,ic])
+         ic=ic+1
    return qsym12
 
 #==========================================
@@ -218,8 +218,8 @@ def toTucker(tensor,shape,thresh=1.e-10):
    print('\n[toTucker]')
    #
    # C[p1,p2,p3,p4]=U[p1,d1]*s1V[d1,p2,p3,p4]
-   # 		   	   =>s1V[p2,p3,p4,d1] (Transpose)
-   #			   = U[p2,d2]*s3V[p3,p4,d1]
+   #                       =>s1V[p2,p3,p4,d1] (Transpose)
+   #                       = U[p2,d2]*s3V[p3,p4,d1]
    #
    rank=len(shape)
    print('shape=',shape,' size= ',tensor.shape,' rank=',rank)
@@ -240,7 +240,7 @@ def toTucker(tensor,shape,thresh=1.e-10):
       print('stat=',len(numpy.argwhere(sig1>thresh)))
       if len(sig1)>len(isig1): 
          isig1=sig1
-	 isite=i
+         isite=i
       tucker_site.append(u1)
       tshape.append(u1.shape[1])
       tensor2=numpy.diag(sig1).dot(v1)
@@ -260,7 +260,7 @@ def toTucker(tensor,shape,thresh=1.e-10):
    print('Maximum bond dimension: site/rank =',isite,rank)
    print('Singular value =\n',isig1)
    print('Length = ',len(isig1),' Maximum=',shape[0]**(isite+1),\
-	 ' Ratio = ',len(isig1)*1.0/shape[0]**(isite+1))
+         ' Ratio = ',len(isig1)*1.0/shape[0]**(isite+1))
    tucker=(tucker_core,tucker_site)
    tuckerlib.tucker_check(tensor,shape,tucker)
    return tucker 
@@ -314,13 +314,13 @@ def cp_als(tensor,shape,maxiter,thresh,rank,seed=(0,0)):
       cp_core[:r0]=seed[0][:r0]
    for i in range(N):
       if isinstance(seed[0],numpy.ndarray):
-	 u=seed[1][i]     
+         u=seed[1][i]     
       else:
-	 tmat=tensorSubs.tensor_matricization(tensor,shape,i)[1]
+         tmat=tensorSubs.tensor_matricization(tensor,shape,i)[1]
          u,sig,v=scipy.linalg.svd(tmat,full_matrices=False)
          u=u.transpose(1,0)
       dim=u.shape[0]
-      if rank > dim:   	
+      if rank > dim:    
          nres=rank-dim
          ures=numpy.random.uniform(-1,1,nres*shape[i])
          ures=ures.reshape(nres,shape[i])
@@ -338,34 +338,34 @@ def cp_als(tensor,shape,maxiter,thresh,rank,seed=(0,0)):
       errorlst.append(error)
       if error<=thresh: 
          print("ALS converged!")
-	 info=0
-	 break
+         info=0
+         break
       if it >=1 and abs(errorlst[-1]-errorlst[-2])<1.e-2*error:
-	 print("No enough decrease!")
-	 info=1
-	 break
+         print("No enough decrease!")
+         info=1
+         break
       # solve G*B=T (B=G^+*T) via least square problem
       for i in range(N):
          order=list(range(N))
-	 order.remove(i)
- 	 # G^+
-	 complement=[cp_site[j] for j in order]
-	 ctensor=reduce(tensorSubs.matrix_KRprod,complement)
-	 complement=[x.dot(x.T) for x in complement]
+         order.remove(i)
+         # G^+
+         complement=[cp_site[j] for j in order]
+         ctensor=reduce(tensorSubs.matrix_KRprod,complement)
+         complement=[x.dot(x.T) for x in complement]
          # Harmard elementwise product
-	 gram=1.0
-	 for j in range(N-1):
-	    gram=gram*complement[j]
-	 # T
-	 tmat=tensorSubs.tensor_matricization(tensor,shape,i)[1]
-	 trp=numpy.einsum('rp,qp->rq',ctensor,tmat)
-	 # >>> Least square
-	 # gram=scipy.linalg.pinv(gram,rcond=1.e-10)
-	 # ainew=gram.dot(trp)
-	 ainew=numpy.linalg.lstsq(gram,trp)[0]
-	 cp_core=[numpy.linalg.norm(x) for x in ainew]
-	 ainew=[x*1.0/numpy.linalg.norm(x) for x in ainew]
-	 cp_site[i]=numpy.array(ainew) 
+         gram=1.0
+         for j in range(N-1):
+            gram=gram*complement[j]
+         # T
+         tmat=tensorSubs.tensor_matricization(tensor,shape,i)[1]
+         trp=numpy.einsum('rp,qp->rq',ctensor,tmat)
+         # >>> Least square
+         # gram=scipy.linalg.pinv(gram,rcond=1.e-10)
+         # ainew=gram.dot(trp)
+         ainew=numpy.linalg.lstsq(gram,trp)[0]
+         cp_core=[numpy.linalg.norm(x) for x in ainew]
+         ainew=[x*1.0/numpy.linalg.norm(x) for x in ainew]
+         cp_site[i]=numpy.array(ainew) 
       # update
       it=it+1
       cp=(cp_core,cp_site)
@@ -441,7 +441,7 @@ if __name__ == '__main__':
 #       det_core[:r0]=seed[0][:r0]
 #       det_site[:r0]=seed[1][:r0]
 #    norm=numpy.linalg.norm(det_core)
-#    det_core=det_core/norm		   
+#    det_core=det_core/norm                
 #    dets=(det_core,det_site)
 #    #
 #    # Begin   
@@ -455,56 +455,56 @@ if __name__ == '__main__':
 #       errorlst.append(error)
 #       if error<=thresh: 
 #          print "ALS converged!"
-# 	 info=0
-# 	 break
+#        info=0
+#        break
 #       if it >=1 and abs(errorlst[-1]-errorlst[-2])<1.e-2*error:
-# 	 print "No enough decrease!"
-# 	 info=1
-# 	 break
+#        print "No enough decrease!"
+#        info=1
+#        break
 #       iden=numpy.identity(nsorb)
 #       for r in range(rank-1,rank):
-# 	 # For r-th Determinant, search c[r]
+#        # For r-th Determinant, search c[r]
 #          print ' >>> r = ',r,' of R-dets = ',rank 
-# 	 res=range(rank)
-# 	 res.remove(r)
-# 	 cr_old = 1.0
-# 	 micro_iter  =0
-# 	 micro_error =1.0
-# 	 micro_thresh=1.e-6
-# 	 site = det_site[r].copy() #(N,K)matrix
-# 	 while micro_error>micro_thresh:
-# 	    print '  micro_iter=',micro_iter,' diff=',micro_error
-# 	    micro_iter+=1
-# 	    # DMRG-sweep for sites	
-# 	    for j in range(nelec):
-# 	       vec=numpy.zeros(nsorb)
-#       	       # <P|R> 
-# 	       ic=0
-#       	       for statep in itools.combinations(range(nsorb),nelec):
-# 	          matrix = site[:,statep]
-# 		  # cofactor[i]*x[i,mu]
-# 	          cofactor = map(lambda x:detlib.det_cofactor(matrix,x,j),range(nelec))
-# 		  vec += tensor[ic]*numpy.einsum('i,im->m',cofactor,iden[list(statep)])
-# 		  ic = ic + 1
-# 	       # <R'|R>
-# 	       for rp in res:
-# 	          matrix = det_site[rp].dot(site.T)
-# 	          cofactor = map(lambda x:detlib.det_cofactor(matrix,x,j),range(nelec))
-# 		  vec += det_core[rp]*numpy.einsum('i,im->m',cofactor,det_site[rp])
-# 	       # Q|v>=(I-P')|v>
-# 	       pindx=range(nelec)
-# 	       pindx.remove(j)
-# 	       Qv = vec - site[pindx].T.dot( site[pindx].dot(vec) )
-# 	       Qv = Qv/numpy.linalg.norm(Qv)
-# 	       site[j] = Qv.copy()
-# 	       cr_new = numpy.dot(Qv,vec)
-# 	       #print 'det',numpy.linalg.det(site.dot(site.T))
-# 	       print '   orb_j: ',j,' cr_new: ',cr_new
-# 	    # DIFF   
-# 	    micro_error=abs(cr_new-cr_old)
-# 	    cr_old=cr_new
+#        res=range(rank)
+#        res.remove(r)
+#        cr_old = 1.0
+#        micro_iter  =0
+#        micro_error =1.0
+#        micro_thresh=1.e-6
+#        site = det_site[r].copy() #(N,K)matrix
+#        while micro_error>micro_thresh:
+#           print '  micro_iter=',micro_iter,' diff=',micro_error
+#           micro_iter+=1
+#           # DMRG-sweep for sites      
+#           for j in range(nelec):
+#              vec=numpy.zeros(nsorb)
+#                      # <P|R> 
+#              ic=0
+#                      for statep in itools.combinations(range(nsorb),nelec):
+#                 matrix = site[:,statep]
+#                 # cofactor[i]*x[i,mu]
+#                 cofactor = map(lambda x:detlib.det_cofactor(matrix,x,j),range(nelec))
+#                 vec += tensor[ic]*numpy.einsum('i,im->m',cofactor,iden[list(statep)])
+#                 ic = ic + 1
+#              # <R'|R>
+#              for rp in res:
+#                 matrix = det_site[rp].dot(site.T)
+#                 cofactor = map(lambda x:detlib.det_cofactor(matrix,x,j),range(nelec))
+#                 vec += det_core[rp]*numpy.einsum('i,im->m',cofactor,det_site[rp])
+#              # Q|v>=(I-P')|v>
+#              pindx=range(nelec)
+#              pindx.remove(j)
+#              Qv = vec - site[pindx].T.dot( site[pindx].dot(vec) )
+#              Qv = Qv/numpy.linalg.norm(Qv)
+#              site[j] = Qv.copy()
+#              cr_new = numpy.dot(Qv,vec)
+#              #print 'det',numpy.linalg.det(site.dot(site.T))
+#              print '   orb_j: ',j,' cr_new: ',cr_new
+#           # DIFF   
+#           micro_error=abs(cr_new-cr_old)
+#           cr_old=cr_new
 #          det_core[r]=cr_new
-# 	 det_site[r]=site.copy()
+#        det_site[r]=site.copy()
 #       # update
 #       it=it+1
 #       dets=(det_core,det_site)
@@ -532,7 +532,7 @@ if __name__ == '__main__':
 #       for i in range(civec0.size):
 #          bstring=bin(tensorRep.addr2str_o1(nsorb,nelec,i))
 #          orblst=list(tensorRep.bit2string( int(bstring,2),nsorb ))
-# 	 civec1[i]+=numpy.linalg.det(stateR[:,orblst])*cp_core[r]
+#        civec1[i]+=numpy.linalg.det(stateR[:,orblst])*cp_core[r]
 #    norm1=numpy.linalg.norm(civec0)
 #    norm2=numpy.linalg.norm(civec1)
 #    diff =numpy.linalg.norm(civec1-civec0)
@@ -636,75 +636,75 @@ if __name__ == '__main__':
 #       errorlst.append(error)
 #       if error<=thresh: 
 #          print "ALS converged!"
-# 	 info=0
-# 	 break
+#        info=0
+#        break
 #       if it >=1 and abs(errorlst[-1]-errorlst[-2])<1.e-2*error:
-# 	 print "No enough decrease!"
-# 	 info=1
-# 	 break
+#        print "No enough decrease!"
+#        info=1
+#        break
 #       # solve least square problem
 #       for j in range(N):
 # 
 #          # v_{rm}[i]
 #          vec=numpy.zeros((rank,K))
-# 	 for r in range(rank):
+#        for r in range(rank):
 #             stateR = numpy.array([cp_site[i][r] for i in range(N)]).transpose(1,0)
 #             for stateP in itools.combinations(range(K),N):
-#  	       matrix=stateR[stateP,:]
-#     	       # cofactor[i]*x[i,mu]
+#              matrix=stateR[stateP,:]
+#              # cofactor[i]*x[i,mu]
 #                cofactor = map(lambda x:detlib.det_cofactor(matrix,x,j),range(N))
-# 	       addr = numpy.dot(list(stateP),stride)    
-#   	       vec[r] += tensor[addr]\
-# 		       * numpy.einsum('i,im->m',cofactor,iden[list(stateP)])
-# 	 vec=vec*math.sqrt(math.factorial(N))
-# 	 trp=vec.reshape(rank*K)
+#              addr = numpy.dot(list(stateP),stride)    
+#              vec[r] += tensor[addr]\
+#                      * numpy.einsum('i,im->m',cofactor,iden[list(stateP)])
+#        vec=vec*math.sqrt(math.factorial(N))
+#        trp=vec.reshape(rank*K)
 # 
 #          # GRAM
 #          gram=numpy.zeros((rank,rank,K,K))
-# 	 nres=range(N)
-# 	 nres.remove(j)
-# 	 for rp in range(rank):
+#        nres=range(N)
+#        nres.remove(j)
+#        for rp in range(rank):
 #             stateRp = numpy.array([cp_site[i][rp] for i in range(N)])
-# 	    for r in range(rank):
+#           for r in range(rank):
 #                stateR = numpy.array([cp_site[i][r] for i in range(N)])
-# 	       matrix = stateRp.dot(stateR.T)
-# 	       # G(r',r)[jk,ij] 
-# 	       gki =numpy.zeros((N-1,N-1))
-# 	       for ic in range(N-1):
-# 		  i=nres[ic]
-# 		  rows=range(N)
-# 		  rows.remove(i)
-# 	          matij=matrix[numpy.array(rows)[:,numpy.newaxis],
-# 	   	               numpy.array(nres)]
-# 		  jdx=rows.index(j)
-# 		  rows2=range(N-1)
-# 		  rows2.remove(jdx)
-# 		  for kc in range(N-1):
-# 	 	     cols=range(N-1)
-# 		     cols.remove(kc)
-# 		     if rows2==[] and cols==[]:
-# 			matjkij=numpy.identity(1)     
-# 		     else:
-# 		        matjkij=matij[numpy.array(rows2)[:,numpy.newaxis],
-# 				   numpy.array(cols)]
-# 		     # 		index in old mat, index in new matij 
-# 		     gki[kc,ic]=(-1)**(i+j)*(-1)**(jdx+kc)*numpy.linalg.det(matjkij)
+#              matrix = stateRp.dot(stateR.T)
+#              # G(r',r)[jk,ij] 
+#              gki =numpy.zeros((N-1,N-1))
+#              for ic in range(N-1):
+#                 i=nres[ic]
+#                 rows=range(N)
+#                 rows.remove(i)
+#                 matij=matrix[numpy.array(rows)[:,numpy.newaxis],
+#                              numpy.array(nres)]
+#                 jdx=rows.index(j)
+#                 rows2=range(N-1)
+#                 rows2.remove(jdx)
+#                 for kc in range(N-1):
+#                    cols=range(N-1)
+#                    cols.remove(kc)
+#                    if rows2==[] and cols==[]:
+#                       matjkij=numpy.identity(1)     
+#                    else:
+#                       matjkij=matij[numpy.array(rows2)[:,numpy.newaxis],
+#                                  numpy.array(cols)]
+#                    #          index in old mat, index in new matij 
+#                    gki[kc,ic]=(-1)**(i+j)*(-1)**(jdx+kc)*numpy.linalg.det(matjkij)
 #                # product
-# 	       vecR =[stateR[k] for k in nres]
-# 	       vecRp=[stateRp[i] for i in nres]
-# 	       gram[rp,r]+=numpy.einsum('km,ki,in->mn',vecR,gki,vecRp)
-# 	       gram[rp,r]+=detlib.det_cofactor(matrix,j,j)*numpy.identity(K)
+#              vecR =[stateR[k] for k in nres]
+#              vecRp=[stateRp[i] for i in nres]
+#              gram[rp,r]+=numpy.einsum('km,ki,in->mn',vecR,gki,vecRp)
+#              gram[rp,r]+=detlib.det_cofactor(matrix,j,j)*numpy.identity(K)
 # 
-# 	 # Solve least square problem
-# 	 # G[r'm,rn]
+#        # Solve least square problem
+#        # G[r'm,rn]
 #          gram=gram.transpose(0,2,1,3).reshape((rank*K,rank*K))
-# 	 gram=gram+1.e-3*numpy.identity(rank*K)
-# 	 #print numpy.linalg.norm(gram-gram.T)
-# 	 xrm =numpy.linalg.lstsq(gram,trp)[0]
-# 	 xrm =xrm.reshape((rank,K))
-# 	 cp_core=numpy.array(map(lambda x: numpy.linalg.norm(x),xrm))
-# 	 xrm =map(lambda x: x*1.0/numpy.linalg.norm(x),xrm)
-# 	 cp_site[j]=numpy.array(xrm)
+#        gram=gram+1.e-3*numpy.identity(rank*K)
+#        #print numpy.linalg.norm(gram-gram.T)
+#        xrm =numpy.linalg.lstsq(gram,trp)[0]
+#        xrm =xrm.reshape((rank,K))
+#        cp_core=numpy.array(map(lambda x: numpy.linalg.norm(x),xrm))
+#        xrm =map(lambda x: x*1.0/numpy.linalg.norm(x),xrm)
+#        cp_site[j]=numpy.array(xrm)
 # 
 #       # update
 #       it=it+1

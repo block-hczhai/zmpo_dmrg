@@ -19,15 +19,15 @@ def cdDiag(mol,intor,shells=None,ifsym=True):
     nbas = 0
     for i in shells:
        for j in shells:
-	  if ifsym and j<i: continue     
+          if ifsym and j<i: continue     
           shls = (i,j,j,i)
           buf = gto.moleintor.getints_by_shell(intor, shls, atm, bas, env)
-	  buf = buf.transpose(0,1,3,2)
+          buf = buf.transpose(0,1,3,2)
           di, dj, dk, dl = buf.shape
           buf = buf.reshape((di*dj,di*dj))
           diag = numpy.diag(buf)
           dmax = numpy.amax(diag)
-	  lst.append(dmax)
+          lst.append(dmax)
           Qij.append([(i,j),ioff,dmax,diag,di*dj])
           ioff = ioff + di*dj
        nbas += di
@@ -59,7 +59,7 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
     if shells is None: shells=list(range(mol.nbas))
     nshl = len(shells)
     if ifsym:
-       npair = nshl*(nshl+1)/2	   
+       npair = nshl*(nshl+1)/2     
     else:
        npair = nshl*nshl
     if debug:
@@ -77,124 +77,124 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
     cdbuf  = []
     cdbas  = []
     for ij in range(npair):
-	if iop == 0:
-	   indx = ij # Without pivoting  
-	else:
-	   indx = -1 # With pivoting
+        if iop == 0:
+           indx = ij # Without pivoting  
+        else:
+           indx = -1 # With pivoting
         ijshl= Qij[indx][0]
-	ishl,jshl=ijshl
- 	#
-	# 1. COMPUTE [kl|ji] - Nbas*Nbas*const
-	#
-	dmax = Qij[indx][2]
-	if debug: print('\n>>> ij=',ij,'/',npair,'i=',ishl,'j=',jshl,' dmax=',dmax)
-	if dmax < thresh:
-	   if debug: print("    Skipped based on Dmax:",ij,ijshl,dmax)
-	   continue
-  	   # Actually, it is safe to break here when Qij is ordered
-	   #break
-	buff = []
-	for kshl in shells:
-	   for lshl in shells:
-	      if ifsym and lshl<kshl: continue     
+        ishl,jshl=ijshl
+        #
+        # 1. COMPUTE [kl|ji] - Nbas*Nbas*const
+        #
+        dmax = Qij[indx][2]
+        if debug: print('\n>>> ij=',ij,'/',npair,'i=',ishl,'j=',jshl,' dmax=',dmax)
+        if dmax < thresh:
+           if debug: print("    Skipped based on Dmax:",ij,ijshl,dmax)
+           continue
+           # Actually, it is safe to break here when Qij is ordered
+           #break
+        buff = []
+        for kshl in shells:
+           for lshl in shells:
+              if ifsym and lshl<kshl: continue     
               shls = (kshl,lshl,jshl,ishl)
               buf2 = gto.moleintor.getints_by_shell(intor, shls, atm, bas, env)
-	      buf2 = buf2.transpose(0,1,3,2)
-	      dk,dl,di,dj = buf2.shape
-	      buf2 = buf2.reshape(dk*dl,di*dj)
-	      if buff == []:
- 	         buff = buf2
-	      else:
-	         buff = numpy.vstack((buff,buf2))         
-	#
- 	# 2. Construct decomposition
-	#
-	lenij = len(Qij[indx][3])
-	diag  = [[i,Qij[indx][3][i]] for i in range(lenij)]
-	if iop !=0: diag = sorted(diag,key=lambda x:x[1])
-	cdvec = []
-	noff  = Qij[indx][1]
-	#
-	# FOR THIS column - (*|IJ)
-	#
-	for i in range(lenij):
-	    if iop == 0:
-	       idx = i 
-	    else:
-	       idx = -1
-	    # Check diagonal of L
-	    vdiag = diag[idx][1]
-	    if abs(vdiag.imag) > 1.e-10:
-	       print("ERROR: Imaginary part is larger than 1.e-10 !")
-	       exit(1)
-	    if vdiag.real < thresh:
-	       if debug: print("    Skipped based on vdiag=",i,diag)
-	       break
-	    lij  = math.sqrt(vdiag.real)
-      	    #======================================== 
-	    # Construct CD vector via subtraction
-      	    #======================================== 
- 	    j = diag[idx][0]
-	    cdbas.append([ishl,jshl,j,di,dj,vdiag])
-	    addr = noff + j
-	    vec  = buff[:,j]
-	    for j in range(len(cdvec)):
-	       vec=vec-cdvec[j]*numpy.conj(cdvec[j][addr])
-	    # Buff
-	    for j in range(len(cdbuf)):
-	       vec=vec-cdbuf[j]*numpy.conj(cdbuf[j][addr])
-	    # Load previous CD vec from file
-	    if nblk > 0:
-	       for iblk in range(nblk):
- 	          sblk = "block"+str(iblk)
-	          nvec = f[sblk].shape[0]
-	          for j in range(nvec):
-	             vec=vec-f[sblk][j]*numpy.conj(f[sblk][j][addr])
-	    # Update
-	    vec = vec/lij
-	    cdvec.append(vec)
-      	    #======================================== 
-	    # Update diagonal
-	    if iop != 0: diag.pop()
-	    qlen = len(diag)
-	    for q in range(qlen):
-	       # Orbital index	   
-	       j = diag[q][0]
-	       diag[q][1]=diag[q][1]-vec[noff+j]*numpy.conj(vec[noff+j])
-	    # Re-ordering
-	    if iop != 0: diag=sorted(diag,key=lambda x:x[1])
-	#
-	# Update all Qij and resort
-	#
-	if iop !=0: Qij.pop()
-	qlen = len(Qij)
-	for ijp in range(qlen):
-	   qoff =Qij[ijp][1]
-	   qdiag=Qij[ijp][3].copy()
-	   for j in range(len(qdiag)):
-	      qaddr=qoff+j
-	      for i in range(len(cdvec)):
-	         qdiag[j]=qdiag[j]-cdvec[i][qaddr]*numpy.conj(cdvec[i][qaddr])
-		 if qdiag[j]<-0.1: 
-		    print("ERROR diag < 0.0",ijp,j,qdiag[j])
-		    exit(1)     
-	   Qij[ijp][2]=numpy.amax(qdiag)
-	   Qij[ijp][3]=qdiag.copy()
-	# Re-ordering
-	if iop != 0: Qij=sorted(Qij,key=lambda x:x[2])
-	# 
-	# BUFF += DUMP (**|IJ)
-  	# 
-	cdbuf = cdbuf + cdvec
-	size  = len(cdbuf)*cdbuf[0].nbytes/1024.0**2
-	if debug: 
+              buf2 = buf2.transpose(0,1,3,2)
+              dk,dl,di,dj = buf2.shape
+              buf2 = buf2.reshape(dk*dl,di*dj)
+              if buff == []:
+                 buff = buf2
+              else:
+                 buff = numpy.vstack((buff,buf2))         
+        #
+        # 2. Construct decomposition
+        #
+        lenij = len(Qij[indx][3])
+        diag  = [[i,Qij[indx][3][i]] for i in range(lenij)]
+        if iop !=0: diag = sorted(diag,key=lambda x:x[1])
+        cdvec = []
+        noff  = Qij[indx][1]
+        #
+        # FOR THIS column - (*|IJ)
+        #
+        for i in range(lenij):
+            if iop == 0:
+               idx = i 
+            else:
+               idx = -1
+            # Check diagonal of L
+            vdiag = diag[idx][1]
+            if abs(vdiag.imag) > 1.e-10:
+               print("ERROR: Imaginary part is larger than 1.e-10 !")
+               exit(1)
+            if vdiag.real < thresh:
+               if debug: print("    Skipped based on vdiag=",i,diag)
+               break
+            lij  = math.sqrt(vdiag.real)
+            #======================================== 
+            # Construct CD vector via subtraction
+            #======================================== 
+            j = diag[idx][0]
+            cdbas.append([ishl,jshl,j,di,dj,vdiag])
+            addr = noff + j
+            vec  = buff[:,j]
+            for j in range(len(cdvec)):
+               vec=vec-cdvec[j]*numpy.conj(cdvec[j][addr])
+            # Buff
+            for j in range(len(cdbuf)):
+               vec=vec-cdbuf[j]*numpy.conj(cdbuf[j][addr])
+            # Load previous CD vec from file
+            if nblk > 0:
+               for iblk in range(nblk):
+                  sblk = "block"+str(iblk)
+                  nvec = f[sblk].shape[0]
+                  for j in range(nvec):
+                     vec=vec-f[sblk][j]*numpy.conj(f[sblk][j][addr])
+            # Update
+            vec = vec/lij
+            cdvec.append(vec)
+            #======================================== 
+            # Update diagonal
+            if iop != 0: diag.pop()
+            qlen = len(diag)
+            for q in range(qlen):
+               # Orbital index     
+               j = diag[q][0]
+               diag[q][1]=diag[q][1]-vec[noff+j]*numpy.conj(vec[noff+j])
+            # Re-ordering
+            if iop != 0: diag=sorted(diag,key=lambda x:x[1])
+        #
+        # Update all Qij and resort
+        #
+        if iop !=0: Qij.pop()
+        qlen = len(Qij)
+        for ijp in range(qlen):
+           qoff =Qij[ijp][1]
+           qdiag=Qij[ijp][3].copy()
+           for j in range(len(qdiag)):
+              qaddr=qoff+j
+              for i in range(len(cdvec)):
+                 qdiag[j]=qdiag[j]-cdvec[i][qaddr]*numpy.conj(cdvec[i][qaddr])
+                 if qdiag[j]<-0.1: 
+                    print("ERROR diag < 0.0",ijp,j,qdiag[j])
+                    exit(1)     
+           Qij[ijp][2]=numpy.amax(qdiag)
+           Qij[ijp][3]=qdiag.copy()
+        # Re-ordering
+        if iop != 0: Qij=sorted(Qij,key=lambda x:x[2])
+        # 
+        # BUFF += DUMP (**|IJ)
+        # 
+        cdbuf = cdbuf + cdvec
+        size  = len(cdbuf)*cdbuf[0].nbytes/1024.0**2
+        if debug: 
            print("    di*dj=",di*dj," lencdvec=",len(cdvec)," lenbuf=",len(cdbuf),\
-	   	 " MEM(M)=",size)
-	if size > mem:
- 	   sblk = "block"+str(nblk)
-	   nblk = nblk + 1
-	   s=f.create_dataset(sblk, data=cdbuf) #dtype='float64')
-	   cdbuf = []
+                 " MEM(M)=",size)
+        if size > mem:
+           sblk = "block"+str(nblk)
+           nblk = nblk + 1
+           s=f.create_dataset(sblk, data=cdbuf) #dtype='float64')
+           cdbuf = []
     #
     # END: Dump remaining CD vector
     #
@@ -210,7 +210,7 @@ def cdMain(mol,intor,thresh=1.e-8,shells=None,ifsym=True,fname='cdvec.h5'):
     print("NBAS =",nbas)
     print("NPAIR=",nbas*(nbas+1)/2) # NOT EXACTLY IN SYM-CASE
     for name in f:
-	print(name,'shape =',f[name].shape)
+        print(name,'shape =',f[name].shape)
     # CLOSE
     f.close()
     return nbas,cdbas
@@ -224,27 +224,27 @@ def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
     for idx,i in enumerate(shells):
        for jdx,j in enumerate(shells):
           if ifsym and j<i: continue
-	  # The full column
-	  buff = None
-	  for k in shells:
+          # The full column
+          buff = None
+          for k in shells:
               pl = 0
-	      for l in shells:
-	          if ifsym and l<k: continue     
+              for l in shells:
+                  if ifsym and l<k: continue     
                   # A[i,j,k,l] = [kl|ij]
-	          shls = (k,l,j,i)
+                  shls = (k,l,j,i)
                   buf = gto.moleintor.getints_by_shell(intor, shls, atm, bas, env)
-	          buf = buf.transpose(0,1,3,2)
-	          dk, dl, di, dj = buf.shape
-	          buf = buf.reshape(dk*dl,di*dj)
-		  if buff is None: 
- 	             buff = buf
-	          else:
-	             buff = numpy.vstack((buff,buf))
-	  # Store into full matrix
-	  if idx==0 and jdx==0:
- 	     mat = buff.copy()
-	  else:
-	     mat = numpy.hstack((mat,buff))
+                  buf = buf.transpose(0,1,3,2)
+                  dk, dl, di, dj = buf.shape
+                  buf = buf.reshape(dk*dl,di*dj)
+                  if buff is None: 
+                     buff = buf
+                  else:
+                     buff = numpy.vstack((buff,buf))
+          # Store into full matrix
+          if idx==0 and jdx==0:
+             mat = buff.copy()
+          else:
+             mat = numpy.hstack((mat,buff))
     print("\nCDcheck:")
     print("mat_sym  =",numpy.linalg.norm(mat-mat.T.conj()))
     eri=mat
@@ -269,12 +269,12 @@ def cdCheck(mol,intor,shells=None,ifsym=True,fname='cdvec.h5'):
     eri2 = numpy.zeros(eri.shape)
     lvec = []
     for iblk in range(nblk):
- 	sblk = "block"+str(iblk)
-	nvec = f[sblk].shape[0]
-	print(sblk,'shape=',f[sblk].shape) 
-	for j in range(nvec):
-	   l=f[sblk][j]
-	   lvec.append(l)
+        sblk = "block"+str(iblk)
+        nvec = f[sblk].shape[0]
+        print(sblk,'shape=',f[sblk].shape) 
+        for j in range(nvec):
+           l=f[sblk][j]
+           lvec.append(l)
     f.close()
     lvec=numpy.array(lvec)
     # L[mu,vec]*L[mu,vec]^* in such case
@@ -331,13 +331,13 @@ def reorgblk2d(mol):
       for l in range(mol.nbas):
          lang  = mol.bas_angular(l)
          lcntr = mol.bas_nctr(l)
-	 lbas  = lcntr*(2*lang+1)
-	 lindx = numpy.arange(pl,pl+lbas)
+         lbas  = lcntr*(2*lang+1)
+         lindx = numpy.arange(pl,pl+lbas)
          for kb in kindx:
-	    for lb in lindx:
-	       indx.append([kb,lb,idx])
-	       idx +=1
-         pl += lbas    	
+            for lb in lindx:
+               indx.append([kb,lb,idx])
+               idx +=1
+         pl += lbas     
       pk += kbas
    nindx = [x[2] for x in sorted(indx)]
    return numpy.array(nindx)

@@ -89,7 +89,7 @@ def collect(qred):
    for item in qred:
       key = str(item)
       if key != key_current:
-	 qr.append(item+[len(dic[key])])
+         qr.append(item+[len(dic[key])])
          key_current = key
    return numpy.array(qr)
 
@@ -101,7 +101,7 @@ def expandSM(qr):
      # (2s+1)(2d+1)
      for im in range(int(2*s1+1)):
         m1 = -s1+im
-	qsm += [[n1,m1]]*int(d1)
+        qsm += [[n1,m1]]*int(d1)
   return numpy.array(qsm)
 
 # (K,N,S) - check for the high-spin det.
@@ -109,9 +109,9 @@ def ifpermissible(k,n,s):
    na = int(n/2.0+s) 
    nb = int(n/2.0-s)
    return na>=0 and na<=k and \
-   	  nb>=0 and nb<=k and \
-	  abs(na+nb-n)<1.e-8 \
-	  and abs(na-nb-2.0*s)<1.e-8
+          nb>=0 and nb<=k and \
+          abs(na+nb-n)<1.e-8 \
+          and abs(na-nb-2.0*s)<1.e-8
 
 def ifpermit(k,n,sval,sl):
    srmin = abs(sval-sl)
@@ -125,7 +125,7 @@ def ifpermit(k,n,sval,sl):
 
 # Symmetry Screening - only start to be effective for isite>nsite/2 !!!
 def symScreen(isite,nsite,rotL,qred,sigs,ne,sval,debug=True,status='L',ifscreen=True,\
-	      ifBlockSymScreen=False):
+              ifBlockSymScreen=False):
    if status == 'L':
       kres = nsite-1-isite
    # when isite=1, there should be one left.
@@ -145,30 +145,30 @@ def symScreen(isite,nsite,rotL,qred,sigs,ne,sval,debug=True,status='L',ifscreen=
       key = str(item)
       if key != key_current:
          wt = numpy.sum(sigs[dic[key]])
-	 pop += wt
-	 n1,s1 = item
-	 nres = ne-n1
-	 
-	 # Check the possibility for coupling to the right
-	 if ifBlockSymScreen:
-	    ifcouple = True
-	    if n1 > ne+1.e-10: ifcouple = False
-	    if abs(n1-ne)<1.e-10 and s1>0.0: ifcouple = False
-	    if n1 < ne-1.e-10 and s1>(ne-n1)/2.0: ifcouple = False
-	    # Not complete for example: H10 isite=6 has quanta=[8,2], but 
-	    # the remaining 3 sites cannot contribute to s=2 for singelt!
+         pop += wt
+         n1,s1 = item
+         nres = ne-n1
+         
+         # Check the possibility for coupling to the right
+         if ifBlockSymScreen:
+            ifcouple = True
+            if n1 > ne+1.e-10: ifcouple = False
+            if abs(n1-ne)<1.e-10 and s1>0.0: ifcouple = False
+            if n1 < ne-1.e-10 and s1>(ne-n1)/2.0: ifcouple = False
+            # Not complete for example: H10 isite=6 has quanta=[8,2], but 
+            # the remaining 3 sites cannot contribute to s=2 for singelt!
          else:
-	    ifcouple = ifpermit(kres,nres,sval,s1)
+            ifcouple = ifpermit(kres,nres,sval,s1)
 
-	 if not debug:
-	    print(' idx=',idx,'item=',item,'dim=',len(dic[key]),\
-	          ' sigs=',wt,'pop=',pop,'ifcouple=',ifcouple)
-	 key_current = key
-	 idx += 1 
-	 # Save for permitted case
-	 if (not ifscreen) or (ifscreen and ifcouple):
-	    qr.append(item+[len(dic[key])])
-	    indx += dic[key]
+         if not debug:
+            print(' idx=',idx,'item=',item,'dim=',len(dic[key]),\
+                  ' sigs=',wt,'pop=',pop,'ifcouple=',ifcouple)
+         key_current = key
+         idx += 1 
+         # Save for permitted case
+         if (not ifscreen) or (ifscreen and ifcouple):
+            qr.append(item+[len(dic[key])])
+            indx += dic[key]
    # Update
    qnumsl = numpy.array(qr)
    rotLnew = rotL[:,indx].copy() 
@@ -200,7 +200,7 @@ if __name__ == '__main__':
    print(expandSM(qr2))
 
    qr2 = numpy.array([[ 1., 0.5, 2. ],[ 2., 0. , 3. ],\
-	     	      [ 2.,  1., 1. ],[ 3., 0.5, 2. ]])
+                      [ 2.,  1., 1. ],[ 3., 0.5, 2. ]])
    print() 
    print(qr2)
    print(expandSM(qr2))

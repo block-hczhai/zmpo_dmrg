@@ -72,7 +72,7 @@ class mpo_dmrg:
       self.nsweep  = None
       self.deltaE  = None
       self.Energy  = 0.0  # Record energy at each sweep
-      self.eav 	   = None # List
+      self.eav     = None # List
       self.dwt     = None # List
       self.esweeps = None # List
       # Files
@@ -93,14 +93,14 @@ class mpo_dmrg:
       #------------------------------------------------------
       # Quantum numbers
       self.isym  = 2    # =0, no symmetry is used.
-      			# =1, particle number - N.
-			# =2, spin projection - Sz.
+                        # =1, particle number - N.
+                        # =2, spin projection - Sz.
       self.qphys = None # quantum number of physical indices
       self.dphys = None
       self.qnuml = None # quantum number of virtual indices L
       self.qnumr = None # quantum number of virtual indices R
-			# site :    0   1   2  
-			# qnum : -0-*-1-*-2-*-3- (indices)
+                        # site :    0   1   2  
+                        # qnum : -0-*-1-*-2-*-3- (indices)
       self.sigsl = None
       self.sigsr = None
       self.nelec = 0.0 
@@ -134,7 +134,7 @@ class mpo_dmrg:
       # Qtensor
       self.ifQt = False
       self.qkey = None # Record symmetry of current targeted states!
-      		       # This is used to change the quantum numbers.
+                       # This is used to change the quantum numbers.
       self.qlst = None # [ql,qc,qr] lists 
       self.qtmp = None # tmplate for CI vectors
       self.idlstCI   = None # temporay idlst for CI
@@ -206,30 +206,30 @@ class mpo_dmrg:
    def partition(self):
       if self.comm.rank == 0: print('\n[mpo_dmrg_class.partition]')
       if self.sbas is None:
-	 print('error: sbas is not defined!')
-	 exit(1)
+         print('error: sbas is not defined!')
+         exit(1)
       rank = self.comm.rank
       size = self.comm.size
       # Normal MPS
       if self.npts is None: 
          assert self.sbas >= size
-	 indices = parallel_util.partitionSites(self.sbas,size,rank)
-	 self.opers = [[x,None] for x in indices]
+         indices = parallel_util.partitionSites(self.sbas,size,rank)
+         self.opers = [[x,None] for x in indices]
       # SP-MPS
       else:
-	 assert self.npts*self.sbas >= self.comm.size
-	 indices = parallel_util.partitionSites(self.npts*self.sbas,size,rank)
-	 self.opers = [parallel_util.unrank(x,self.npts) for x in indices]
+         assert self.npts*self.sbas >= self.comm.size
+         indices = parallel_util.partitionSites(self.npts*self.sbas,size,rank)
+         self.opers = [parallel_util.unrank(x,self.npts) for x in indices]
       self.nops  = len(self.opers)
       # Set up mapping dictionary for integrals
       if self.ifAllInts:
-	 self.pidx = list(range(self.sbas))
+         self.pidx = list(range(self.sbas))
       else:
-	 # One must be caution that both set and dic.keys()
-	 # do not preserve the ordering when converted to list!
-	 # {8: 2, 6: 0, 7: 1}
-	 # set([6,7,8]) = [8,6,7]
-	 self.pidx = sorted(list(set([x[0] for x in self.opers])))
+         # One must be caution that both set and dic.keys()
+         # do not preserve the ordering when converted to list!
+         # {8: 2, 6: 0, 7: 1}
+         # set([6,7,8]) = [8,6,7]
+         self.pidx = sorted(list(set([x[0] for x in self.opers])))
       self.pdim = len(self.pidx) 
       self.pdic = dict([(self.pidx[i],i) for i in range(self.pdim)])
       assert self.nops>0
@@ -237,12 +237,12 @@ class mpo_dmrg:
       if self.npts is None:
          self.hpwts = numpy.ones(self.nops)
       else: 
-	 self.hpwts = numpy.array([self.qwts[x[1]] for x in self.opers])
+         self.hpwts = numpy.array([self.qwts[x[1]] for x in self.opers])
       # debug:
       for i in range(self.comm.size):
-	 if i == self.comm.rank: 
-	    print(' rank=',self.comm.rank,' nops=',self.nops,' opers=',self.opers)
-	 self.comm.Barrier()
+         if i == self.comm.rank: 
+            print(' rank=',self.comm.rank,' nops=',self.nops,' opers=',self.opers)
+         self.comm.Barrier()
       return 0
 
    # Load integrals
@@ -257,19 +257,19 @@ class mpo_dmrg:
       mpo_dmrg_io.dumpMPO_H(self,debug)
       mpo_dmrg_io.dumpMPO_R(self,debug)
       if self.ifpt and self.ifH0:
-	 mpo_dmrg_io.dumpMPO_H0(self,debug)
+         mpo_dmrg_io.dumpMPO_H0(self,debug)
       return 0
 
    def dumpMPO_Model(self,name,debug=False):
       rank = self.comm.rank
       if rank == 0: print('\n[mpo_dmrg_class.dumpMPO_Model] name =',name,' path =',self.path)
       if name == 'Hubbard':
-	 mpo_dmrg_io.dumpMPO_Hubbard(self)
+         mpo_dmrg_io.dumpMPO_Hubbard(self)
       elif name == 'HubbardGeneral':
          mpo_dmrg_io.dumpMPO_H1e(self,debug)
          mpo_dmrg_io.dumpMPO_R(self,debug)
       else:
-	 print('error: Not implemented yet!')
+         print('error: Not implemented yet!')
          exit(1)
       return 0
 
@@ -278,8 +278,8 @@ class mpo_dmrg:
    # we use nsite+1 places to keep all the symmety indices for qnuml/r.
    def build(self):
       if self.nsite < 2:
-	 print('error: mps is not supported for nsite < 2')
-	 exit(1)
+         print('error: mps is not supported for nsite < 2')
+         exit(1)
       assert self.isym in [1,2]
       # Initialize quantum numbers
       self.qphys = mpo_dmrg_qphys.initSpatialOrb(self.nsite,self.isym)
@@ -298,7 +298,7 @@ class mpo_dmrg:
 
    def initStates(self):
       if self.qsectors is None and self.neig is None:
-	 print('error: no state is specified!')
+         print('error: no state is specified!')
          exit(1)
       if self.qsectors is not None:
          if self.isym == 0:
@@ -309,7 +309,7 @@ class mpo_dmrg:
             neig += self.qsectors[key]
          self.neig = neig
       else:
-         # No symmetry case	 
+         # No symmetry case      
          if self.isym == 0:
             key = str([])
          elif self.isym == 1:
@@ -331,23 +331,23 @@ class mpo_dmrg:
       self.schedule = sc
       self.crit_tol = sc.tol
       if rank == 0: 
-	 print('\n[mpo_dmrg_class.default]')
-	 mpo_dmrg_prt.title(self)
+         print('\n[mpo_dmrg_class.default]')
+         mpo_dmrg_prt.title(self)
       ti = time.time()
       # Count states
       self.initStates()
       if rank == 0: 
-	 # Only set Dcut for rank-0 is sufficient, 
-	 # as RDM truncation is done here.
-	 if self.Dcut is not None:
-	    print(' Dcut = ',self.Dcut)
-	    # Similar to qnuml and qnumr
-	    assert len(self.Dcut) == self.nsite-1
-	    self.Dcut = [1]+self.Dcut+[1]
+         # Only set Dcut for rank-0 is sufficient, 
+         # as RDM truncation is done here.
+         if self.Dcut is not None:
+            print(' Dcut = ',self.Dcut)
+            # Similar to qnuml and qnumr
+            assert len(self.Dcut) == self.nsite-1
+            self.Dcut = [1]+self.Dcut+[1]
          # LogFile in current directory
-	 flog_name = 'log_'+os.path.split(self.path)[-1]
-	 print(' flog_name =',flog_name)
-	 flog = open(flog_name,'w')
+         flog_name = 'log_'+os.path.split(self.path)[-1]
+         print(' flog_name =',flog_name)
+         flog = open(flog_name,'w')
          flog.write('path:'+self.path+'\n')
       # MPSfile
       self.flmps = h5py.File(self.path+'/lmps','w')
@@ -358,9 +358,9 @@ class mpo_dmrg:
       mpo_dmrg_io.saveQnum(self.frmps,self.nsite,self.qnumr[-1])
       # Initialize L-MPS by a single left sweep
       if fmps is None:
-	 # This is not allowed for using Qt.
-	 assert self.ifQt == False 
-	 self.status = 'init'
+         # This is not allowed for using Qt.
+         assert self.ifQt == False 
+         self.status = 'init'
          self.Dmax   = self.schedule.MaxMs[0]  
          self.crit_e = self.schedule.Tols[0]   
          self.noise  = self.schedule.Noises[0]
@@ -368,16 +368,16 @@ class mpo_dmrg:
       # Use L-MPS from input
       else:
          self.comm.Barrier()
-	 # Not only requires qnuml for setting up mpo_dmrg_util
-	 self.qnuml = mpo_dmrg_io.loadQnums(fmps)
-	 # but also the sites are needed to be copied to flmps!
-	 mpo_dmrg_io.copyMPS(self.flmps,fmps,self.ifQt)
+         # Not only requires qnuml for setting up mpo_dmrg_util
+         self.qnuml = mpo_dmrg_io.loadQnums(fmps)
+         # but also the sites are needed to be copied to flmps!
+         mpo_dmrg_io.copyMPS(self.flmps,fmps,self.ifQt)
          self.comm.Barrier()
-	 # Initialize operators
-	 mpo_dmrg_util.initOps(self,fmps)	 
+         # Initialize operators
+         mpo_dmrg_util.initOps(self,fmps)        
       # Optimize
       self.comm.Barrier()
-      self.esweeps = []	
+      self.esweeps = [] 
       self.psi0 = None
       self.eav = []
       self.dwt = []
@@ -388,39 +388,39 @@ class mpo_dmrg:
       isweep = -1
       # Optimize following the schedule
       for isweep in range(self.schedule.maxiter):
-	 if rank == 0: print('\n'+'#'*30+' isweep = ',isweep,'#'*30)
-	 t0 = time.time()
-	 # Record status
-	 self.isweep = isweep
-	 # Setup parameters
-	 self.schedule.getParameters(self,isweep)
-	 # Optimization
-	 result1 = mpo_dmrg_opt.sweep(self,sitelst,self.ncsite,'R',ifsym=self.ifsym)
-	 result2 = mpo_dmrg_opt.sweep(self,sitelst,self.ncsite,'L',ifsym=self.ifsym)
-	 nmvp1,indx1,eav1,dwt1,elst1,dlst1 = result1
-	 nmvp2,indx2,eav2,dwt2,elst2,dlst2 = result2
-	 if rank == 0: mpo_dmrg_prt.flogWrite(self,flog,isweep,result1,result2) 	 
-	 self.nmvp.append(nmvp1+nmvp2)
-	 self.esweeps += elst1+elst2
-	 if eav1 < eav2:
-    	    self.eav.append(eav1)
-    	    self.dwt.append(dwt1)
-	    eav = eav1
-	 else:
-    	    self.eav.append(eav2)
-    	    self.dwt.append(dwt2)
-	    eav = eav2
+         if rank == 0: print('\n'+'#'*30+' isweep = ',isweep,'#'*30)
+         t0 = time.time()
+         # Record status
+         self.isweep = isweep
+         # Setup parameters
+         self.schedule.getParameters(self,isweep)
+         # Optimization
+         result1 = mpo_dmrg_opt.sweep(self,sitelst,self.ncsite,'R',ifsym=self.ifsym)
+         result2 = mpo_dmrg_opt.sweep(self,sitelst,self.ncsite,'L',ifsym=self.ifsym)
+         nmvp1,indx1,eav1,dwt1,elst1,dlst1 = result1
+         nmvp2,indx2,eav2,dwt2,elst2,dlst2 = result2
+         if rank == 0: mpo_dmrg_prt.flogWrite(self,flog,isweep,result1,result2)          
+         self.nmvp.append(nmvp1+nmvp2)
+         self.esweeps += elst1+elst2
+         if eav1 < eav2:
+            self.eav.append(eav1)
+            self.dwt.append(dwt1)
+            eav = eav1
+         else:
+            self.eav.append(eav2)
+            self.dwt.append(dwt2)
+            eav = eav2
          # Check convergence
-	 t1 = time.time()
-	 self.Energy = eav
-    	 deltaE = eav-eold
-	 if rank == 0: print('Summary: isweep=',isweep,' Emin=',eav,\
-			     ' dE=%9.2e  tol=%8.1e  t=%8.1e s'%(deltaE,self.crit_tol,t1-t0))
-	 # Check convergence
-	 ifconv = self.schedule.checkConv(self,isweep,deltaE)
+         t1 = time.time()
+         self.Energy = eav
+         deltaE = eav-eold
+         if rank == 0: print('Summary: isweep=',isweep,' Emin=',eav,\
+                             ' dE=%9.2e  tol=%8.1e  t=%8.1e s'%(deltaE,self.crit_tol,t1-t0))
+         # Check convergence
+         ifconv = self.schedule.checkConv(self,isweep,deltaE)
          eold = eav
-	 if ifconv: break
-      # Save	 
+         if ifconv: break
+      # Save     
       self.ifconv = ifconv
       self.nsweep = isweep + 1
       self.deltaE = deltaE
@@ -484,7 +484,7 @@ class mpo_dmrg:
       if fket is not None: 
          fkmps = fket
       else:
-	 fkmps = fbmps
+         fkmps = fbmps
       # bond dimension
       nsite = fbmps['nsite'].value
       bdim = [len(x) for x in mpo_dmrg_io.loadQnums(fbmps)]
@@ -516,7 +516,7 @@ class mpo_dmrg:
             energy = esum/ovlp
          print()     
          print('Summary for '+status+'-MPS:')
-	 print(' npts   =',self.npts)
+         print(' npts   =',self.npts)
          print(' <H(P)> =',esum)
          print(' ovlp   =',ovlp)
          print(' <(P)>  =',psum)
@@ -527,28 +527,28 @@ class mpo_dmrg:
          print(' kBdims =',kdim)
       # Check Ecomponents
       if ifep:
-	 if self.ifs2proj:
- 	    npts = self.npts
-	 else:
- 	    npts = 1
+         if self.ifs2proj:
+            npts = self.npts
+         else:
+            npts = 1
          ecomp = self.comm.gather(exphop,root=0)
          opswt = self.comm.gather(hpwts,root=0)
-	 if rank == 0:
-	    ecomp = numpy.array(ecomp).flatten()
+         if rank == 0:
+            ecomp = numpy.array(ecomp).flatten()
             opswt = numpy.array(opswt).flatten()
-	    ecomp = ecomp*opswt
-	    # Sum over grid points
+            ecomp = ecomp*opswt
+            # Sum over grid points
             tmp = numpy.zeros(self.sbas)
             for ipt in range(npts):
                tmp += ecomp[ipt::npts]
             # Spatial orbitals
-	    ecomp = numpy.zeros(self.nsite)
-	    # Sum over spin cases
+            ecomp = numpy.zeros(self.nsite)
+            # Sum over spin cases
             for ispin in range(2):
                ecomp += tmp[ispin::2]
-	    print('### Energy decompositions: <Hp> ###')
+            print('### Energy decompositions: <Hp> ###')
             print(' nsite =',self.nsite)
-	    print(' ecomp =',ecomp)
+            print(' ecomp =',ecomp)
             if psum is not None:
                self.ecomp = ecomp/psum
             else:

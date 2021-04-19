@@ -22,7 +22,7 @@ def distanceMatrix(eri):
    dij = numpy.zeros((nb,nb))
    for i in range(nb):
       for j in range(nb):
-	 dij[i,j] = eri[i,i,j,j]/numpy.sqrt(eri[i,i,i,i]*eri[j,j,j,j]) 
+         dij[i,j] = eri[i,i,j,j]/numpy.sqrt(eri[i,i,i,i]*eri[j,j,j,j]) 
    return dij
 
 # Kij = (ij|ij)
@@ -51,7 +51,7 @@ def orbitalOrdering(eri,mode='kij',debug=False):
    if mode.lower() == 'dij':
       dij = distanceMatrix(eri)
    elif mode.lower() == 'kij':
-      dij = exchangeMatrix(eri)	  
+      dij = exchangeMatrix(eri)   
    elif mode.lower() == 'kmat':
       dij = eri.copy() 
    lap = laplacian(dij)

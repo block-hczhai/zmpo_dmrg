@@ -11,7 +11,7 @@ from zmpo_dmrg.source import sysutil_io
 #
 class class_molinfo:
    
-   def __init__(self):	
+   def __init__(self):  
       self.fname = None
       self.nelec = None 
       self.sbas  = None
@@ -33,11 +33,11 @@ class class_molinfo:
    def loadHam(self,fname="mole.h5"):
       status=0
       if self.comm.rank == 0:
-	 try:     
+         try:     
             f = h5py.File(fname, "r")
-	 except IOError:
+         except IOError:
             print("\nerror in molinfo.loadHam: No such file =",fname)
-	    status=1
+            status=1
       status = self.comm.bcast(status)
       if status == 1: exit(1)
       self.fname = fname
@@ -53,20 +53,20 @@ class class_molinfo:
       self.enuc  = self.comm.bcast(self.enuc )
       self.escf  = self.comm.bcast(self.escf )
       self.ecor  = self.comm.bcast(self.ecor )
-      # Empty	
+      # Empty   
       self.orboccun = numpy.empty(self.sbas,dtype=numpy.float_)
       self.orbsymO3 = numpy.empty(self.sbas,dtype=numpy.int)
       self.orbsymSz = numpy.empty(self.sbas,dtype=numpy.int)
       if self.comm.rank == 0:
          self.orboccun = f['occun'].value
-	 self.orbsymO3 = f['orbsym'].value
+         self.orbsymO3 = f['orbsym'].value
          self.orbsymSz = f['spinsym'].value
       # Bcast with buffer array
       self.comm.Bcast( [self.orboccun,MPI.DOUBLE] ) 
       self.comm.Bcast( [self.orbsymO3,MPI.INT] ) 
       self.comm.Bcast( [self.orbsymSz,MPI.INT] )
       if self.comm.rank == 0: 
-         f.close()	   
+         f.close()         
          print(" loadHam sucessfully!")
       return 0
 

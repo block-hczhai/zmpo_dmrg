@@ -21,7 +21,7 @@ def det_init(N,K,iop=1):
       t=-1.0 # hopping is negative
       for i in range(K):
          h[i,(i+1)%K]=t
-	 h[i,(i-1)%K]=t
+         h[i,(i-1)%K]=t
       e,v=scipy.linalg.eigh(h)
       print("Cyclic Hamiltonian:")
       print(h)
@@ -33,8 +33,8 @@ def det_init(N,K,iop=1):
       t=-2.0 # hopping is negative
       for i in range(K):
          h[i,(i+1)%K]=t
-	 h[i,(i-1)%K]=t
-	 h[i,i]=-i/10.0
+         h[i,(i-1)%K]=t
+         h[i,i]=-i/10.0
       e,v=scipy.linalg.eigh(h)
       print("Cyclic Hamiltonian:")
       print(h)
@@ -85,7 +85,7 @@ def det_check(civec,nsorb,nelec,dets,iprt):
    civec2=numpy.zeros(civec.size)
    for i in itools.combinations(list(range(nsorb)),nelec):
       for r in range(rank):
-	 matrix=det_site[r][:,i]
+         matrix=det_site[r][:,i]
          civec2[ic]+=numpy.linalg.det(matrix)*det_core[r]
       ic=ic+1
    diff=numpy.linalg.norm(civec-civec2)
@@ -95,5 +95,5 @@ def det_check(civec,nsorb,nelec,dets,iprt):
 def det_cofactor(matrix,i,j):
    nr,nc=matrix.shape
    minor=matrix[numpy.array(list(range(i))+list(range(i+1,nr)))[:,numpy.newaxis],
-		numpy.array(list(range(j))+list(range(j+1,nc)))]
+                numpy.array(list(range(j))+list(range(j+1,nc)))]
    return (-1)**(i+j)*numpy.linalg.det(minor)

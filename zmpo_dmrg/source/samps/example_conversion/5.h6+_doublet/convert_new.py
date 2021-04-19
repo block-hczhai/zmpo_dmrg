@@ -21,10 +21,10 @@ qtensor_api.fmpsQtReverse(flmpsQ,flmps0,'L')
 # Conversion
 t0 = time.time()
 mpo_dmrg_conversion.sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-14,\
-				     ifcompress=True,\
-				     ifBlockSingletEmbedding=True,\
-				     ifBlockSymScreen=True,\
-				     ifpermute=True)
+                                     ifcompress=True,\
+                                     ifBlockSingletEmbedding=True,\
+                                     ifBlockSymScreen=True,\
+                                     ifpermute=True)
 path = './lmps_compact'
 block_itrf.compact_rotL(flmps1,path)
 t1 = time.time()

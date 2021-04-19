@@ -97,7 +97,7 @@ print('Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop))
 exit()
 
 
-# <S2>	 
+# <S2>   
 if not ifs2proj:
    info=None
 else:

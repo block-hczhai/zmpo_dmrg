@@ -50,7 +50,7 @@ def block(nsite,isite,ncsite,status):
    string=''.join(string)
    print()
    print(' Site[i]:',isite,'/',nsite,\
-	 ' status =',status,': [',string,']  active dot:',list(range(isite,isite+ncsite)))
+         ' status =',status,': [',string,']  active dot:',list(range(isite,isite+ncsite)))
    return 0
 
 def parameters(Dmax,crit_e,noise,ncsite,sitelst,actlst,status):
@@ -83,7 +83,7 @@ def singleSweep(dmrg,his,status,dt):
       for i in range(m):
          eigi = eigs[i]
          dwti = dwts[i]
-	 print('  idx = %4d'%i,' dwt= %6.2e'%dwti,' eigs=',eigi)
+         print('  idx = %4d'%i,' dwt= %6.2e'%dwti,' eigs=',eigi)
       # Final
       print('-'*n)
       print(' averaged energy [%4d] = %20.12f   dwts = %6.2e'%\
@@ -102,7 +102,7 @@ def finalSweep(dmrg,dt):
          '   nsites = ',dmrg.nsite,\
          '   nMVPs = ',numpy.sum(dmrg.nmvp),\
          '   time = %7.2e s'%dt,\
-	 '   comm.size = %3d'%dmrg.comm.size)
+         '   comm.size = %3d'%dmrg.comm.size)
    print('-'*n)
    dmrg.schedule.prt()
    print('-'*n)
@@ -115,7 +115,7 @@ def finalSweep(dmrg,dt):
          de = dmrg.eav[isweep]-dmrg.eav[isweep-1]
       # Possible change of schedule
       if dmrg.schedule.Tag == 'Normal0' and isweep == dmrg.schedule.change: 
-	 print(' twoSite to oneSite:')
+         print(' twoSite to oneSite:')
       print('  isweep =%4d  nmvp =%5d  eav[i] =%20.12f  dwt[i] = %6.2e  de = %7.1e'%\
               (isweep,dmrg.nmvp[isweep],dmrg.eav[isweep],dmrg.dwt[isweep],de))
    print('-'*n)

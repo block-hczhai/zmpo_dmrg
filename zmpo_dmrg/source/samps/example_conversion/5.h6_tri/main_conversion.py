@@ -21,8 +21,8 @@ flmps1 = h5py.File('./lmps1T','w')
 # Conversion
 t0 = time.time()
 mpo_dmrg_conversion.sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-5,\
-			  	     ifcompress=True,ifBlockSingletEmbedding=True,\
-				     ifBlockSymScreen=True,ifpermute=True)
+                                     ifcompress=True,ifBlockSingletEmbedding=True,\
+                                     ifBlockSymScreen=True,ifpermute=True)
 path = './lmps_compactT'
 block_itrf.compact_rotL(flmps1,path,ifaux=False)
 flmps1.close()
@@ -142,7 +142,7 @@ print('sop=',sop)
 print('Overlap: <Psi|P|Psi0>*N0=',sop/math.sqrt(pop))
 exit()
 
-# <S2>	 
+# <S2>   
 if not ifs2proj:
    info=None
 else:

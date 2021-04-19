@@ -29,7 +29,7 @@ def cMPS(fmps0,fmps1,icase=1,thresh=-1,Dcut=-1,debug=False):
       mps = mps.qcompress(thresh=thresh,Dcut=Dcut,debug=True)
       mps.qnums = [[numpy.array([0.0,0.0])]]+mps.qnums
       mpo_dmrg_io.dumpMPS(fmps1,[mps.sites,mps.qnums],icase)
-   # With qnums and Qt	   
+   # With qnums and Qt     
    elif icase == 2:
       raise NotImplementedError
    return 0
@@ -45,7 +45,7 @@ def objectMPS(fmps0,icase,thresh=1.e-12,Dcut=-1):
    elif icase == 1:
       qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,2)
       mps = mps_class.class_mps(nsite,isym=2,sites=mps0[0],iop=1,qphys=qphys,qnums=mps0[1])
-   # With qnums and Qt	   
+   # With qnums and Qt     
    elif icase == 2:
       mps = mps0 # [sites,qnums]
    return mps

@@ -87,14 +87,14 @@ def genNpXYMat(ispin,jspin):
    if ispin == jspin:
       tmp = genNpSpinMat(ispin)
    else:
-      # a^+*b	   
+      # a^+*b      
       if ispin == 0 and jspin == 1:
          tmp[2,1] = 1.
       elif ispin == 1 and jspin == 0:
-	 tmp[1,2] = 1.
+         tmp[1,2] = 1.
       else:
-	 print('error: no such spin case in genNpXYMat! ispin,jspin=',(ispin,jspin))
-	 exit(1)
+         print('error: no such spin case in genNpXYMat! ispin,jspin=',(ispin,jspin))
+         exit(1)
    return tmp
 
 # Op = Sz = 0.5*(pa^+pa-pb^+pb) 

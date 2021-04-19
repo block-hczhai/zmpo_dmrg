@@ -30,7 +30,7 @@ class iface:
 
    # CheckFile
    def check(self,fname='mole.h5'):
-      print('\n[iface.check]')	   
+      print('\n[iface.check]')     
       f2 = h5py.File(fname, "r")
       print(" nelec=",f2['cal'].attrs['nelec'])
       print(" sbas =",f2['cal'].attrs['sbas'])
@@ -46,25 +46,25 @@ class iface:
    # 2016.10.12: 
    # The very first version of dump4C - no localization, no reorder!
    def dump4C(self,fname='mole4C.h5'):
-      print('\n[iface.dump4C]')	 
+      print('\n[iface.dump4C]')  
       #
       # Define active space
-      #	
+      # 
       if self.core is None and self.act is None:
-	 # The first N2C orbitals are negative energy states
-	 mo_coeff = self.mo_coeff[:,self.sbas:]
-	 ncore = 0
-	 nact  = self.sbas
+         # The first N2C orbitals are negative energy states
+         mo_coeff = self.mo_coeff[:,self.sbas:]
+         ncore = 0
+         nact  = self.sbas
       elif self.core is not None and self.act is None:
-	 mo_coeff = self.mo_coeff[:,self.sbas:]
-	 ncore = len(self.core)
-	 nact  = self.sbas-ncore
+         mo_coeff = self.mo_coeff[:,self.sbas:]
+         ncore = len(self.core)
+         nact  = self.sbas-ncore
       elif self.core is not None and self.act is not None:
-	 mo_coeff = self.mo_coeff[:,self.sbas:]
-	 mo_coeff = numpy.hstack((mo_coeff[:,numpy.array(self.core)],\
-			  	  mo_coeff[:,numpy.array(self.act)]))
-	 ncore = len(self.core)
-	 nact  = len(self.act)
+         mo_coeff = self.mo_coeff[:,self.sbas:]
+         mo_coeff = numpy.hstack((mo_coeff[:,numpy.array(self.core)],\
+                                  mo_coeff[:,numpy.array(self.act)]))
+         ncore = len(self.core)
+         nact  = len(self.act)
       elif self.core is None and self.act is not None:
          print('Core must be set, if act exists') 
          exit()
@@ -96,14 +96,14 @@ class iface:
       zreleri.ao2mo(self.mf, mo_coeff, erifile)
       if self.ifgaunt: zreleri.ao2mo_gaunt(self.mf, mo_coeff, erifile)
       with h5py.File(erifile) as f1:
-	 eri = f1['ericas'].value # [ij|kl]
-	 eri = eri.reshape(norb,norb,norb,norb)
-	 eriC = eri[:ncore,:ncore,:ncore,:ncore]
+         eri = f1['ericas'].value # [ij|kl]
+         eri = eri.reshape(norb,norb,norb,norb)
+         eriC = eri[:ncore,:ncore,:ncore,:ncore]
       # 
       # ecore = hii + 1/2<ij||ij> = hij + 1/2*([ii|jj]-[ij|ji])
       # 
       ecore = numpy.einsum('ii',hmo[:ncore,:ncore])\
- 	    + 0.5*(numpy.einsum('iijj',eriC)-numpy.einsum('ijji',eriC))
+            + 0.5*(numpy.einsum('iijj',eriC)-numpy.einsum('ijji',eriC))
       ecore = ecore.real
       #
       # fock_ij = hij + <ik||jk> = hij + [ij|kk]-[ik|kj]; k in core
@@ -111,8 +111,8 @@ class iface:
       fock = hmo[ncore:,ncore:].copy()
       for i in range(nact):
          for j in range(nact):
- 	    for k in range(ncore):
-	       fock[i,j] +=  eri[ncore+i,ncore+j,k,k]-eri[ncore+i,k,k,ncore+j]
+            for k in range(ncore):
+               fock[i,j] +=  eri[ncore+i,ncore+j,k,k]-eri[ncore+i,k,k,ncore+j]
       hmo = fock.copy()
       #
       # Get antisymmetrized integrals
@@ -124,15 +124,15 @@ class iface:
          kij = numpy.einsum('ijji->ij',eri)
          kij_imag = numpy.linalg.norm(kij.imag)
          kij_real = kij.real
-	 print('\nReorder of spinors:')
+         print('\nReorder of spinors:')
          print(' Norm of kij_imag =',kij_imag)
          print(' Symm of kij_real =',numpy.linalg.norm(kij_real-kij_real.T))
          order = fielder.orbitalOrdering(kij_real,'kmat')
          print(' order =',order)
-	 hmo = hmo[numpy.ix_(order,order)].copy()
-	 eri = eri[numpy.ix_(order,order,order,order)].copy()
+         hmo = hmo[numpy.ix_(order,order)].copy()
+         eri = eri[numpy.ix_(order,order,order,order)].copy()
       else:
-         order = list(range(eri.shape[0]))	
+         order = list(range(eri.shape[0]))      
       # <ij|kl>=[ik|jl]
       eri = eri.transpose(0,2,1,3)
       # Antisymmetrize V[pqrs]=-1/2*<pq||rs> - In MPO construnction, only r<s part is used. 
@@ -167,7 +167,7 @@ class iface:
       #
       occun = numpy.zeros(nact)
       for i in range(self.nelec-ncore):
-	 occun[i] = 1.0
+         occun[i] = 1.0
       print()
       print(' order:',order)
       print(' initial occun for',len(occun),' spin orbitals:\n',occun)
@@ -186,12 +186,12 @@ class iface:
       os.remove(erifile)
       # Test
       if self.ifHFtest:
-	 etot = ecore \
-	      + numpy.einsum('ii',hmo[:nelec,:nelec])\
-	      - numpy.einsum('ijij',eri[:nelec,:nelec,:nelec,:nelec])
-	 etot = etot.real
-	 escf = self.mf.energy_elec(self.mf.make_rdm1())[0]
-	 print(' HFtest_etot',etot)
+         etot = ecore \
+              + numpy.einsum('ii',hmo[:nelec,:nelec])\
+              - numpy.einsum('ijij',eri[:nelec,:nelec,:nelec,:nelec])
+         etot = etot.real
+         escf = self.mf.energy_elec(self.mf.make_rdm1())[0]
+         print(' HFtest_etot',etot)
          print(' HFtest_escf',escf)
          print(' HFtest_edif',etot-escf)
          assert abs(etot-escf)<1.e-8

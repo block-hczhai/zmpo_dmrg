@@ -17,15 +17,15 @@ class Qt:
       self.nslc = None
       if slcdim is not None:
          self.slcdim = slcdim
-	 if maxslc is not None:
-	    self.maxslc = [maxslc]*slcdim
-   	    self.genDic()
-	 else:
+         if maxslc is not None:
+            self.maxslc = [maxslc]*slcdim
+            self.genDic()
+         else:
             self.maxslc = [0]*slcdim
-	    self.size   = None
+            self.size   = None
       else:
- 	 self.slcdim = None
-	 self.maxslc = None
+         self.slcdim = None
+         self.maxslc = None
          self.size = None
 
    def prt(self):  
@@ -65,7 +65,7 @@ class Qt:
    def dump(self,f1,name):
       self.dumpInfo(f1,name)
       for idx in range(self.nslc):
-	 if self.size[idx] > 0: 
+         if self.size[idx] > 0: 
             self.dumpSLC(f1,name,idx)
       return 0
 
@@ -86,8 +86,8 @@ class Qt:
       self.loadInfo(f1,name)
       self.dic = dict([(i,0) for i in range(self.nslc)])
       for idx in range(self.nslc):
-	 if self.size[idx] > 0:
-	    self.dic[idx] = self.loadSLC(f1,name,idx)
+         if self.size[idx] > 0:
+            self.dic[idx] = self.loadSLC(f1,name,idx)
       return 0
 
    def diagH(self):
@@ -99,7 +99,7 @@ class Qt:
       diag.dic = dict([(i,qtensor()) for i in range(self.nslc)])
       for idx in range(self.nslc):
          if diag.size[idx] > 0:
-	    diag.dic[idx] = self.dic[idx].diagH()
+            diag.dic[idx] = self.dic[idx].diagH()
       return diag
 
 #
@@ -108,15 +108,15 @@ class Qt:
 class qtensor:
    def __init__(self,status=None):
       #------------------
-      self.rank  = None	 	# int64  1 
-      self.qsyms = None 	# list of numpy.arrays (float64)
-      self.ndims = None  	# list of array containing dimensions in each sym.
-			        #  ndims= [array([4, 1, 2, 2, 1, 2, 1, 1, 2]), array(...]
+      self.rank  = None         # int64  1 
+      self.qsyms = None         # list of numpy.arrays (float64)
+      self.ndims = None         # list of array containing dimensions in each sym.
+                                #  ndims= [array([4, 1, 2, 2, 1, 2, 1, 1, 2]), array(...]
       #------------------
-      self.nqnum = None		# (nsyms[i],nqnum) = qsyms[i]
-      self.nsyms = None		# nsyms = [ 9  4 16] 
-      self.shape = None  	# shape = [16  4 64]
-      self.size  = None 	# size  = 4096=16*4*64
+      self.nqnum = None         # (nsyms[i],nqnum) = qsyms[i]
+      self.nsyms = None         # nsyms = [ 9  4 16] 
+      self.shape = None         # shape = [16  4 64]
+      self.size  = None         # size  = 4096=16*4*64
       self.nblks = None         # nblks = 576 =9*4*16
       #------------------
       # KEY for BLOCKS
@@ -129,12 +129,12 @@ class qtensor:
       self.ioff_allowed  = None # int64  nblks
       #------------------
       self.size_allowed  = None # int64  1
-      self.value   = None  	# dtype  size_allowed
+      self.value   = None       # dtype  size_allowed
       self.savings = None       # float64
       if status is None:
-	 self.status = None
+         self.status = None
       else:
-	 self.status = numpy.array(status)
+         self.status = numpy.array(status)
       #------------------
       # For contractions
       #------------------
@@ -144,7 +144,7 @@ class qtensor:
       # Optional
       #------------------
       self.idlst = None # list of list
-        	        #  idlst= [[[6, 7, 8, 9], [5], [11, 12], [3, 4], [0], ...]
+                        #  idlst= [[[6, 7, 8, 9], [5], [11, 12], [3, 4], [0], ...]
       #------------------
 
    def copy(self,other):
@@ -160,10 +160,10 @@ class qtensor:
       self.nsyms = [0]*self.rank
       self.shape = [0]*self.rank
       for i in range(self.rank):
-	 self.qsyms[i] = other.qsyms[i].copy()
-	 self.ndims[i] = other.ndims[i].copy()
-	 self.nsyms[i] = other.nsyms[i]
-	 self.shape[i] = other.shape[i]
+         self.qsyms[i] = other.qsyms[i].copy()
+         self.ndims[i] = other.ndims[i].copy()
+         self.nsyms[i] = other.nsyms[i]
+         self.shape[i] = other.shape[i]
       self.iblks_allowed = other.iblks_allowed.copy()
       self.dims_allowed  = other.dims_allowed.copy() 
       self.idx_allowed   = other.idx_allowed.copy()  
@@ -175,7 +175,7 @@ class qtensor:
          self.value = other.value.copy()
       self.status = None
       if other.status is not None:
-	 self.status = other.status.copy()
+         self.status = other.status.copy()
       #--------------------------------------
       # The following things are not copied. 
       #--------------------------------------
@@ -210,7 +210,7 @@ class qtensor:
       grp['ndims'] = numpy.hstack(self.ndims)
       if self.idlst is not None:
          grp['idlst'] = numpy.hstack([qtensor_idlst.flatten(self.idlst[irank]) \
-           	      		      for irank in range(self.rank)])
+                                      for irank in range(self.rank)])
       return 0
 
    #@profile
@@ -241,14 +241,14 @@ class qtensor:
       ioff = 0
       for irank in range(self.rank):
          self.qsyms[irank] = qsyms[ioff:ioff+self.nsyms[irank]]
-	 ioff += self.nsyms[irank]
+         ioff += self.nsyms[irank]
       # > ndims
       self.ndims = [0]*self.rank
       ndims = grp['ndims'].value 
       ioff = 0
       for irank in range(self.rank):
          self.ndims[irank] = ndims[ioff:ioff+self.nsyms[irank]]
-	 ioff += self.nsyms[irank]
+         ioff += self.nsyms[irank]
       # > idlst
       if 'idlst' in grp:
          self.idlst = [0]*self.rank
@@ -256,7 +256,7 @@ class qtensor:
          ioff = 0
          for irank in range(self.rank):
             self.idlst[irank] = qtensor_idlst.seperate(self.ndims[irank],\
-           		 			       idlst[ioff:ioff+self.shape[irank]])
+                                                       idlst[ioff:ioff+self.shape[irank]])
             ioff += self.shape[irank]
       return 0
 
@@ -276,7 +276,7 @@ class qtensor:
       self.qsyms = copy.deepcopy(qsyms) # [[1,0],...] for each dimension  
       self.ndims = copy.deepcopy(ndims) #  size for each dimension
       if idlst is not None:
-	 self.idlst = copy.deepcopy(idlst) #  indices for each symmetry sector
+         self.idlst = copy.deepcopy(idlst) #  indices for each symmetry sector
       # information for qnumbers
       self.nqnum = self.qsyms[0].shape[1] 
       # derived full information
@@ -296,23 +296,23 @@ class qtensor:
          print(' size =',self.size)
          print(' nsyms=',self.nsyms)
          print(' nblks=',self.nblks)
-	 # [fromQsyms]
-	 #  rank = 3
-	 #  qsyms= [array([[ 2. ,  0. ],
-	 #        [ 1. , -0.5]]), array([[ 1. ,  0.5],
-	 #        [ 0. ,  0. ],
-	 #        [ 1. , -0.5]]), array([[ 2. ,  0. ],
-	 #        [ 3. ,  1.5]])]
-	 #  ndims= [array([4, 1, 2, 2, 1, 2, 1, 1, 2]), array([1, 1, 1, 1]), array([9, 3, 1, 3, 3, 9, 3, 1, 3, 1, 9, 9, 3, 3, 3, 1])]
-	 #  idlst= [[[6, 7, 8, 9], [5], [11, 12], [3, 4], [0], [13, 14], [15], [10], [1, 2]], [[2], [3], [0], [1]], [[10, 11, 12, 13, 14, 15, 16, 17, 18], [60, 61, 62], [63], [57, 58, 59], [7, 8, 9], [23, 24, 25, 26, 27, 28, 29, 30, 31], [4, 5, 6], [0], [42, 43, 44], [22], [32, 33, 34, 35, 36, 37, 38, 39, 40], [45, 46, 47, 48, 49, 50, 51, 52, 53], [19, 20, 21], [1, 2, 3], [54, 55, 56], [41]]]
-	 #  nqnum= 2
-	 #  shape= [16  4 64]
-	 #  size = 4096
-	 #  nsyms= [ 9  4 16]
-	 #  nblks= 576
+         # [fromQsyms]
+         #  rank = 3
+         #  qsyms= [array([[ 2. ,  0. ],
+         #        [ 1. , -0.5]]), array([[ 1. ,  0.5],
+         #        [ 0. ,  0. ],
+         #        [ 1. , -0.5]]), array([[ 2. ,  0. ],
+         #        [ 3. ,  1.5]])]
+         #  ndims= [array([4, 1, 2, 2, 1, 2, 1, 1, 2]), array([1, 1, 1, 1]), array([9, 3, 1, 3, 3, 9, 3, 1, 3, 1, 9, 9, 3, 3, 3, 1])]
+         #  idlst= [[[6, 7, 8, 9], [5], [11, 12], [3, 4], [0], [13, 14], [15], [10], [1, 2]], [[2], [3], [0], [1]], [[10, 11, 12, 13, 14, 15, 16, 17, 18], [60, 61, 62], [63], [57, 58, 59], [7, 8, 9], [23, 24, 25, 26, 27, 28, 29, 30, 31], [4, 5, 6], [0], [42, 43, 44], [22], [32, 33, 34, 35, 36, 37, 38, 39, 40], [45, 46, 47, 48, 49, 50, 51, 52, 53], [19, 20, 21], [1, 2, 3], [54, 55, 56], [41]]]
+         #  nqnum= 2
+         #  shape= [16  4 64]
+         #  size = 4096
+         #  nsyms= [ 9  4 16]
+         #  nblks= 576
       assert self.status is not None
       self.iblks_allowed = qtensor_util.blks_allowed1(self.nblks,self.rank,self.nqnum,\
-		      				      self.nsyms,self.status,self.qsyms)
+                                                      self.nsyms,self.status,self.qsyms)
       self.nblks_allowed = numpy.sum(self.iblks_allowed)
       # For efficiency reason, store additional information
       self.idx_allowed = numpy.flatnonzero(self.iblks_allowed)
@@ -324,14 +324,14 @@ class qtensor:
       self.ioff_allowed = numpy.zeros((self.nblks),dtype=numpy.int64)
       ioff = 0
       for idx in self.idx_allowed:
-	 self.ioff_allowed[idx] = ioff 
-	 ioff += self.ndim_allowed[idx]
+         self.ioff_allowed[idx] = ioff 
+         ioff += self.ndim_allowed[idx]
       # vals
       self.size_allowed = ioff
       if ifallocate:
          self.value = numpy.zeros(self.size_allowed)
       else:
-	 self.value = None
+         self.value = None
       self.savings = float(self.size_allowed)/self.size
       if debug:
          print(' Symmetry allowed:')
@@ -363,12 +363,12 @@ class qtensor:
 
    def fromDense(self,val,idlst):
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 dims  = self.dims_allowed[idx]
- 	 ndim  = self.ndim_allowed[idx]
+         ioff  = self.ioff_allowed[idx]
+         dims  = self.dims_allowed[idx]
+         ndim  = self.ndim_allowed[idx]
          isyms = numpy.unravel_index(idx,self.nsyms)
-	 indices = numpy.ix_(*[idlst[i][isyms[i]] for i in range(self.rank)])
-	 self.value[ioff:ioff+ndim] = val[indices].reshape(ndim)
+         indices = numpy.ix_(*[idlst[i][isyms[i]] for i in range(self.rank)])
+         self.value[ioff:ioff+ndim] = val[indices].reshape(ndim)
       debug = False
       if debug:
          norm0 = numpy.linalg.norm(val)
@@ -382,12 +382,12 @@ class qtensor:
    def toDenseTensor(self,idlst):
       val = numpy.zeros(self.shape) 
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 dims  = self.dims_allowed[idx]
-	 ndim  = self.ndim_allowed[idx]
+         ioff  = self.ioff_allowed[idx]
+         dims  = self.dims_allowed[idx]
+         ndim  = self.ndim_allowed[idx]
          isyms = numpy.unravel_index(idx,self.nsyms)
-	 indices = numpy.ix_(*[idlst[i][isyms[i]] for i in range(self.rank)])
-	 val[indices] = self.value[ioff:ioff+ndim].reshape(dims)
+         indices = numpy.ix_(*[idlst[i][isyms[i]] for i in range(self.rank)])
+         val[indices] = self.value[ioff:ioff+ndim].reshape(dims)
       debug = False
       if debug:
          norm0 = numpy.linalg.norm(val)
@@ -401,13 +401,13 @@ class qtensor:
    def toDenseDiag(self,idlst):
       val = numpy.zeros(self.shape[:-1]) 
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 dims  = self.dims_allowed[idx]
-	 ndim  = self.ndim_allowed[idx]
+         ioff  = self.ioff_allowed[idx]
+         dims  = self.dims_allowed[idx]
+         ndim  = self.ndim_allowed[idx]
          isyms = numpy.unravel_index(idx,self.nsyms)
-	 if isyms[-1] != isyms[-2]: continue
-	 indices = numpy.ix_(*[idlst[i][isyms[i]] for i in range(self.rank-1)])
-	 val[indices] = numpy.einsum('...ii->...i',self.value[ioff:ioff+ndim].reshape(dims))
+         if isyms[-1] != isyms[-2]: continue
+         indices = numpy.ix_(*[idlst[i][isyms[i]] for i in range(self.rank-1)])
+         val[indices] = numpy.einsum('...ii->...i',self.value[ioff:ioff+ndim].reshape(dims))
       return val
 
    # A brute-force way to make Hd from H in MPO representation
@@ -416,16 +416,16 @@ class qtensor:
       qt = qtensor(self.status)
       qt.fromQsyms(self.rank,self.qsyms,self.ndims,idlst=self.idlst)
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 ndim  = self.ndim_allowed[idx]         
-	 dims  = self.dims_allowed[idx]
-	 # find new position
-	 isyms = numpy.unravel_index(idx,self.nsyms)
-	 if isyms[-1] != isyms[-2]: continue
-	 tmp = self.value[ioff:ioff+ndim].reshape(dims)
-	 dim = dims[-1]
-	 tmp[...,~numpy.eye(dim,dtype=bool)] = 0.
-	 qt.value[ioff:ioff+ndim] = tmp.reshape(ndim)
+         ioff  = self.ioff_allowed[idx]
+         ndim  = self.ndim_allowed[idx]         
+         dims  = self.dims_allowed[idx]
+         # find new position
+         isyms = numpy.unravel_index(idx,self.nsyms)
+         if isyms[-1] != isyms[-2]: continue
+         tmp = self.value[ioff:ioff+ndim].reshape(dims)
+         dim = dims[-1]
+         tmp[...,~numpy.eye(dim,dtype=bool)] = 0.
+         qt.value[ioff:ioff+ndim] = tmp.reshape(ndim)
       return qt
 
    #
@@ -442,14 +442,14 @@ class qtensor:
    def prjmap(self,idlst):
       prjmap = []
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 dims  = self.dims_allowed[idx]
-	 ndim  = self.ndim_allowed[idx]
+         ioff  = self.ioff_allowed[idx]
+         dims  = self.dims_allowed[idx]
+         ndim  = self.ndim_allowed[idx]
          isyms = numpy.unravel_index(idx,self.nsyms)
-	 indices = [idlst[i][isyms[i]] for i in range(self.rank)]
-	 ntuple = qtensor_util.cartesian_prod(indices)
-	 idx = [numpy.ravel_multi_index(x,self.shape) for x in ntuple]
-	 prjmap += idx
+         indices = [idlst[i][isyms[i]] for i in range(self.rank)]
+         ntuple = qtensor_util.cartesian_prod(indices)
+         idx = [numpy.ravel_multi_index(x,self.shape) for x in ntuple]
+         prjmap += idx
       return numpy.array(prjmap)
 
    # Assuming continous groups, otherwise tranpose can be applied first!
@@ -473,19 +473,19 @@ class qtensor:
       status_new = []
       for ig in range(rank):
          ng = len(groups[ig])
-	 status = [self.status[i] for i in groups[ig]] 
+         status = [self.status[i] for i in groups[ig]] 
          assert numpy.array_equal(status,[status[0]]*ng)
-	 status_new.append(status[0])
-	 qsyms = [self.qsyms[i] for i in groups[ig]]
-	 ndims = [self.ndims[i] for i in groups[ig]]
+         status_new.append(status[0])
+         qsyms = [self.qsyms[i] for i in groups[ig]]
+         ndims = [self.ndims[i] for i in groups[ig]]
          #idlst = [self.idlst[i] for i in groups[ig]]
-	 shape = [self.shape[i] for i in groups[ig]] # global shape
-	 qsyms_prod = qtensor_util.cartesian_prod_qsyms(qsyms)
-	 ndims_prod = qtensor_util.cartesian_prod_nsyms(ndims)
-	 #idlst_prod = qtensor_util.cartesian_prod_idlst(idlst,shape)
-	 qsyms_new.append(qsyms_prod)
-	 ndims_new.append(ndims_prod)
-	 #idlst_new.append(idlst_prod)
+         shape = [self.shape[i] for i in groups[ig]] # global shape
+         qsyms_prod = qtensor_util.cartesian_prod_qsyms(qsyms)
+         ndims_prod = qtensor_util.cartesian_prod_nsyms(ndims)
+         #idlst_prod = qtensor_util.cartesian_prod_idlst(idlst,shape)
+         qsyms_new.append(qsyms_prod)
+         ndims_new.append(ndims_prod)
+         #idlst_new.append(idlst_prod)
       # create new object
       qt = qtensor(status_new)
       # direct construct block structures via qsyms,
@@ -507,18 +507,18 @@ class qtensor:
       qt = qtensor(status)
       qt.fromQsyms(rank,qsyms,ndims)
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 ndim  = self.ndim_allowed[idx]         
-	 dims  = self.dims_allowed[idx]
-	 # find new position
-	 isyms = numpy.unravel_index(idx,self.nsyms)
-	 isyms_new = tuple([isyms[i] for i in args])
-	 idx_new  = qt.iblks_allowed[isyms_new]-1
-	 ioff_new = qt.ioff_allowed[idx_new]
-	 ndim_new = qt.ndim_allowed[idx_new]
-	 assert ndim == ndim_new
-	 tmp = self.value[ioff:ioff+ndim].reshape(dims)
-	 qt.value[ioff_new:ioff_new+ndim] = tmp.transpose(*args).reshape(ndim)
+         ioff  = self.ioff_allowed[idx]
+         ndim  = self.ndim_allowed[idx]         
+         dims  = self.dims_allowed[idx]
+         # find new position
+         isyms = numpy.unravel_index(idx,self.nsyms)
+         isyms_new = tuple([isyms[i] for i in args])
+         idx_new  = qt.iblks_allowed[isyms_new]-1
+         ioff_new = qt.ioff_allowed[idx_new]
+         ndim_new = qt.ndim_allowed[idx_new]
+         assert ndim == ndim_new
+         tmp = self.value[ioff:ioff+ndim].reshape(dims)
+         qt.value[ioff_new:ioff_new+ndim] = tmp.transpose(*args).reshape(ndim)
       return qt
 
    # very similar to transpose: in fact, even isyms
@@ -531,15 +531,15 @@ class qtensor:
       qt.fromQsyms(self.rank,qsyms,self.ndims,idlst=self.idlst)
       # map the entries into new arrays
       for idx in self.idx_allowed:
-	 ioff  = self.ioff_allowed[idx]
-	 ndim  = self.ndim_allowed[idx]         
-	 # find new position
-	 isyms = numpy.unravel_index(idx,self.nsyms)
-	 idx_new  = qt.iblks_allowed[isyms]-1
-	 ioff_new = qt.ioff_allowed[idx_new]
-	 ndim_new = qt.ndim_allowed[idx_new]
-	 assert ndim == ndim_new
-	 qt.value[ioff_new:ioff_new+ndim] = self.value[ioff:ioff+ndim]
+         ioff  = self.ioff_allowed[idx]
+         ndim  = self.ndim_allowed[idx]         
+         # find new position
+         isyms = numpy.unravel_index(idx,self.nsyms)
+         idx_new  = qt.iblks_allowed[isyms]-1
+         ioff_new = qt.ioff_allowed[idx_new]
+         ndim_new = qt.ndim_allowed[idx_new]
+         assert ndim == ndim_new
+         qt.value[ioff_new:ioff_new+ndim] = self.value[ioff:ioff+ndim]
       return qt
 
    # "reverse" of reduceQsymsToN
@@ -548,15 +548,15 @@ class qtensor:
       qt.fromQsyms(self.rank,qsyms0,self.ndims)
       # extract the entries into new arrays
       for idx in qt.idx_allowed:
-	 ioff  = qt.ioff_allowed[idx]
-	 ndim  = qt.ndim_allowed[idx]         
-	 # find new position
-	 isyms = numpy.unravel_index(idx,qt.nsyms)
-	 idx_old = self.iblks_allowed[isyms]-1
-	 ioff_old = self.ioff_allowed[idx_old]
-	 ndim_old = self.ndim_allowed[idx_old]
-	 assert ndim == ndim_old
-	 qt.value[ioff:ioff+ndim] = self.value[ioff_old:ioff_old+ndim]
+         ioff  = qt.ioff_allowed[idx]
+         ndim  = qt.ndim_allowed[idx]         
+         # find new position
+         isyms = numpy.unravel_index(idx,qt.nsyms)
+         idx_old = self.iblks_allowed[isyms]-1
+         ioff_old = self.ioff_allowed[idx_old]
+         ndim_old = self.ndim_allowed[idx_old]
+         assert ndim == ndim_old
+         qt.value[ioff:ioff+ndim] = self.value[ioff_old:ioff_old+ndim]
       return qt
 
    #@profile
@@ -632,8 +632,8 @@ class qtensor:
             ioff2 = qt2.ioff_allowed[idx2]
             dims2 = qt2.dims_allowed[idx2]
             ndim2 = qt2.ndim_allowed[idx2]
-	    # clst: information for contraction
-	    self.clst.append([ioff,ioff1,ioff2,ndim,ndim1,ndim2,dims,dims1,dims2])
+            # clst: information for contraction
+            self.clst.append([ioff,ioff1,ioff2,ndim,ndim1,ndim2,dims,dims1,dims2])
       return len(self.idx_allowed)
 
 
@@ -644,18 +644,18 @@ class qtensor:
       for item in self.clst:
          ioff,ioff1,ioff2,ndim,ndim1,ndim2,dims,dims1,dims2 = item
          t1 = qt1.value[ioff1:ioff1+ndim1].reshape(dims1)
-	 t2 = qt2.value[ioff2:ioff2+ndim2].reshape(dims2)
-	 # Size should be sufficiently large 
-	 if ndim1 > tsize:
-	    amax1 = numpy.max(numpy.abs(t1))
-	    if amax1 < thresh: continue
-	 if ndim2 > tsize:
-	    amax2 = numpy.max(numpy.abs(t2))
-	    if amax2 < thresh: continue
+         t2 = qt2.value[ioff2:ioff2+ndim2].reshape(dims2)
+         # Size should be sufficiently large 
+         if ndim1 > tsize:
+            amax1 = numpy.max(numpy.abs(t1))
+            if amax1 < thresh: continue
+         if ndim2 > tsize:
+            amax2 = numpy.max(numpy.abs(t2))
+            if amax2 < thresh: continue
          # T1*T2
-	 if ifc1: t1 = t1.conj()
-	 if ifc2: t2 = t2.conj()
-	 self.value[ioff:ioff+ndim] += numpy.tensordot(t1,t2,self.axes).reshape(ndim)
+         if ifc1: t1 = t1.conj()
+         if ifc2: t2 = t2.conj()
+         self.value[ioff:ioff+ndim] += numpy.tensordot(t1,t2,self.axes).reshape(ndim)
       return 0 
 
 # 
@@ -746,9 +746,9 @@ def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
          t1 = qt1.value[ioff1:ioff1+ndim1].reshape(dims1)
          t2 = qt2.value[ioff2:ioff2+ndim2].reshape(dims2)
          # contract
-	 if ifc1: t1 = t1.conj() 
-	 if ifc2: t2 = t2.conj() 
- 	 qt += numpy.tensordot(t1,t2,axes)
+         if ifc1: t1 = t1.conj() 
+         if ifc2: t2 = t2.conj() 
+         qt += numpy.tensordot(t1,t2,axes)
    else:
       qt = qtensor(exts12)
       # Generation of final information
@@ -786,8 +786,8 @@ def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
             t1 = qt1.value[ioff1:ioff1+ndim1].reshape(dims1)
             t2 = qt2.value[ioff2:ioff2+ndim2].reshape(dims2)
             # direct product
-	    if ifc1: t1 = t1.conj() 
-	    if ifc2: t2 = t2.conj() 
+            if ifc1: t1 = t1.conj() 
+            if ifc2: t2 = t2.conj() 
             tmp12 = numpy.tensordot(t1,t2,axes)
             qt.value[ioff:ioff+ndim] = tmp12.reshape(ndim)
       #
@@ -818,8 +818,8 @@ def tensordot(qt1,qt2,ifc1=False,ifc2=False,axes=None):
                t1 = qt1.value[ioff1:ioff1+ndim1].reshape(dims1)
                t2 = qt2.value[ioff2:ioff2+ndim2].reshape(dims2)
                # contract
-	       if ifc1: t1 = t1.conj() 
-	       if ifc2: t2 = t2.conj() 
+               if ifc1: t1 = t1.conj() 
+               if ifc2: t2 = t2.conj() 
                tmp12 += numpy.tensordot(t1,t2,axes)
             # store
             qt.value[ioff:ioff+ndim] = tmp12.reshape(ndim)

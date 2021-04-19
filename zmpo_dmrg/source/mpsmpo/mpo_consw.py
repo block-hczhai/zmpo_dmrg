@@ -40,11 +40,11 @@ def sqC(sc,ic,iop):
       if iop == 1: 
          ops[ic] = jwtrans.cre
       elif iop == 0:
-	 ops[ic] = jwtrans.ann
+         ops[ic] = jwtrans.ann
       for i in range(ic):
          ops[i] = jwtrans.sgn
       for i in range(ic+1,nc):
-	 ops[i] = jwtrans.idn
+         ops[i] = jwtrans.idn
       tmp = reduce(numpy.kron,ops)
    return tmp
 
@@ -73,13 +73,13 @@ def l1r2(h1e,h2e,sl,sc,sr):
       op_p = sqC(sc,idxp,1)
       for idxr,orbr in enumerate(sc):
          op_r = sqC(sc,idxr,0)
-   	 for idxs,orbs in enumerate(sc):
+         for idxs,orbs in enumerate(sc):
             op_s = sqC(sc,idxs,0)
-	    # r < s
-	    if orbr < orbs:
-	       op = op_p.dot(op_r.dot(op_s))
-   	       for idxq,orbq in enumerate(sr):
-	          tmp[idxq] += h2e[orbp,orbq,orbr,orbs]*op
+            # r < s
+            if orbr < orbs:
+               op = op_p.dot(op_r.dot(op_s))
+               for idxq,orbq in enumerate(sr):
+                  tmp[idxq] += h2e[orbp,orbq,orbr,orbs]*op
    sgn = sgnC(sc)
    for idxq,orbq in enumerate(sr):
       tmp[idxq] = tmp[idxq].dot(sgn)
@@ -98,12 +98,12 @@ def l1r3(h1e,h2e,sl,sc,sr):
          tmp[idxq] += h1e[orbp,orbq]*op_p
       for idxq,orbq in enumerate(sc):
          op_q = sqC(sc,idxq,1)
-	 if orbp < orbq:
-   	    for idxr,orbr in enumerate(sc):
+         if orbp < orbq:
+            for idxr,orbr in enumerate(sc):
                op_r = sqC(sc,idxr,0)
-	       op = op_p.dot(op_q.dot(op_r))
-   	       for idxs,orbs in enumerate(sr):
-	          tmp[idxs] += h2e[orbp,orbq,orbr,orbs]*op
+               op = op_p.dot(op_q.dot(op_r))
+               for idxs,orbs in enumerate(sr):
+                  tmp[idxs] += h2e[orbp,orbq,orbr,orbs]*op
    sgn = sgnC(sc)
    for idxq,orbq in enumerate(sr):
       tmp[idxq] = tmp[idxq].dot(sgn)
@@ -122,14 +122,14 @@ def l1r4(h1e,h2e,sl,sc,sr):
       op_r = sqC(sc,idxr,0)
       for idxs,orbs in enumerate(sc):
          op_s = sqC(sc,idxs,0)
-	 if orbr < orbs:
-	    op = op_r.dot(op_s)
-	    ipq = 0
-   	    for idxp,orbp in enumerate(sr):
-   	       for idxq,orbq in enumerate(sr):
-	          if orbp < orbq:
-	             tmp[ipq] += h2e[orbp,orbq,orbr,orbs]*op
-	             ipq += 1
+         if orbr < orbs:
+            op = op_r.dot(op_s)
+            ipq = 0
+            for idxp,orbp in enumerate(sr):
+               for idxq,orbq in enumerate(sr):
+                  if orbp < orbq:
+                     tmp[ipq] += h2e[orbp,orbq,orbr,orbs]*op
+                     ipq += 1
    return tmp
 
 # w[1,5]=P^+
@@ -145,14 +145,14 @@ def l1r5(h1e,h2e,sl,sc,sr):
       op_r = sqC(sc,idxr,1)
       for idxs,orbs in enumerate(sc):
          op_s = sqC(sc,idxs,1)
-	 if orbr < orbs:
-	    op = op_r.dot(op_s)
-	    ipq = 0
-   	    for idxp,orbp in enumerate(sr):
-   	       for idxq,orbq in enumerate(sr):
-	          if orbp < orbq:
-	             tmp[ipq] += h2e[orbr,orbs,orbp,orbq]*op
-	   	     ipq += 1
+         if orbr < orbs:
+            op = op_r.dot(op_s)
+            ipq = 0
+            for idxp,orbp in enumerate(sr):
+               for idxq,orbq in enumerate(sr):
+                  if orbp < orbq:
+                     tmp[ipq] += h2e[orbr,orbs,orbp,orbq]*op
+                     ipq += 1
    return tmp
 
 # w[1,7]=-tilde{a}
@@ -176,7 +176,7 @@ def l1r11(h1e,h2e,sl,sc,sr):
    for idxr,orbr in enumerate(sc):
       for idxs,orbs in enumerate(sc):
          tmp[irs] = -numpy.dot(sqC(sc,idxr,1),sqC(sc,idxs,0))
-	 irs +=1
+         irs +=1
    return tmp
 
 # w[1,13]=tilde{a}^+
@@ -212,23 +212,23 @@ def l1r16(h1e,h2e,sl,sc,sr):
       op_p = sqC(sc,idxp,1)
       for idxq,orbq in enumerate(sc):
          op_q = sqC(sc,idxq,0)
-	 op = op_p.dot(op_q)	 
-	 tmp += h1e[orbp,orbq]*op
+         op = op_p.dot(op_q)     
+         tmp += h1e[orbp,orbq]*op
    # p^+q^+rs
    for idxp,orbp in enumerate(sc):
       op_p = sqC(sc,idxp,1)
       for idxq,orbq in enumerate(sc):
          op_q = sqC(sc,idxq,1)
-	 if orbp < orbq:
-	    op_pq = op_p.dot(op_q)	 
-   	    for idxr,orbr in enumerate(sc):
+         if orbp < orbq:
+            op_pq = op_p.dot(op_q)       
+            for idxr,orbr in enumerate(sc):
                op_r = sqC(sc,idxr,0)
-   	       for idxs,orbs in enumerate(sc):
-	          op_s = sqC(sc,idxs,0)
-		  if orbr < orbs:
-	 	     op_rs = op_r.dot(op_s)		  
-		     op = op_pq.dot(op_rs)
-	             tmp += h2e[orbp,orbq,orbr,orbs]*op
+               for idxs,orbs in enumerate(sc):
+                  op_s = sqC(sc,idxs,0)
+                  if orbr < orbs:
+                     op_rs = op_r.dot(op_s)               
+                     op = op_pq.dot(op_rs)
+                     tmp += h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 #----------------
@@ -300,9 +300,9 @@ def l6r16(h1e,h2e,sl,sc,sr):
    irs = 0
    for idxr,orbr in enumerate(sc):
       for idxs,orbs in enumerate(sc):
-	 if orbr < orbs:
+         if orbr < orbs:
             tmp[irs,0] = numpy.dot(sqC(sc,idxr,1),sqC(sc,idxs,1))
-	    irs +=1
+            irs +=1
    return tmp
 
 #-----------------------
@@ -354,9 +354,9 @@ def l9r16(h1e,h2e,sl,sc,sr):
    irs = 0
    for idxr,orbr in enumerate(sc):
       for idxs,orbs in enumerate(sc):
-	 if orbr < orbs:
+         if orbr < orbs:
             tmp[irs,0] = numpy.dot(sqC(sc,idxr,0),sqC(sc,idxs,0))
-	    irs +=1
+            irs +=1
    return tmp
 
 #-----------------------
@@ -436,7 +436,7 @@ def l13r2(h1e,h2e,sl,sc,sr):
       for idxp,orbp in enumerate(sl):
          for idxr,orbr in enumerate(sl):
             for idxq,orbq in enumerate(sr):
-	       tmp[idxp,idxr,idxq] += -h2e[orbp,orbq,orbr,orbs]*op
+               tmp[idxp,idxr,idxq] += -h2e[orbp,orbq,orbr,orbs]*op
    tmp = tmp.reshape((nl*nl,nr,2**nc,2**nc))
    return tmp
 
@@ -453,7 +453,7 @@ def l13r3(h1e,h2e,sl,sc,sr):
       for idxp,orbp in enumerate(sl):
          for idxr,orbr in enumerate(sl):
             for idxs,orbs in enumerate(sr):
-	       tmp[idxp,idxr,idxs] += h2e[orbp,orbq,orbr,orbs]*op
+               tmp[idxp,idxr,idxs] += h2e[orbp,orbq,orbr,orbs]*op
    tmp = tmp.reshape((nl*nl,nr,2**nc,2**nc))
    return tmp
 
@@ -483,10 +483,10 @@ def l13r16(h1e,h2e,sl,sc,sr):
       op_q = sqC(sc,idxq,1)
       for idxs,orbs in enumerate(sc):
          op_s = sqC(sc,idxs,0)
-	 op = op_q.dot(op_s)
-   	 for idxp,orbp in enumerate(sl):
-   	    for idxr,orbr in enumerate(sl):
-	       tmp[idxp,idxr,0] += h2e[orbp,orbq,orbr,orbs]*op
+         op = op_q.dot(op_s)
+         for idxp,orbp in enumerate(sl):
+            for idxr,orbr in enumerate(sl):
+               tmp[idxp,idxr,0] += h2e[orbp,orbq,orbr,orbs]*op
    tmp = tmp.reshape((nl*nl,1,2**nc,2**nc))
    return tmp
 
@@ -504,11 +504,11 @@ def l14r2(h1e,h2e,sl,sc,sr):
       op_r = sqC(sc,idxr,0)
       for idxs,orbs in enumerate(sc):
          op_s = sqC(sc,idxs,0)
-	 if orbr < orbs:
-	    op = op_r.dot(op_s.dot(sgn))
-   	    for idxp,orbp in enumerate(sl):
-   	       for idxq,orbq in enumerate(sr):
-	          tmp[idxp,idxq] += h2e[orbp,orbq,orbr,orbs]*op
+         if orbr < orbs:
+            op = op_r.dot(op_s.dot(sgn))
+            for idxp,orbp in enumerate(sl):
+               for idxq,orbq in enumerate(sr):
+                  tmp[idxp,idxq] += h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 # w[14,3]=v[pL,qC,rC,sR]*(ta_qC^+rC)
@@ -522,10 +522,10 @@ def l14r3(h1e,h2e,sl,sc,sr):
       op_q = sqC(sc,idxq,1)
       for idxr,orbr in enumerate(sc):
          op_r = sqC(sc,idxr,0)
-	 op = op_q.dot(op_r.dot(sgn))
+         op = op_q.dot(op_r.dot(sgn))
          for idxp,orbp in enumerate(sl):
             for idxs,orbs in enumerate(sr):
-	       tmp[idxp,idxs] += h2e[orbp,orbq,orbr,orbs]*op
+               tmp[idxp,idxs] += h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 # w[14,5]=v[pL,qC,rR,sR]*qC^+
@@ -540,12 +540,12 @@ def l14r5(h1e,h2e,sl,sc,sr):
    for idxq,orbq in enumerate(sc):
       op_q = sqC(sc,idxq,1)
       for idxp,orbp in enumerate(sl):
-	 irs = 0 
+         irs = 0 
          for idxr,orbr in enumerate(sr):
             for idxs,orbs in enumerate(sr):
-	       if orbr < orbs:
-	          tmp[idxp,irs] += h2e[orbp,orbq,orbr,orbs]*op_q
-		  irs += 1
+               if orbr < orbs:
+                  tmp[idxp,irs] += h2e[orbp,orbq,orbr,orbs]*op_q
+                  irs += 1
    return tmp
 
 # w[14,9]=-a_rC
@@ -561,7 +561,7 @@ def l14r9(h1e,h2e,sl,sc,sr):
    for idxr,orbr in enumerate(sc):
       op_r = sqC(sc,idxr,0)
       for idxp,orbp in enumerate(sl):
-	 tmp[idxp,idxp,idxr] = -op_r
+         tmp[idxp,idxp,idxr] = -op_r
    tmp = tmp.reshape((nl,nl*nc,2**nc,2**nc))
    return tmp
 
@@ -586,13 +586,13 @@ def l14r16(h1e,h2e,sl,sc,sr):
       op_q = sqC(sc,idxq,1)
       for idxr,orbr in enumerate(sc):
          op_r = sqC(sc,idxr,0)
-   	 for idxs,orbs in enumerate(sc):
+         for idxs,orbs in enumerate(sc):
             op_s = sqC(sc,idxs,0)
-	    # r < s
-	    if orbr < orbs:
-	       op = op_q.dot(op_r.dot(op_s))
-   	       for idxp,orbp in enumerate(sl):
-	          tmp[idxp,0] += h2e[orbp,orbq,orbr,orbs]*op
+            # r < s
+            if orbr < orbs:
+               op = op_q.dot(op_r.dot(op_s))
+               for idxp,orbp in enumerate(sl):
+                  tmp[idxp,0] += h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 #---------------------
@@ -609,10 +609,10 @@ def l15r2(h1e,h2e,sl,sc,sr):
       op_p = sqC(sc,idxp,1)
       for idxs,orbs in enumerate(sc):
          op_s = sqC(sc,idxs,0)
-	 op = op_p.dot(op_s.dot(sgn))
+         op = op_p.dot(op_s.dot(sgn))
          for idxr,orbr in enumerate(sl):
-   	    for idxq,orbq in enumerate(sr):
-	       tmp[idxr,idxq] += -h2e[orbp,orbq,orbr,orbs]*op
+            for idxq,orbq in enumerate(sr):
+               tmp[idxr,idxq] += -h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 # w[15,3]=v[pC,qC,rL,sR]*(ta_pC^+qC^+)
@@ -626,11 +626,11 @@ def l15r3(h1e,h2e,sl,sc,sr):
       op_q = sqC(sc,idxq,1)
       for idxp,orbp in enumerate(sc):
          op_p = sqC(sc,idxp,1)
- 	 if orbp < orbq:
-	    op = op_p.dot(op_q.dot(sgn))
+         if orbp < orbq:
+            op = op_p.dot(op_q.dot(sgn))
             for idxr,orbr in enumerate(sl):
                for idxs,orbs in enumerate(sr):
-	          tmp[idxr,idxs] += h2e[orbp,orbq,orbr,orbs]*op
+                  tmp[idxr,idxs] += h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 # w[15,4]=v[pR,qR,rL,sC]*sC
@@ -645,12 +645,12 @@ def l15r4(h1e,h2e,sl,sc,sr):
    for idxs,orbs in enumerate(sc):
       op_s = sqC(sc,idxs,0)
       for idxr,orbr in enumerate(sl):
-	 ipq = 0 
+         ipq = 0 
          for idxp,orbp in enumerate(sr):
             for idxq,orbq in enumerate(sr):
-	       if orbp < orbq:
-	          tmp[idxr,ipq] += h2e[orbp,orbq,orbr,orbs]*op_s
-		  ipq += 1
+               if orbp < orbq:
+                  tmp[idxr,ipq] += h2e[orbp,orbq,orbr,orbs]*op_s
+                  ipq += 1
    return tmp
 
 # w[15,10]=a^+_p 
@@ -666,7 +666,7 @@ def l15r10(h1e,h2e,sl,sc,sr):
    for idxp,orbp in enumerate(sc):
       op_p = sqC(sc,idxp,1)
       for idxr,orbr in enumerate(sl):
-	 tmp[idxr,idxp,idxr] = op_p
+         tmp[idxr,idxp,idxr] = op_p
    tmp = tmp.reshape((nl,nc*nl,2**nc,2**nc))
    return tmp
 
@@ -691,12 +691,12 @@ def l15r16(h1e,h2e,sl,sc,sr):
       op_p = sqC(sc,idxp,1)
       for idxq,orbq in enumerate(sc):
          op_q = sqC(sc,idxq,1)
-	 if orbp < orbq:
+         if orbp < orbq:
             for idxs,orbs in enumerate(sc):
                op_s = sqC(sc,idxs,0)
-	       op = op_p.dot(op_q.dot(op_s))
-	       for idxr,orbr in enumerate(sl):
-		  tmp[idxr,0] += h2e[orbp,orbq,orbr,orbs]*op
+               op = op_p.dot(op_q.dot(op_s))
+               for idxr,orbr in enumerate(sl):
+                  tmp[idxr,0] += h2e[orbp,orbq,orbr,orbs]*op
    return tmp
 
 #------------------

@@ -72,7 +72,7 @@ dmrg2.checkMPS(flmps0)
 dmrg2.checkMPS(flmps1)
 dmrg2.checkMPS(flmps0,flmps1)
 
-# <S2>	 
+# <S2>   
 if not ifs2proj:
    info=None
 else:

@@ -28,11 +28,11 @@ def vacuum(isym=1):
 # Spin-orbitals  
 def initSpinOrb(norb,isym=1):
    if isym == 0:
-      lst = None		
+      lst = None                
    elif isym == 1:
       lst = [[[0.],[1.]]]*norb
    elif isym == 2:
-      assert norb%2 == 0	   
+      assert norb%2 == 0           
       lst = [[[0.,0.],[1.,0.5]],[[0.,0.],[1.,-0.5]]]*(norb/2)
    else:
       print('error in mpo_dmrg_qphys.initSpinOrb: no such isym=',isym)
@@ -81,8 +81,8 @@ def merge(qphys,partition,debug=False):
       for j in range(1,npart):
          qnew = dpt(qnew,qphys[ipart[j]])
       if debug:
-	 print(' >>> ipart = ',ipart)
-	 print(' qnew = ',qnew)
+         print(' >>> ipart = ',ipart)
+         print(' qnew = ',qnew)
       qphys_new.append(qnew)
    return qphys_new
 

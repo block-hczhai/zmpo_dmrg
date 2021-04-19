@@ -24,9 +24,9 @@ class iface:
       self.nalpha = (mol.nelectron+mol.spin)/2
       self.nbeta  = (mol.nelectron-mol.spin)/2
       try: 
-	 self.nbas = mf.mo_coeff[0].shape[0]
+         self.nbas = mf.mo_coeff[0].shape[0]
       except:
-	 self.nbas = 0     
+         self.nbas = 0     
       self.mo_coeff = mf.mo_coeff
       self.lmo_coeff = None
       # frozen core
@@ -67,7 +67,7 @@ class iface:
       if self.ifreorder:
          order = fielder.orbitalOrdering(eri,'kij')
       else:
-	 order = list(range(mcoeffA.shape[1]))	    
+         order = list(range(mcoeffA.shape[1]))      
       # Sort
       mcoeffA = mcoeffA[:,numpy.array(order)].copy()
       fmo = fmo[numpy.ix_(order,order)].copy()
@@ -99,9 +99,9 @@ class iface:
       # Occupation
       occun = numpy.zeros(sbas)
       for i in range(self.nalpha-self.nfrozen):
-	 occun[2*i] = 1.0
+         occun[2*i] = 1.0
       for i in range(self.nbeta-self.nfrozen):
-	 occun[2*i+1] = 1.0
+         occun[2*i+1] = 1.0
       print()
       print('initial occun for',len(occun),' spin orbitals:\n',occun)
       sorder = numpy.array([[2*i,2*i+1] for i in order]).flatten()
@@ -122,7 +122,7 @@ class iface:
       return 0
 
    def check(self,fname='mole.h5'):
-      print('\n[iface.check]')	   
+      print('\n[iface.check]')     
       f2 = h5py.File(fname, "r")
       print("nelec=",f2['cal'].attrs['nelec'])
       print("sbas =",f2['cal'].attrs['sbas'])

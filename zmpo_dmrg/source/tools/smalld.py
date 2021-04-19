@@ -13,7 +13,7 @@ def value(j,mp,ms,beta0):
    # Inconsistent j,mp,ms values
    if abs(r1-r2)>thresh or abs(r2-r3)>thresh or abs(r1-r3)>thresh:
       return 0.0 
-   beta = float(beta0)	
+   beta = float(beta0)  
    f1 = scipy.special.gamma(j+mp+1)
    f2 = scipy.special.gamma(j-mp+1)
    f3 = scipy.special.gamma(j+ms+1)
@@ -25,9 +25,9 @@ def value(j,mp,ms,beta0):
    thresh = -0.1
    for s in numpy.arange(0.0,2*j+0.1):
       if j+ms-s>thresh and \
- 	 mp-ms+s>thresh and \
-	 j-mp-s>thresh:
-	 sgn = math.pow(-1.0,mp-ms+s)
+         mp-ms+s>thresh and \
+         j-mp-s>thresh:
+         sgn = math.pow(-1.0,mp-ms+s)
          a1 = 1.0/scipy.special.gamma(j+ms-s+1)
          a2 = 1.0/scipy.special.gamma(s+1)
          a3 = 1.0/scipy.special.gamma(mp-ms+s+1)
@@ -68,7 +68,7 @@ if __name__ == '__main__':
    print('\ntest-1 [half j]')
    for beta in betalst:
       print('d1/2,1/2,1/2=',math.cos(beta/2.0))
-      print('myval 	 =',value(s,mp,ms,beta))
+      print('myval       =',value(s,mp,ms,beta))
 
    s = 1.5
    mp = 1.5
@@ -77,9 +77,9 @@ if __name__ == '__main__':
    print('\ntest-2 [half j]')
    for beta in betalst:
       print('d3/2,3/2,1/2=',-math.sqrt(3)*(1+math.cos(beta))/2*math.sin(beta/2))
-      print('myval 	 =',value(s,mp,ms,beta))
+      print('myval       =',value(s,mp,ms,beta))
       print('d3/2,3/2,-1/2=',math.sqrt(3)*(1-math.cos(beta))/2*math.cos(beta/2))
-      print('myval 	 =',value(s,mp,-ms,beta))
+      print('myval       =',value(s,mp,-ms,beta))
       
    beta = 1.0   
    print()

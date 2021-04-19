@@ -18,7 +18,7 @@ def compact_rotL(flmps1,path,ifaux=False):
    try:
       shutil.rmtree(path)
    except:  
-      pass	   
+      pass         
    os.mkdir(path)
    # Start conversion
    nsite = flmps1['nsite'].value
@@ -39,11 +39,11 @@ def compact_rotL(flmps1,path,ifaux=False):
       for isite in range(naux):
          qnumISite = numpy.array([isite,isite*0.5,1,1])
          fp = numpy.memmap(path+'/quanta'+str(isite),dtype='float64',\
-      		     mode='write',order='C',shape=qnumISite.shape)
+                     mode='write',order='C',shape=qnumISite.shape)
          fp[:] = qnumISite[:]
          rotL1 = numpy.ones(1)
          fp = numpy.memmap(path+'/rotL'+str(isite),dtype='float64',\
-		           mode='write',order='C',shape=rotL1.shape)
+                           mode='write',order='C',shape=rotL1.shape)
          fp[:] = rotL1[:]
       ioff = naux
    else:
@@ -51,7 +51,7 @@ def compact_rotL(flmps1,path,ifaux=False):
 
    qnumISite = numpy.array([2*sval,sval,1,1])
    fp = numpy.memmap(path+'/quanta'+str(ioff),dtype='float64',\
-		     mode='write',order='C',shape=qnumISite.shape)
+                     mode='write',order='C',shape=qnumISite.shape)
    fp[:] = qnumISite[:]
    for isite in range(nsite):
       key0 = 'rotL'+str(isite)
@@ -63,19 +63,19 @@ def compact_rotL(flmps1,path,ifaux=False):
       qnumISite = []
       rotL1 = []
       for idx in range(qnum.shape[0]):
-	 n1 = qnum[idx][0]
-	 s1 = qnum[idx][1]
-	 key = str(qnum[idx][:2])
-	 d1,d2 = rdic[key].shape
-	 qnumISite.append([n1,s1,d1,d2])
-	 rotL1.append(rdic[key].reshape(d1*d2))
+         n1 = qnum[idx][0]
+         s1 = qnum[idx][1]
+         key = str(qnum[idx][:2])
+         d1,d2 = rdic[key].shape
+         qnumISite.append([n1,s1,d1,d2])
+         rotL1.append(rdic[key].reshape(d1*d2))
       qnumISite = numpy.array(qnumISite)
       fp = numpy.memmap(path+'/quanta'+str(ioff+isite+1),dtype='float64',\
-		        mode='write',order='C',shape=qnumISite.shape)
+                        mode='write',order='C',shape=qnumISite.shape)
       fp[:] = qnumISite[:]
       rotL1 = numpy.hstack(rotL1)
       fp = numpy.memmap(path+'/rotL'+str(ioff+isite),dtype='float64',\
-		        mode='write',order='C',shape=rotL1.shape)
+                        mode='write',order='C',shape=rotL1.shape)
       fp[:] = rotL1[:]
    return 0
 
@@ -102,26 +102,26 @@ def merged_rotL(rotL,qr1,qr2,qr3,debug=False):
          smax = s1+s2
          ns = int(smax-smin)+1
          for ij in range(ns):
-    	    i12 += 1		 
-      	    sij = smin+ij
-   	    dg12 = int(2*sij+1); dr12 = dr1*dr2
-   	    or12 = off_red12[i12]
-   	    # Locate (n1+n2,sij) sectors in the reduced dimensions
-   	    key = str(numpy.array([n1+n2,sij]))
-   	    if key not in dic: continue
-   	    i3 = dic[key]
+            i12 += 1             
+            sij = smin+ij
+            dg12 = int(2*sij+1); dr12 = dr1*dr2
+            or12 = off_red12[i12]
+            # Locate (n1+n2,sij) sectors in the reduced dimensions
+            key = str(numpy.array([n1+n2,sij]))
+            if key not in dic: continue
+            i3 = dic[key]
             q3 = qr3[i3]
             n3,s3,d3 = q3
-   	    dg3 = int(2*s3+1); dr3 = int(d3)
-   	    or3 = off_red3[i3]
-   	    # Reshaping the reduced-dense tensor <SaNaSbNb||ScNc>
-   	    tmp = rotL[or12:or12+dr12,or3:or3+dr3].copy()
-	    if debug: print('(Sa,Sb,Sc),(na,nb,nc)=',(s1,s2,s3),(dr1,dr2,dr3))
-	    # Only block diagonal
-	    if key not in tensorDic:
-	       tensorDic[key] = [tmp]
-	    else:
-	       tensorDic[key].append(tmp)
+            dg3 = int(2*s3+1); dr3 = int(d3)
+            or3 = off_red3[i3]
+            # Reshaping the reduced-dense tensor <SaNaSbNb||ScNc>
+            tmp = rotL[or12:or12+dr12,or3:or3+dr3].copy()
+            if debug: print('(Sa,Sb,Sc),(na,nb,nc)=',(s1,s2,s3),(dr1,dr2,dr3))
+            # Only block diagonal
+            if key not in tensorDic:
+               tensorDic[key] = [tmp]
+            else:
+               tensorDic[key].append(tmp)
    rdic = {}
    fnorm2b = 0.
    idx = 0

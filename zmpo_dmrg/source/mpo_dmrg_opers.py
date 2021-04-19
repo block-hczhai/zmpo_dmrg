@@ -104,7 +104,7 @@ def genWfacSpin(nsite,isite,hq,vqrs):
       rindx = 0
       for rsite in range(isite+1,nsite):
          wop[0,off+rindx] = vqrs[isite,isite,rsite]*mpo_dmrg_const.niit
-	 rindx += 1
+         rindx += 1
       # blk[0,4]
       off = 1+2*dimr+diml
       wop[0,off] = -mpo_dmrg_const.ann
@@ -123,7 +123,7 @@ def genWfacSpin(nsite,isite,hq,vqrs):
       # blk[3,0]
       for jsite in range(isite):
          wop[3+jsite,0] = vqrs[isite,jsite,isite]*mpo_dmrg_const.nii
-      # blk[5,0]	 
+      # blk[5,0]         
       wop[ndim1-1,0] = mpo_dmrg_const.idn
    else:
       # ROW-1:
@@ -134,7 +134,7 @@ def genWfacSpin(nsite,isite,hq,vqrs):
       rindx = 0
       for rsite in range(isite+1,nsite):
          wop[0,off+rindx] = vqrs[isite,isite,rsite]*mpo_dmrg_const.niit
-	 rindx += 1
+         rindx += 1
       # blk[0,4]
       off = 1+2*dimr+diml
       wop[0,off] = -mpo_dmrg_const.ann
@@ -148,8 +148,8 @@ def genWfacSpin(nsite,isite,hq,vqrs):
       # ROW-3:
       rindx = 0
       for rsite in range(isite+1,nsite):
-	 wop[2+rindx,1+rindx] = mpo_dmrg_const.idnt
-	 rindx += 1
+         wop[2+rindx,1+rindx] = mpo_dmrg_const.idnt
+         rindx += 1
       # ROW-4:
       offl = 2+dimr
       wop[offl,ndim2-1] = mpo_dmrg_const.ann
@@ -159,23 +159,23 @@ def genWfacSpin(nsite,isite,hq,vqrs):
       rindx = 0
       for rsite in range(isite+1,nsite):
          wop[offl+rindx,offr+rindx] = mpo_dmrg_const.idnt
-	 rindx += 1
+         rindx += 1
       # ROW-6:
       offl = 3+2*dimr
       for lsite in range(isite):
         rindx = 0
         for rsite in range(isite+1,nsite):
-	   wop[offl+lsite,1+rindx] = -vqrs[rsite,lsite,isite]*mpo_dmrg_const.annt
-	   rindx += 1
+           wop[offl+lsite,1+rindx] = -vqrs[rsite,lsite,isite]*mpo_dmrg_const.annt
+           rindx += 1
       offr = 1+dimr
       for lsite in range(isite):
         rindx = 0
         for rsite in range(isite+1,nsite):
-	   wop[offl+lsite,offr+rindx] = vqrs[isite,lsite,rsite]*mpo_dmrg_const.cret
-	   rindx += 1
+           wop[offl+lsite,offr+rindx] = vqrs[isite,lsite,rsite]*mpo_dmrg_const.cret
+           rindx += 1
       offr = 1+2*dimr
       for lsite in range(isite):
-	  wop[offl+lsite,offr+lsite] = mpo_dmrg_const.idn
+          wop[offl+lsite,offr+lsite] = mpo_dmrg_const.idn
       for lsite in range(isite):
           wop[offl+lsite,ndim2-1] = vqrs[isite,lsite,isite]*mpo_dmrg_const.nii
       # ROW-7:
@@ -183,12 +183,12 @@ def genWfacSpin(nsite,isite,hq,vqrs):
       offr = 1+dimr
       for lsite in range(isite):
         rindx = 0
-	for rsite in range(isite+1,nsite):
-	   wop[offl+lsite,offr+rindx] = vqrs[lsite,isite,rsite]*mpo_dmrg_const.annt
-	   rindx += 1
+        for rsite in range(isite+1,nsite):
+           wop[offl+lsite,offr+rindx] = vqrs[lsite,isite,rsite]*mpo_dmrg_const.annt
+           rindx += 1
       offr = 2+2*dimr+diml
       for lsite in range(isite):
-	  wop[offl+lsite,offr+lsite] = mpo_dmrg_const.idn
+          wop[offl+lsite,offr+lsite] = mpo_dmrg_const.idn
       # ROW-8: 
       wop[ndim1-1,ndim2-1] = mpo_dmrg_const.idn
    return wop
@@ -199,7 +199,7 @@ def genHfacSpin(p,nsite,isite,hq,vqrs):
    elem = genElemSpinMat(p,isite)
    #hfac = numpy.einsum('ij,abjk->abik',elem,wfac)
    hfac = numpy.tensordot(wfac,elem,axes=([2],[1])) # abjk,ij-> abki
-   hfac = hfac.transpose(0,1,3,2).copy() 	    # abki->abik
+   hfac = hfac.transpose(0,1,3,2).copy()            # abki->abik
    return hfac
 
 ########################

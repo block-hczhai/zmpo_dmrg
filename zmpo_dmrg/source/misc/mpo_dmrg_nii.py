@@ -55,7 +55,7 @@ def diagNQt(dmrg,fbmps,fname,debug=False):
       # * L   *m    * R
       #  \    |    /
       #   a---*---b
-      #	
+      # 
       tmp = numpy.einsum('mn,lnr->lmr',npmat,bsite)
       tmp = numpy.einsum('Ll,lmr->Lmr',tmpl,tmp)
       tmp = numpy.einsum('lmr,rR->lmR',tmp,tmpr)

@@ -32,7 +32,7 @@ def ao2mo(mf, mo_coeff, erifile):
                 logger.debug(mf, 'load %s %d', intor, i0)
                 buf = feri[dst][i0:i1]
                 # Add the contribution from 'tmp' to erifile
-		buf += feri['tmp'][i0:i1]
+                buf += feri['tmp'][i0:i1]
                 feri[dst][i0:i1] = buf
                 buf = None
 

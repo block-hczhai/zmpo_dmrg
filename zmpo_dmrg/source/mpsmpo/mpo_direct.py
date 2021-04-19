@@ -2,8 +2,8 @@
 # Direct construciton of MPO for H and T via W factors in SPIN-ORBITAL
 #
 # Examples: current limitation is about 60spinorbs = 30Hatoms 
-#	    MEMORY BOUND - O(K^5) scaling
-# 	    W[k] needs to be dumped into disk.
+#           MEMORY BOUND - O(K^5) scaling
+#           W[k] needs to be dumped into disk.
 #
 import time
 import copy
@@ -93,7 +93,7 @@ def genTablesWdims(tabdim,debug=False):
    #
    # W[a1]*W[a1]
    # W[a1]*W[a1,a2]*W[a2]
-   # W[a1]*W[a1,a2]*W[a2,a3]*W[a3]	
+   # W[a1]*W[a1,a2]*W[a2,a3]*W[a3]      
    #
    ngroups = len(tabdim)
    wdims = []
@@ -196,135 +196,135 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
       a1 = [0]+list(itools.accumulate(dims1l)) 
       a2 = [0]+list(itools.accumulate(dims2l))
       if debug: 
-	 print()
-	 print('igroup=',igroup,diml,dimr)
+         print()
+         print('igroup=',igroup,diml,dimr)
          print(' wfacs[i]=',wtmp.shape)
          print(' sl,sc,sr=',sl,sc,sr)
          print(' lg,cg,rg=',(lg,cg,rg))
          print(' dims1l = ',len(dims1l),dims1l)
          print(' dims2l = ',len(dims2l),dims2l)
-	 print(' accum1 = ',len(a1),a1)
-	 print(' accum2 = ',len(a2),a2)
+         print(' accum1 = ',len(a1),a1)
+         print(' accum2 = ',len(a2),a2)
       if igroup == 0:
-	 # row-1: match last index for a1,a2
-	 identity = mpo_consw.l1r1(h1e,h2e,sl,sc,sr)
-	 wtmp[0:1,a2[0]:a2[1]] = identity.copy() 
-	 wtmp[0:1,a2[1]:a2[2]] = mpo_consw.l1r2(h1e,h2e,sl,sc,sr) 
-	 wtmp[0:1,a2[2]:a2[3]] = mpo_consw.l1r3(h1e,h2e,sl,sc,sr)
-	 if a2[3]<a2[4]:
-	    wtmp[0:1,a2[3]:a2[4]] = mpo_consw.l1r4(h1e,h2e,sl,sc,sr)
-	 if a2[4]<a2[5]:
+         # row-1: match last index for a1,a2
+         identity = mpo_consw.l1r1(h1e,h2e,sl,sc,sr)
+         wtmp[0:1,a2[0]:a2[1]] = identity.copy() 
+         wtmp[0:1,a2[1]:a2[2]] = mpo_consw.l1r2(h1e,h2e,sl,sc,sr) 
+         wtmp[0:1,a2[2]:a2[3]] = mpo_consw.l1r3(h1e,h2e,sl,sc,sr)
+         if a2[3]<a2[4]:
+            wtmp[0:1,a2[3]:a2[4]] = mpo_consw.l1r4(h1e,h2e,sl,sc,sr)
+         if a2[4]<a2[5]:
             wtmp[0:1,a2[4]:a2[5]] = mpo_consw.l1r5(h1e,h2e,sl,sc,sr)
          wtmp[0:1,a2[6]:a2[7]] = mpo_consw.l1r7(h1e,h2e,sl,sc,sr)
-	 wtmp[0:1,a2[10]:a2[11]] = mpo_consw.l1r11(h1e,h2e,sl,sc,sr) # Qterm
-	 wtmp[0:1,a2[12]:a2[13]] = mpo_consw.l1r13(h1e,h2e,sl,sc,sr)
+         wtmp[0:1,a2[10]:a2[11]] = mpo_consw.l1r11(h1e,h2e,sl,sc,sr) # Qterm
+         wtmp[0:1,a2[12]:a2[13]] = mpo_consw.l1r13(h1e,h2e,sl,sc,sr)
          wtmp[0:1,a2[14]:a2[15]] = mpo_consw.l1r15(h1e,h2e,sl,sc,sr)
          wtmp[0:1,a2[15]:a2[16]] = mpo_consw.l1r16(h1e,h2e,sl,sc,sr) \
-			 	 - e0*identity
+                                 - e0*identity
          #----------------------------------------------
-	 # Reordering of Qterm
-	 ijdx = sortQlc(lg,cg)+a2[7]
-	 assert len(ijdx)==a2[11]-a2[7]
-	 wtmp[:,a2[7]:a2[11]] = wtmp[:,ijdx].copy()
+         # Reordering of Qterm
+         ijdx = sortQlc(lg,cg)+a2[7]
+         assert len(ijdx)==a2[11]-a2[7]
+         wtmp[:,a2[7]:a2[11]] = wtmp[:,ijdx].copy()
          #----------------------------------------------
       elif igroup == ngroups-1:
          # col-1
-	 wtmp[a1[0]:a1[1]  ,0:1] = mpo_consw.l1r16(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[1]:a1[2]  ,0:1] = mpo_consw.l2r16(h1e,h2e,sl,sc,sr)
+         wtmp[a1[0]:a1[1]  ,0:1] = mpo_consw.l1r16(h1e,h2e,sl,sc,sr)
+         wtmp[a1[1]:a1[2]  ,0:1] = mpo_consw.l2r16(h1e,h2e,sl,sc,sr)
          wtmp[a1[3]:a1[4]  ,0:1] = mpo_consw.l4r16(h1e,h2e,sl,sc,sr)
          if a1[5] < a1[6]: 
-	    wtmp[a1[5]:a1[6],0:1] = mpo_consw.l6r16(h1e,h2e,sl,sc,sr)
-	 if a1[8] < a1[9]:
-	    wtmp[a1[8]:a1[9],0:1] = mpo_consw.l9r16(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[11]:a1[12],0:1] = mpo_consw.l12r16(h1e,h2e,sl,sc,sr)
+            wtmp[a1[5]:a1[6],0:1] = mpo_consw.l6r16(h1e,h2e,sl,sc,sr)
+         if a1[8] < a1[9]:
+            wtmp[a1[8]:a1[9],0:1] = mpo_consw.l9r16(h1e,h2e,sl,sc,sr)
+         wtmp[a1[11]:a1[12],0:1] = mpo_consw.l12r16(h1e,h2e,sl,sc,sr)
          wtmp[a1[12]:a1[13],0:1] = mpo_consw.l13r16(h1e,h2e,sl,sc,sr)
          wtmp[a1[13]:a1[14],0:1] = mpo_consw.l14r16(h1e,h2e,sl,sc,sr)
          wtmp[a1[14]:a1[15],0:1] = mpo_consw.l15r16(h1e,h2e,sl,sc,sr)
          wtmp[a1[15]:a1[16],0:1] = mpo_consw.l16r16(h1e,h2e,sl,sc,sr)
          #----------------------------------------------
-	 # Reordering of Pterm
-	 ijdx = sortPcr(cg,rg)
-	 assert len(ijdx)==a1[8]-a1[5]
-	 wtmp[a1[5]:a1[8],:] = wtmp[ijdx+a1[5],:].copy()
-	 assert len(ijdx)==a1[11]-a1[8]
-	 wtmp[a1[8]:a1[11],:] = wtmp[ijdx+a1[8],:].copy()
+         # Reordering of Pterm
+         ijdx = sortPcr(cg,rg)
+         assert len(ijdx)==a1[8]-a1[5]
+         wtmp[a1[5]:a1[8],:] = wtmp[ijdx+a1[5],:].copy()
+         assert len(ijdx)==a1[11]-a1[8]
+         wtmp[a1[8]:a1[11],:] = wtmp[ijdx+a1[8],:].copy()
          #----------------------------------------------
       else:
-	 # row-1 => H 
-	 wtmp[a1[0]:a1[1],a2[0]:a2[1]] = mpo_consw.l1r1(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[0]:a1[1],a2[1]:a2[2]] = mpo_consw.l1r2(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[0]:a1[1],a2[2]:a2[3]] = mpo_consw.l1r3(h1e,h2e,sl,sc,sr)
-	 if a2[3]<a2[4]:
-	    wtmp[a1[0]:a1[1],a2[3]:a2[4]] = mpo_consw.l1r4(h1e,h2e,sl,sc,sr)
-	 if a2[4]<a2[5]:
+         # row-1 => H 
+         wtmp[a1[0]:a1[1],a2[0]:a2[1]] = mpo_consw.l1r1(h1e,h2e,sl,sc,sr)
+         wtmp[a1[0]:a1[1],a2[1]:a2[2]] = mpo_consw.l1r2(h1e,h2e,sl,sc,sr)
+         wtmp[a1[0]:a1[1],a2[2]:a2[3]] = mpo_consw.l1r3(h1e,h2e,sl,sc,sr)
+         if a2[3]<a2[4]:
+            wtmp[a1[0]:a1[1],a2[3]:a2[4]] = mpo_consw.l1r4(h1e,h2e,sl,sc,sr)
+         if a2[4]<a2[5]:
             wtmp[a1[0]:a1[1],a2[4]:a2[5]] = mpo_consw.l1r5(h1e,h2e,sl,sc,sr)
          wtmp[a1[0]:a1[1],a2[6]:a2[7]] = mpo_consw.l1r7(h1e,h2e,sl,sc,sr)
          wtmp[a1[0]:a1[1],a2[10]:a2[11]] = mpo_consw.l1r11(h1e,h2e,sl,sc,sr)
          wtmp[a1[0]:a1[1],a2[12]:a2[13]] = mpo_consw.l1r13(h1e,h2e,sl,sc,sr)
          wtmp[a1[0]:a1[1],a2[14]:a2[15]] = mpo_consw.l1r15(h1e,h2e,sl,sc,sr)
          wtmp[a1[0]:a1[1],a2[15]:a2[16]] = mpo_consw.l1r16(h1e,h2e,sl,sc,sr)
-	 # row-2 => a+[i]
-	 wtmp[a1[1]:a1[2],a2[15]:a2[16]] = mpo_consw.l2r16(h1e,h2e,sl,sc,sr)
-	 # row-3 => a+[i+1,K]
-	 wtmp[a1[2]:a1[3],a2[1]:a2[2]] = mpo_consw.l3r2(h1e,h2e,sl,sc,sr)
-	 # row-4 => a[i]
-	 wtmp[a1[3]:a1[4],a2[15]:a2[16]] = mpo_consw.l4r16(h1e,h2e,sl,sc,sr)
-	 # row-5 => a[i+1,K]
-	 wtmp[a1[4]:a1[5],a2[2]:a2[3]] = mpo_consw.l5r3(h1e,h2e,sl,sc,sr)
-	 # row-6 => A+[i][i]
-	 if a1[5] < a1[6]: 
-	    wtmp[a1[5]:a1[6],a2[15]:a2[16]] = mpo_consw.l6r16(h1e,h2e,sl,sc,sr)
-	 # row-7 => A+[i][i+1,K]
-	 wtmp[a1[6]:a1[7],a2[1]:a2[2]] = mpo_consw.l7r2(h1e,h2e,sl,sc,sr)
-	 # row-8 => A+[i+1,K][i+1,K]
-	 if a1[7] < a1[8]:
-	    wtmp[a1[7]:a1[8],a2[3]:a2[4]] = mpo_consw.l8r4(h1e,h2e,sl,sc,sr)
-	 # row-9 => A[i][i]
-	 if a1[8] < a1[9]:
-	    wtmp[a1[8]:a1[9],a2[15]:a2[16]] = mpo_consw.l9r16(h1e,h2e,sl,sc,sr)
-	 # row-10 => A[i][i+1,K]
-	 wtmp[a1[9]:a1[10],a2[2]:a2[3]] = mpo_consw.l10r3(h1e,h2e,sl,sc,sr)
-	 # row-11 => A[i+1,K]A[i+1,K]
-	 if a1[10]<a1[11]:
-	    wtmp[a1[10]:a1[11],a2[4]:a2[5]] = mpo_consw.l11r5(h1e,h2e,sl,sc,sr)
-	 # row-12 => S[1,i-1]
-	 wtmp[a1[11]:a1[12],a2[5]:a2[6]] = mpo_consw.l12r6(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[11]:a1[12],a2[15]:a2[16]] = mpo_consw.l12r16(h1e,h2e,sl,sc,sr)
-	 # row-13 => Q[1,i-1][1,i-1]
-	 wtmp[a1[12]:a1[13],a2[1]:a2[2]] = mpo_consw.l13r2(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[12]:a1[13],a2[2]:a2[3]] = mpo_consw.l13r3(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[12]:a1[13],a2[7]:a2[8]] = mpo_consw.l13r8(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[12]:a1[13],a2[15]:a2[16]] = mpo_consw.l13r16(h1e,h2e,sl,sc,sr)
-	 # row-14 => T1[1,i-1]
-	 wtmp[a1[13]:a1[14],a2[1]:a2[2]] = mpo_consw.l14r2(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[13]:a1[14],a2[2]:a2[3]] = mpo_consw.l14r3(h1e,h2e,sl,sc,sr)
-	 if a2[4]<a2[5]:
-	    wtmp[a1[13]:a1[14],a2[4]:a2[5]] = mpo_consw.l14r5(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[13]:a1[14],a2[8]:a2[9]] = mpo_consw.l14r9(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[13]:a1[14],a2[11]:a2[12]] = mpo_consw.l14r12(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[13]:a1[14],a2[15]:a2[16]] = mpo_consw.l14r16(h1e,h2e,sl,sc,sr)
-	 # row-15 => T3[1,i-1]
-	 wtmp[a1[14]:a1[15],a2[1]:a2[2]] = mpo_consw.l15r2(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[14]:a1[15],a2[2]:a2[3]] = mpo_consw.l15r3(h1e,h2e,sl,sc,sr)
-	 if a2[3]<a2[4]:
-	    wtmp[a1[14]:a1[15],a2[3]:a2[4]] = mpo_consw.l15r4(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[14]:a1[15],a2[9]:a2[10]] = mpo_consw.l15r10(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[14]:a1[15],a2[13]:a2[14]] = mpo_consw.l15r14(h1e,h2e,sl,sc,sr)
-	 wtmp[a1[14]:a1[15],a2[15]:a2[16]] = mpo_consw.l15r16(h1e,h2e,sl,sc,sr)
-	 # row-16 => I[i,K]
-	 wtmp[a1[15]:a1[16],a2[15]:a2[16]] = mpo_consw.l16r16(h1e,h2e,sl,sc,sr)
+         # row-2 => a+[i]
+         wtmp[a1[1]:a1[2],a2[15]:a2[16]] = mpo_consw.l2r16(h1e,h2e,sl,sc,sr)
+         # row-3 => a+[i+1,K]
+         wtmp[a1[2]:a1[3],a2[1]:a2[2]] = mpo_consw.l3r2(h1e,h2e,sl,sc,sr)
+         # row-4 => a[i]
+         wtmp[a1[3]:a1[4],a2[15]:a2[16]] = mpo_consw.l4r16(h1e,h2e,sl,sc,sr)
+         # row-5 => a[i+1,K]
+         wtmp[a1[4]:a1[5],a2[2]:a2[3]] = mpo_consw.l5r3(h1e,h2e,sl,sc,sr)
+         # row-6 => A+[i][i]
+         if a1[5] < a1[6]: 
+            wtmp[a1[5]:a1[6],a2[15]:a2[16]] = mpo_consw.l6r16(h1e,h2e,sl,sc,sr)
+         # row-7 => A+[i][i+1,K]
+         wtmp[a1[6]:a1[7],a2[1]:a2[2]] = mpo_consw.l7r2(h1e,h2e,sl,sc,sr)
+         # row-8 => A+[i+1,K][i+1,K]
+         if a1[7] < a1[8]:
+            wtmp[a1[7]:a1[8],a2[3]:a2[4]] = mpo_consw.l8r4(h1e,h2e,sl,sc,sr)
+         # row-9 => A[i][i]
+         if a1[8] < a1[9]:
+            wtmp[a1[8]:a1[9],a2[15]:a2[16]] = mpo_consw.l9r16(h1e,h2e,sl,sc,sr)
+         # row-10 => A[i][i+1,K]
+         wtmp[a1[9]:a1[10],a2[2]:a2[3]] = mpo_consw.l10r3(h1e,h2e,sl,sc,sr)
+         # row-11 => A[i+1,K]A[i+1,K]
+         if a1[10]<a1[11]:
+            wtmp[a1[10]:a1[11],a2[4]:a2[5]] = mpo_consw.l11r5(h1e,h2e,sl,sc,sr)
+         # row-12 => S[1,i-1]
+         wtmp[a1[11]:a1[12],a2[5]:a2[6]] = mpo_consw.l12r6(h1e,h2e,sl,sc,sr)
+         wtmp[a1[11]:a1[12],a2[15]:a2[16]] = mpo_consw.l12r16(h1e,h2e,sl,sc,sr)
+         # row-13 => Q[1,i-1][1,i-1]
+         wtmp[a1[12]:a1[13],a2[1]:a2[2]] = mpo_consw.l13r2(h1e,h2e,sl,sc,sr)
+         wtmp[a1[12]:a1[13],a2[2]:a2[3]] = mpo_consw.l13r3(h1e,h2e,sl,sc,sr)
+         wtmp[a1[12]:a1[13],a2[7]:a2[8]] = mpo_consw.l13r8(h1e,h2e,sl,sc,sr)
+         wtmp[a1[12]:a1[13],a2[15]:a2[16]] = mpo_consw.l13r16(h1e,h2e,sl,sc,sr)
+         # row-14 => T1[1,i-1]
+         wtmp[a1[13]:a1[14],a2[1]:a2[2]] = mpo_consw.l14r2(h1e,h2e,sl,sc,sr)
+         wtmp[a1[13]:a1[14],a2[2]:a2[3]] = mpo_consw.l14r3(h1e,h2e,sl,sc,sr)
+         if a2[4]<a2[5]:
+            wtmp[a1[13]:a1[14],a2[4]:a2[5]] = mpo_consw.l14r5(h1e,h2e,sl,sc,sr)
+         wtmp[a1[13]:a1[14],a2[8]:a2[9]] = mpo_consw.l14r9(h1e,h2e,sl,sc,sr)
+         wtmp[a1[13]:a1[14],a2[11]:a2[12]] = mpo_consw.l14r12(h1e,h2e,sl,sc,sr)
+         wtmp[a1[13]:a1[14],a2[15]:a2[16]] = mpo_consw.l14r16(h1e,h2e,sl,sc,sr)
+         # row-15 => T3[1,i-1]
+         wtmp[a1[14]:a1[15],a2[1]:a2[2]] = mpo_consw.l15r2(h1e,h2e,sl,sc,sr)
+         wtmp[a1[14]:a1[15],a2[2]:a2[3]] = mpo_consw.l15r3(h1e,h2e,sl,sc,sr)
+         if a2[3]<a2[4]:
+            wtmp[a1[14]:a1[15],a2[3]:a2[4]] = mpo_consw.l15r4(h1e,h2e,sl,sc,sr)
+         wtmp[a1[14]:a1[15],a2[9]:a2[10]] = mpo_consw.l15r10(h1e,h2e,sl,sc,sr)
+         wtmp[a1[14]:a1[15],a2[13]:a2[14]] = mpo_consw.l15r14(h1e,h2e,sl,sc,sr)
+         wtmp[a1[14]:a1[15],a2[15]:a2[16]] = mpo_consw.l15r16(h1e,h2e,sl,sc,sr)
+         # row-16 => I[i,K]
+         wtmp[a1[15]:a1[16],a2[15]:a2[16]] = mpo_consw.l16r16(h1e,h2e,sl,sc,sr)
          #----------------------------------------------
-	 # Reordering of Qterm
-	 ijdx = sortQlc(lg,cg)+a2[7]
-	 assert len(ijdx)==a2[11]-a2[7]
-	 wtmp[:,a2[7]:a2[11]] = wtmp[:,ijdx].copy()
+         # Reordering of Qterm
+         ijdx = sortQlc(lg,cg)+a2[7]
+         assert len(ijdx)==a2[11]-a2[7]
+         wtmp[:,a2[7]:a2[11]] = wtmp[:,ijdx].copy()
          #----------------------------------------------
-	 # Reordering of Pterm
-	 ijdx = sortPcr(cg,rg)
-	 assert len(ijdx)==a1[8]-a1[5]
-	 wtmp[a1[5]:a1[8],:] = wtmp[ijdx+a1[5],:].copy()
-	 assert len(ijdx)==a1[11]-a1[8]
-	 wtmp[a1[8]:a1[11],:] = wtmp[ijdx+a1[8],:].copy()
+         # Reordering of Pterm
+         ijdx = sortPcr(cg,rg)
+         assert len(ijdx)==a1[8]-a1[5]
+         wtmp[a1[5]:a1[8],:] = wtmp[ijdx+a1[5],:].copy()
+         assert len(ijdx)==a1[11]-a1[8]
+         wtmp[a1[8]:a1[11],:] = wtmp[ijdx+a1[8],:].copy()
          #----------------------------------------------
       # Store
       wfacs[igroup] = wtmp.copy()
@@ -343,31 +343,31 @@ def directHmpo(h1e,h2e,e0,partition=None,debug=False,iprt=0,isym=0):
          qtmp[a2[11]:a2[13]] = [ [+1] ]*(a2[13]-a2[11])
          qtmp[a2[13]:a2[15]] = [ [-1] ]*(a2[15]-a2[13])
          qtmp[a2[15]:a2[16]] = [ [0]  ]*(a2[16]-a2[15])
-	 if igroup == ngroups-1:
-	    qnums[igroup] = [[0]]
- 	 else:
+         if igroup == ngroups-1:
+            qnums[igroup] = [[0]]
+         else:
             qnums[igroup] = copy.deepcopy(qtmp)
       elif isym == 2:
-	 # Only works for spin-orbital case
-	 assert k == ngroups
-	 if igroup%2 == 0:
-	    sz = 0.5
-	 else:
-	    sz = -0.5
+         # Only works for spin-orbital case
+         assert k == ngroups
+         if igroup%2 == 0:
+            sz = 0.5
+         else:
+            sz = -0.5
          qtmp[a2[0] :a2[1]]  = [ [0,0]     ]*(a2[1] -a2[0] )
          qtmp[a2[1] :a2[2]]  = [ [-1,-sz]  ]*(a2[2] -a2[1] ) # T2
          qtmp[a2[2] :a2[3]]  = [ [+1,sz]   ]*(a2[3] -a2[2] ) # S+T4
-	 qtmp[a2[3] :a2[4]]  = [ [-2,-2*sz]]*(a2[4] -a2[3] ) # P2ann: In fact, they will 
-	 qtmp[a2[4] :a2[5]]  = [ [+2,2*sz] ]*(a2[5] -a2[4] ) # P2cre: not exisit at all.
+         qtmp[a2[3] :a2[4]]  = [ [-2,-2*sz]]*(a2[4] -a2[3] ) # P2ann: In fact, they will 
+         qtmp[a2[4] :a2[5]]  = [ [+2,2*sz] ]*(a2[5] -a2[4] ) # P2cre: not exisit at all.
          qtmp[a2[5] :a2[7]]  = [ [-1,-sz]  ]*(a2[7] -a2[5] )
-         qtmp[a2[7] :a2[11]] = [ [0,0]     ]*(a2[11]-a2[7] )	
+         qtmp[a2[7] :a2[11]] = [ [0,0]     ]*(a2[11]-a2[7] )    
          qtmp[a2[11]:a2[13]] = [ [+1,sz]   ]*(a2[13]-a2[11])
          qtmp[a2[13]:a2[15]] = [ [-1,-sz]  ]*(a2[15]-a2[13])
          qtmp[a2[15]:a2[16]] = [ [0,0]     ]*(a2[16]-a2[15])
-	 if igroup == ngroups-1:
-	    qnums[igroup] = [[0,0]]
- 	 else:
-	    qnums[igroup] = copy.deepcopy(qtmp)
+         if igroup == ngroups-1:
+            qnums[igroup] = [[0,0]]
+         else:
+            qnums[igroup] = copy.deepcopy(qtmp)
       #----------------------------------------------
    # Finally, form MPO   
    if iprt>0: print(' wdims=',wdims)
@@ -500,7 +500,7 @@ def linearH(hmpo,xfac=1.0):
    #
    # site-(1,N-2):
    #
-   #	[ I  tC   tD ]
+   #    [ I  tC   tD ]
    #    [ 0   A    B ]
    #    [ 0   0    I ]
    #
@@ -598,7 +598,7 @@ def testTwoSiteW():
    m16r=mpo_consw.l16r16(h1e,h2e,sl2,sc2,sr2)
 
    t = [0]*8
-   t[0] = numpy.kron(m1l,m1r)	# I[0]*H[1]
+   t[0] = numpy.kron(m1l,m1r)   # I[0]*H[1]
    t[1] = numpy.kron(m16l,m16r) # H[0]*I[1]
    t[2] = numpy.kron(m2l.reshape(2,2),m2r.reshape(2,2))   # T2*a1+
    t[3] = numpy.kron(m3l.reshape(2,2),m4r.reshape(2,2))   # (S+T4)*a1

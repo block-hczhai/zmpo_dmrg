@@ -7,11 +7,11 @@
 # Subroutines:
 #
 # def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
-# 		       debug=False,ifcompress=True,ifBlockSingletEmbedding=True):
+#                      debug=False,ifcompress=True,ifBlockSingletEmbedding=True):
 # def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
-#			    ifBlockSingletEmbedding=False):
+#                           ifBlockSingletEmbedding=False):
 # def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
-#			     ifBlockSingletEmbedding=False):
+#                            ifBlockSingletEmbedding=False):
 # 
 import os
 import h5py
@@ -38,15 +38,15 @@ from . import util_spinsym
 # * Note that no quantum number information of lmps0 is used at all!
 #
 def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
-		     debug=False,ifcompress=True,\
-		     ifBlockSingletEmbedding=True,\
-		     ifBlockSymScreen=True,\
-		     ifpermute=False):
+                     debug=False,ifcompress=True,\
+                     ifBlockSingletEmbedding=True,\
+                     ifBlockSymScreen=True,\
+                     ifpermute=False):
    nsite = flmps0['nsite'].value
    # This is the only qnum information used.
    ne,ms = flmps0['qnum'+str(nsite)].value[0]
    print('\n[mpo_dmrg_samps.sweep_projection] ifQt=',ifQt,\
-	 ' (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval))
+         ' (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval))
    assert not ifQt
    # Left projection 
    if not ifcompress:
@@ -59,7 +59,7 @@ def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
       if not ifBlockSingletEmbedding: assert not ifBlockSymScreen
       # In case of singlet embedding: the wts should be 1/(2s+1) (e.g, 0.332 for s=1)
       wt3 = left_sweep_projection(flmpsR,flmps1,[nsite,ne,ms,sval],thresh,Dcut,debug,\
-		      	          ifBlockSingletEmbedding,ifBlockSymScreen,ifpermute)
+                                  ifBlockSingletEmbedding,ifBlockSymScreen,ifpermute)
       flmpsL.close()
       flmpsR.close()
       os.system('rm ./lmpsL_tmp')
@@ -70,12 +70,12 @@ def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
 
 # ---> 
 def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
-			  ifBlockSingletEmbedding=False,\
-			  ifBlockSymScreen=False,\
-			  ifpermute=False):
+                          ifBlockSingletEmbedding=False,\
+                          ifBlockSymScreen=False,\
+                          ifpermute=False):
    nsite,ne,ms,sval = qtarget
    print('\n[mpo_dmrg_samps.left_sweep_projection] (nsite,ne,ms,sval)=',(nsite,ne,ms,sval),\
-         'ifBlockSE=',ifBlockSingletEmbedding)	   
+         'ifBlockSE=',ifBlockSingletEmbedding)     
    flmps1['nsite'] = nsite
    # Reduced qnums - the basis states are ordered to maximize the efficiency.
    qnumsN = numpy.array([[0.,0.,1.],[1.,0.5,1.],[2.,0.,1.]])
@@ -115,8 +115,8 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       # Transform to combined basis
       if ifpermute and ifBlockSingletEmbedding and isite==0:
          wA0 = wA0.transpose(1,0,2)
-	 sgn = numpy.array([1.,(-1.0)**(int(2*sval)),(-1.0)**(int(2*sval)),1.])
-	 wA0 = numpy.einsum('n,nvr->nvr',sgn,wA0)
+         sgn = numpy.array([1.,(-1.0)**(int(2*sval)),(-1.0)**(int(2*sval)),1.])
+         wA0 = numpy.einsum('n,nvr->nvr',sgn,wA0)
          qnumsL,wA1 = util_tensor.spinCouple(wA0,qnumsN,qnums1[isite])
       else:
          qnumsL,wA1 = util_tensor.spinCouple(wA0,qnums1[isite],qnumsN)
@@ -133,25 +133,25 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
          dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_blkdiag(qrdmL,classes,thresh,Dcut,debug)
       
       #
-      #        |	(0) w[i-1] = <l[i-1]|m[i-1]>: expansion coeff of |l(NM)> to |m(NSM)>
+      #        |        (0) w[i-1] = <l[i-1]|m[i-1]>: expansion coeff of |l(NM)> to |m(NSM)>
       #  |-----|------| (1) update formula for w[i]
-      #	 |     L      | (2) L[i] - isometry 
+      #  |     L      | (2) L[i] - isometry 
       #  |     |      | (3) L[i]*t[CG] - new site A[i]
       #  |   t[CG]    |
-      #  |    / \     |	   |
+      #  |    / \     |    |
       #  |   w---A[i]---A[i+1]---
       #  |------------|
       #
 
       # Screen
       qnumsl,rotL = util_spinsym.symScreen(isite,nsite,rotL,qred,sigs,ne_eff,sval_eff,debug,\
-		      			   ifBlockSymScreen=ifBlockSymScreen)
+                                           ifBlockSymScreen=ifBlockSymScreen)
       if ifpermute and ifBlockSingletEmbedding and isite==0:
          # A[lnr]
          site1 = util_tensor.expandRotL(rotL,qnumsN,qnums1[isite],qnumsL,qnumsl) 
          # srotR = rotL^\dagger * wA
          srotR = numpy.tensordot(site1,wA0,axes=([0,1],[0,1])) # LNR,LNr->Rr
-	 site1 = site1.transpose(1,0,2)
+         site1 = site1.transpose(1,0,2)
       else:
          # A[lnr]
          site1 = util_tensor.expandRotL(rotL,qnums1[isite],qnumsN,qnumsL,qnumsl) 
@@ -160,8 +160,8 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 
       # Print: 
       print(' ---> isite=',isite,'site0=',site0.shape,'rotL=',rotL.shape,\
-	 	                 'site1=',site1.shape) #,'srotR=',srotR.shape
-      print() 		 
+                                 'site1=',site1.shape) #,'srotR=',srotR.shape
+      print()            
       # Check left canonical form
       if debug:
          tmp = numpy.tensordot(site1,site1,axes=([0,1],[0,1])) # lna,lnb->ab
@@ -173,38 +173,38 @@ def left_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       # Save
       if isite < nsite-1:
          wmat = srotR.copy() 
-	 qnums1[isite+1] = qnumsl.copy()
+         qnums1[isite+1] = qnumsl.copy()
          flmps1.create_dataset('rotL'+str(isite),data=rotL ,compression='lzf')
          flmps1.create_dataset('site'+str(isite),data=site1,compression='lzf')
       else:
          # Special treatment for the last site by invoking symmetry selection!
-	 info,qnumsl,rotL,site1,wt = util_tensor.lastSite(rotL,site1,srotR,qnumsl,ne_eff,ms_eff,sval_eff)
-	 if info:
-	    qnums1[nsite] = qnumsl.copy()
+         info,qnumsl,rotL,site1,wt = util_tensor.lastSite(rotL,site1,srotR,qnumsl,ne_eff,ms_eff,sval_eff)
+         if info:
+            qnums1[nsite] = qnumsl.copy()
             flmps1.create_dataset('rotL'+str(isite),data=rotL ,compression='lzf')
             flmps1.create_dataset('site'+str(isite),data=site1,compression='lzf')
 
    # Dump on flmps1
    if info:
       print('\nfinalize left_sweep ...')
-      qnumsm = [None]*(nsite+1)	 
+      qnumsm = [None]*(nsite+1)  
       for isite in range(nsite):
-	 qnumsm[isite] = util_spinsym.expandSM(qnums1[isite])
+         qnumsm[isite] = util_spinsym.expandSM(qnums1[isite])
       # Left case
       qnumsm[nsite] = numpy.array([[ne,ms]])
       # DUMP qnums
       for isite in range(nsite+1):
-	 flmps1['qnum'+str(isite)] = qnumsm[isite]
-	 flmps1['qnumNS'+str(isite)] = qnums1[isite]
+         flmps1['qnum'+str(isite)] = qnumsm[isite]
+         flmps1['qnumNS'+str(isite)] = qnums1[isite]
       # Check
       for isite in range(nsite+1):
          dimr = util_spinsym.dim_red(qnums1[isite]) 
-	 print(' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite]))
+         print(' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite]))
    return wt
 
 # <--- 
 def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
-			   ifBlockSingletEmbedding=False):
+                           ifBlockSingletEmbedding=False):
    nsite,ne,ms,sval = qtarget
    print('\n[mpo_dmrg_samps.right_sweep_projection] (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval))
    flmps1['nsite'] = nsite
@@ -237,12 +237,12 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       dwts,qred,rotL,sigs = mpo_dmrg_qparser.rdm_blkdiag(qrdmL,classes,thresh,Dcut,debug) 
       
       #
-      #        |	(0) w[i-1] = <l[i-1]|m[i-1]>: expansion coeff of |l(NM)> to |m(NSM)>
+      #        |        (0) w[i-1] = <l[i-1]|m[i-1]>: expansion coeff of |l(NM)> to |m(NSM)>
       #  |-----|------| (1) update formula for w[i]
-      #	 |     L      | (2) L[i] - isometry 
+      #  |     L      | (2) L[i] - isometry 
       #  |     |      | (3) L[i]*t[CG] - new site A[i]
       #  |   t[CG]    |
-      #  |    / \     |	   |
+      #  |    / \     |    |
       #  |   w---A[i]---A[i+1]---
       #  |------------|
       #
@@ -256,8 +256,8 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
 
       # Print: 
       print(' ---> isite=',isite,'site0=',site0.shape,'rotL=',rotL.shape,\
-	 	                 'site1=',site1.shape) #,'srotR=',srotR.shape
-      print() 		 
+                                 'site1=',site1.shape) #,'srotR=',srotR.shape
+      print()            
       # Check left canonical form
       if debug:
          tmp = numpy.tensordot(site1,site1,axes=([0,1],[0,1])) # lna,lnb->ab
@@ -269,21 +269,21 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
       # Save
       if isite > 0:
          wmat = srotR.copy() 
-	 qnums1[isite] = qnumsl.copy()
+         qnums1[isite] = qnumsl.copy()
          flmps1.create_dataset('rotL'+str(isite),data=rotL ,compression='lzf')
          # *** Change the direction back [Right canonical form]
          site1 = numpy.einsum('rnl->lnr',site1)
          flmps1.create_dataset('site'+str(isite),data=site1,compression='lzf')
       else:
-	 # In case of singlet embedding, the in bond of the first site
-	 # is expanded in the subroutine expandRotL in the left sweep for nonsinglet state.
-	 if ifBlockSingletEmbedding and abs(sval)>1.e-10:
-	    im = int(ms+sval)
-	    srotR = srotR[:,im].reshape(srotR.shape[0],1)
+         # In case of singlet embedding, the in bond of the first site
+         # is expanded in the subroutine expandRotL in the left sweep for nonsinglet state.
+         if ifBlockSingletEmbedding and abs(sval)>1.e-10:
+            im = int(ms+sval)
+            srotR = srotR[:,im].reshape(srotR.shape[0],1)
          # Special treatment for the last site by invoking symmetry selection!
-	 info,qnumsl,rotL,site1,wt = util_tensor.lastSite(rotL,site1,srotR,qnumsl,ne,ms,sval)
-	 if info:
-	    qnums1[0] = qnumsl.copy()
+         info,qnumsl,rotL,site1,wt = util_tensor.lastSite(rotL,site1,srotR,qnumsl,ne,ms,sval)
+         if info:
+            qnums1[0] = qnumsl.copy()
             flmps1.create_dataset('rotL'+str(isite),data=rotL ,compression='lzf')
             site1 = numpy.einsum('rnl->lnr',site1)
             flmps1.create_dataset('site'+str(isite),data=site1,compression='lzf')
@@ -291,17 +291,17 @@ def right_sweep_projection(flmps0,flmps1,qtarget,thresh,Dcut,debug,\
    # Dump on flmps1
    if info:
       print('\nfinalize right_sweep ...')
-      qnumsm = [None]*(nsite+1)	 
+      qnumsm = [None]*(nsite+1)  
       for isite in range(1,nsite+1):
-	 qnumsm[isite] = util_spinsym.expandSM(qnums1[isite])
+         qnumsm[isite] = util_spinsym.expandSM(qnums1[isite])
       # Right case
       qnumsm[0] = numpy.array([[ne,ms]])
       # DUMP qnums
       for isite in range(nsite+1):
-	 flmps1['qnum'+str(isite)] = qnumsm[isite]
-	 flmps1['qnumNS'+str(isite)] = qnums1[isite]
+         flmps1['qnum'+str(isite)] = qnumsm[isite]
+         flmps1['qnumNS'+str(isite)] = qnums1[isite]
       # Check
       for isite in range(nsite+1):
          dimr = util_spinsym.dim_red(qnums1[isite]) 
-	 print(' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite]))
+         print(' ibond/dim(NS)/dim(NSM)=',isite,dimr,len(qnumsm[isite]))
    return wt

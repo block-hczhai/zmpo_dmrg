@@ -75,7 +75,7 @@ def eval_P2(dmrg,flmps0,flmps1,spinfo,debug=False):
    if debug: print('<P>=',denorm)
    return denorm,xts,wts
 
-# <S2>	 
+# <S2>   
 def eval_S2Global(dmrg,flmps,fname='top',spinfo=None):
    print('\n[mpo_dmrg_propsItrf.eval_S2Global]')
    t0 = time.time()
@@ -127,7 +127,7 @@ def eval_Local(dmrg,flmps,groups,key,fname='top',spinfo=None):
          fop = mpo_dmrg_propsMPO.genMPO_Local(nsite,ig,key,fname,dmrg.ifQt)
          exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
          fop.close()
-	 expect[idx] = exphop[0]
+         expect[idx] = exphop[0]
    else:
       denorm,xts,wts = eval_P(dmrg,flmps,spinfo)
       for idx,ig in enumerate(groups):
@@ -149,17 +149,17 @@ def eval_Local2(dmrg,flmps,groups,ikey,jkey,fname='top',spinfo=None):
    if not dmrg.ifs2proj:
       for idx,ig in enumerate(groups):
          for jdx,jg in enumerate(groups):
-	    if idx > jdx: continue
+            if idx > jdx: continue
             fop = mpo_dmrg_propsMPO.genMPO_Local2(nsite,ig,jg,ikey,jkey,1.0,fname,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
-	    expect[idx,jdx] = exphop[0]
+            expect[idx,jdx] = exphop[0]
             expect[jdx,idx] = expect[idx,jdx]
    else:
       denorm,xts,wts = eval_P(dmrg,flmps,spinfo)
       for idx,ig in enumerate(groups):
          for jdx,jg in enumerate(groups):
-	    if idx > jdx: continue
+            if idx > jdx: continue
             fop = mpo_dmrg_propsMPORpt.genMPO_Local2Rpt(nsite,ig,jg,ikey,jkey,1.0,fname,xts,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
@@ -179,7 +179,7 @@ def eval_SiSj(dmrg,flmps,groups,fname='top',spinfo=None):
    if not dmrg.ifs2proj:
       for idx,ig in enumerate(groups):
          for jdx,jg in enumerate(groups):
-	    if idx > jdx: continue
+            if idx > jdx: continue
             fop = mpo_dmrg_propsMPO.genMPO_SiSj(nsite,ig,jg,fname,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
@@ -190,7 +190,7 @@ def eval_SiSj(dmrg,flmps,groups,fname='top',spinfo=None):
       denorm,xts,wts = eval_P(dmrg,flmps,spinfo)
       for idx,ig in enumerate(groups):
          for jdx,jg in enumerate(groups):
-	    if idx > jdx: continue
+            if idx > jdx: continue
             fop = mpo_dmrg_propsMPORpt.genMPO_SiSjRpt(nsite,ig,jg,fname,xts,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
@@ -209,7 +209,7 @@ def eval_rdm1BF(dmrg,flmps,fname='top',spinfo=None):
       rdm1 = numpy.zeros((nsite,nsite,2),dtype=dmrg_dtype)
       for p in range(nsite):
          for q in range(nsite):
-	    if p > q: continue	 
+            if p > q: continue   
             fop = mpo_dmrg_propsMPO.genMPO_Epq(nsite,p,q,fname,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
@@ -225,7 +225,7 @@ def eval_rdm1BF(dmrg,flmps,fname='top',spinfo=None):
       rdm1t = numpy.zeros((nsite,nsite),dtype=dmrg_dtype)
       for p in range(nsite):
          for q in range(nsite):
-	    if p > q: continue	 
+            if p > q: continue   
             fop = mpo_dmrg_propsMPORpt.genMPO_EpqRpt(nsite,p,q,fname,xts,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
@@ -238,13 +238,13 @@ def eval_rdm1BF(dmrg,flmps,fname='top',spinfo=None):
       rdm1s = numpy.zeros((nsite,nsite),dtype=dmrg_dtype)
       for p in range(nsite):
          for q in range(nsite):
-	    if p > q: continue	 
-   	    # We use the same quadrature point		 
+            if p > q: continue   
+            # We use the same quadrature point           
             fop = mpo_dmrg_propsMPORpt.genMPO_TpqRpt(nsite,p,q,fname,xts,dmrg.ifQt)
             exphop = mpo_dmrg_props.evalProps(dmrg,flmps,flmps,fop,status='L')
             fop.close()
             # Summarize results with different weights - wts,wts1
-	    term1 = numpy.sum(wts*(exphop[:npts]-exphop[npts:2*npts]))/math.sqrt(2)
+            term1 = numpy.sum(wts*(exphop[:npts]-exphop[npts:2*npts]))/math.sqrt(2)
             term2 = numpy.sum(wts1*exphop[2*npts:])
             term1 = term1*sval/(sval+1.0)
             term2 = term2*math.sqrt(sval)/(sval+1.0)

@@ -93,8 +93,8 @@ if __name__ == '__main__':
    print(list(permutations([p1,p2,p3,p4],4)))
 
    for i in combinations([1],1):
-      print(i)	  
+      print(i)    
 
    print(len(list(combinations(list(range(6)),4))))
    for i in combinations(list(range(6)),4):
-      print(i)	   
+      print(i)     

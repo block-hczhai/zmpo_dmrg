@@ -54,7 +54,7 @@ dmrg2.loadInts(mol)
 dmrg2.dumpMPO()
 dmrg2.checkMPS(flmps1)
 
-# <S2>	 
+# <S2>   
 if not ifs2proj:
    info=None
 else:

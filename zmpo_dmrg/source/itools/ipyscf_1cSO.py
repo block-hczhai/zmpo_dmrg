@@ -20,9 +20,9 @@ class iface:
       self.nalpha = (mol.nelectron+mol.spin)/2
       self.nbeta  = (mol.nelectron-mol.spin)/2
       try: 
-	 self.nbas = mf.mo_coeff[0].shape[0]
+         self.nbas = mf.mo_coeff[0].shape[0]
       except:
-	 self.nbas = 0     
+         self.nbas = 0     
       self.mo_coeff = mf.mo_coeff
       self.lmo_coeff = None
       # frozen core
@@ -30,18 +30,18 @@ class iface:
       self.ncut = 0
 
    def fci(self,nelecs=None):
-      print('\n[iface.fci]')	   
+      print('\n[iface.fci]')       
       from pyscf import mcscf,fci
       ehf = self.mf.energy_tot(self.mf.make_rdm1())
       if nelecs is None:
          na = (self.mol.nelectron + self.mol.spin)/2
          nb = (self.mol.nelectron - self.mol.spin)/2
       else:
-         na,nb = nelecs	 
+         na,nb = nelecs  
       if na == nb:
          fcisol = fci.FCI(self.mol,self.mo_coeff)
       else:
-	 fcisol = fci.FCI(self.mol,self.mo_coeff,singlet=False)
+         fcisol = fci.FCI(self.mol,self.mo_coeff,singlet=False)
       #fcisol.nroots = 10
       fcisol.max_cycle = 300
       fcisol.max_space = 300
@@ -60,53 +60,53 @@ class iface:
       return efci
 
    def ccsd(self):
-      print('\n[iface.ccsd]')	   
+      print('\n[iface.ccsd]')      
       from pyscf import cc
       pcc=cc.ccsd.CC(self.mf)
       pcc.ccsd()
       return 0
        
    def lowdin(self):    
-      print('\n[iface.lowdin]')	   
+      print('\n[iface.lowdin]')    
       s1e = self.mf.get_ovlp()
       self.lmo_coeff = lowdin(s1e)
       return 0
 
    def local(self):
-      print('\n[iface.local]')	   
+      print('\n[iface.local]')     
       if self.iflowdin:
-	 self.lowdin() 
+         self.lowdin() 
       else:
-	 print('Assuming closed-shell case, do split localization using PMloc')
- 	 from pyscf.future.lo import pmloc
-	 if self.nalpha == self.nbeta:
+         print('Assuming closed-shell case, do split localization using PMloc')
+         from pyscf.future.lo import pmloc
+         if self.nalpha == self.nbeta:
             print('Closed-Virtual Separation: RHF orbitals')
-	    cOrbs = self.mo_coeff[:,self.nfrozen:self.nelec/2]
+            cOrbs = self.mo_coeff[:,self.nfrozen:self.nelec/2]
             vOrbs = self.mo_coeff[:,self.nelec/2:]
             ierr,uc = pmloc.loc(self.mol,cOrbs)
             ierr,uv = pmloc.loc(self.mol,vOrbs)
-	    clmo = numpy.dot(cOrbs,uc)
-	    vlmo = numpy.dot(vOrbs,uv)
+            clmo = numpy.dot(cOrbs,uc)
+            vlmo = numpy.dot(vOrbs,uv)
             lcoeff = numpy.hstack((clmo,vlmo))
          else:
             print('Closed-Open-Virtual Separation: ROHF orbitals')
-	    cOrbs = self.mo_coeff[:,self.nfrozen:self.nbeta]
-	    oOrbs = self.mo_coeff[:,self.nbeta:self.nalpha]
+            cOrbs = self.mo_coeff[:,self.nfrozen:self.nbeta]
+            oOrbs = self.mo_coeff[:,self.nbeta:self.nalpha]
             vOrbs = self.mo_coeff[:,self.nalpha:]
             ierr,uc = pmloc.loc(self.mol,cOrbs)
             ierr,uo = pmloc.loc(self.mol,oOrbs)
             ierr,uv = pmloc.loc(self.mol,vOrbs)
-	    clmo = numpy.dot(cOrbs,uc)
-	    olmo = numpy.dot(oOrbs,uo)
-	    vlmo = numpy.dot(vOrbs,uv)
+            clmo = numpy.dot(cOrbs,uc)
+            olmo = numpy.dot(oOrbs,uo)
+            vlmo = numpy.dot(vOrbs,uv)
             lcoeff = numpy.hstack((clmo,olmo,vlmo))
-	 # Check
+         # Check
          nbas = lcoeff.shape[1]
          ova = self.mol.intor_symmetric("cint1e_ovlp_sph")
-	 diff = reduce(numpy.dot,(lcoeff.T,ova,lcoeff))\
-	      - numpy.identity(nbas)
-	 print('\nCheck orthnormality: diff(CtSC-I)=',numpy.linalg.norm(diff))
-	 self.lmo_coeff = lcoeff.copy()
+         diff = reduce(numpy.dot,(lcoeff.T,ova,lcoeff))\
+              - numpy.identity(nbas)
+         print('\nCheck orthnormality: diff(CtSC-I)=',numpy.linalg.norm(diff))
+         self.lmo_coeff = lcoeff.copy()
       return 0
 
    def molden(self,mo_coeff,fname='mocoeff'):
@@ -115,10 +115,10 @@ class iface:
       with open(fname+'.molden','w') as thefile:
          molden.header(self.mol,thefile)
          molden.orbital_coeff(self.mol,thefile,mo_coeff,symm=['A']*mo_coeff.shape[1])
-      return 0 	 
+      return 0   
 
    def reorder(self,mo_coeff):
-      print('\n[iface.reorder]')	   
+      print('\n[iface.reorder]')           
       from pyscf import ao2mo
       c = mo_coeff
       k = c.shape[1]
@@ -153,16 +153,16 @@ class iface:
       flter = 'lzf'
       # Local or CMO 
       if self.iflocal:
-	 self.local()
-	 mo_coeff = self.lmo_coeff.copy()
+         self.local()
+         mo_coeff = self.lmo_coeff.copy()
       else:
-	 print('canonical or user defined mo')
-	 mo_coeff = self.mo_coeff[:,self.nfrozen:].copy()
+         print('canonical or user defined mo')
+         mo_coeff = self.mo_coeff[:,self.nfrozen:].copy()
       # Reorder
       if self.ifreorder:
          order = list(self.reorder(mo_coeff))
       else:
-	 order = list(range(mo_coeff.shape[1]))	    
+         order = list(range(mo_coeff.shape[1]))     
       mo_coeff = mo_coeff[:,numpy.array(order)].copy()
       self.molden(mo_coeff,fname='mocoeff')
       # Dump MO coefficients
@@ -170,9 +170,9 @@ class iface:
       # Occupation
       occun = numpy.zeros(sbas)
       for i in range(self.nalpha-self.nfrozen):
-	 occun[2*i] = 1.0
+         occun[2*i] = 1.0
       for i in range(self.nbeta-self.nfrozen):
-	 occun[2*i+1] = 1.0
+         occun[2*i+1] = 1.0
       print()
       print('initial occun for',len(occun),' spin orbitals:\n',occun)
       sorder = numpy.array([[2*i,2*i+1] for i in order]).flatten()
@@ -229,7 +229,7 @@ class iface:
       nr[:sfrozen] = 1.0 
       # Ecore = hcc + 1/2*<pq||pq>npnq
       ecore = numpy.einsum('pp,p',hmo,nr)\
-	    - numpy.einsum('pqpq,p,q',eri,nr,nr)
+            - numpy.einsum('pqpq,p,q',eri,nr,nr)
       print('E[core]=',ecore)
       cal.attrs["ecor"]  = ecore
       fpq = hmo - 2.0*numpy.einsum('prqr,r->pq',eri,nr)
@@ -254,25 +254,25 @@ class iface:
       # Construct hSO 
       hSO = numpy.zeros((sbas,sbas),dtype=numpy.complex_) # alpha,beta-ordering
       for iatom in range(self.mol.natm):
-	 zA  = self.mol.atom_charge(iatom)
-	 xyz = self.mol.atom_coord(iatom)
-	 self.mol.set_rinv_orig(xyz)
+         zA  = self.mol.atom_charge(iatom)
+         xyz = self.mol.atom_coord(iatom)
+         self.mol.set_rinv_orig(xyz)
          soxyz = zA*self.mol.intor('cint1e_prinvxp_sph', 3)
-	 # transform to MO
-	 for ic in range(3):
+         # transform to MO
+         for ic in range(3):
             soxyz[ic] = reduce(numpy.dot,(gmo_coeff.T.conj(),soxyz[ic],gmo_coeff))
-	 # 		     [ hZ hX-i*hY ]
-	 # i*sigma*lA/r3 = i*[  	  ]
-	 # 		     [ hX+i*hY -hZ]
-	 hSO[0::2,0::2] += soxyz[2]
-	 hSO[1::2,1::2] += -soxyz[2]
-	 hSO[0::2,1::2] += soxyz[0]-1.j*soxyz[1]
-	 hSO[1::2,0::2] += soxyz[0]+1.j*soxyz[1]
-	 if iatom == 0: print('\nCheck antisymmetricity:')
-	 print('iatom=',iatom,\
-			numpy.linalg.norm(soxyz[0]+soxyz[0].T),\
-			numpy.linalg.norm(soxyz[1]+soxyz[1].T),\
-			numpy.linalg.norm(soxyz[2]+soxyz[2].T))
+         #                   [ hZ hX-i*hY ]
+         # i*sigma*lA/r3 = i*[            ]
+         #                   [ hX+i*hY -hZ]
+         hSO[0::2,0::2] += soxyz[2]
+         hSO[1::2,1::2] += -soxyz[2]
+         hSO[0::2,1::2] += soxyz[0]-1.j*soxyz[1]
+         hSO[1::2,0::2] += soxyz[0]+1.j*soxyz[1]
+         if iatom == 0: print('\nCheck antisymmetricity:')
+         print('iatom=',iatom,\
+                        numpy.linalg.norm(soxyz[0]+soxyz[0].T),\
+                        numpy.linalg.norm(soxyz[1]+soxyz[1].T),\
+                        numpy.linalg.norm(soxyz[2]+soxyz[2].T))
       # Check Hermiticity
       hSO = 1.j*hSO
       diff = numpy.linalg.norm(hSO-hSO.T.conj())
@@ -303,7 +303,7 @@ class iface:
       nr = numpy.zeros(nb)
       nr[:self.nfrozen] = 2.0 
       Fpq = hmo + numpy.einsum('pqrr,r->pq',eri,nr)\
-		- 0.5*numpy.einsum('prrq,r->pq',eri,nr)
+                - 0.5*numpy.einsum('prrq,r->pq',eri,nr)
       #print numpy.linalg.norm(fpq[::2,::2] - Fpq)
       #print numpy.linalg.norm(fpq[1::2,1::2] - Fpq)
       #print numpy.linalg.norm(fpq[::2,1::2])
@@ -320,7 +320,7 @@ class iface:
       return 0
 
    def check(self,fname='mole.h5'):
-      print('\n[iface.check]')	   
+      print('\n[iface.check]')     
       f2 = h5py.File(fname, "r")
       print("nelec=",f2['cal'].attrs['nelec'])
       print("sbas =",f2['cal'].attrs['sbas'])

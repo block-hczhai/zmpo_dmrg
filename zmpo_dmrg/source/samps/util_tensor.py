@@ -39,24 +39,24 @@ def spinCouple(tf0,qr1,qr2):
          dg2 = int(2*s2+1); dr2 = int(d2); df2 = dg2*dr2
          of2 = off_ful2[i2]
          # SaMa,SbMb
-	 tmp = tf0[of1:of1+df1,of2:of2+df2,:].copy() #(ma,nb,X)
-	 tmp = tmp.reshape(dg1,dr1,dg2,dr2,shp[2])
-	 # Combine SaMa,SbMb=>SM
+         tmp = tf0[of1:of1+df1,of2:of2+df2,:].copy() #(ma,nb,X)
+         tmp = tmp.reshape(dg1,dr1,dg2,dr2,shp[2])
+         # Combine SaMa,SbMb=>SM
          smin = abs(s1-s2)
          smax = s1+s2
          ns = int(smax-smin)+1
          for ij in range(ns):
-   	    sij = smin+ij
-	    dg12 = int(2*sij+1); dr12 = dr1*dr2; df12 = dg12*dr12
-   	    qr12.append([n1+n2,sij,dr12])
-	    ift,cgt = util_angular.cgtensor(s1,s2,sij)
-	    assert ift == True
-	    # Transform
-	    transM = numpy.tensordot(cgt,tmp,axes=([0,1],[0,2])) # mnl,manbX->labX
-	    transM = transM.reshape(df12,shp[2])
-	    # Save
-	    tf1[ioff:ioff+df12,:] = transM.copy()
-	    ioff += df12
+            sij = smin+ij
+            dg12 = int(2*sij+1); dr12 = dr1*dr2; df12 = dg12*dr12
+            qr12.append([n1+n2,sij,dr12])
+            ift,cgt = util_angular.cgtensor(s1,s2,sij)
+            assert ift == True
+            # Transform
+            transM = numpy.tensordot(cgt,tmp,axes=([0,1],[0,2])) # mnl,manbX->labX
+            transM = transM.reshape(df12,shp[2])
+            # Save
+            tf1[ioff:ioff+df12,:] = transM.copy()
+            ioff += df12
    # Check
    qr12 = numpy.array(qr12)
    dim3 = util_spinsym.dim_ful(qr12)
@@ -92,7 +92,7 @@ def quasiRDM(wA1,qr1):
 
 #
 # KEY PART: An expansion of reduced rotation matrix to full-SM dense tensor
-# 	    by multiplying the Clebsch-Gordan coefficients.
+#           by multiplying the Clebsch-Gordan coefficients.
 #
 # Key-index map
 def genQredDic(qr3):
@@ -100,10 +100,10 @@ def genQredDic(qr3):
    for idx,val in enumerate(qr3):
       key = str(val[:2])
       if key not in dic: 
-	 dic[key] = idx
+         dic[key] = idx
       else:
-	 print('error: repeated key in reduced dimension!')
-	 exit(1)
+         print('error: repeated key in reduced dimension!')
+         exit(1)
    return dic
 
 def expandRotL(rotL,qr1,qr2,qr12,qr3):
@@ -132,36 +132,36 @@ def expandRotL(rotL,qr1,qr2,qr12,qr3):
          n2,s2,d2 = q2
          dg2 = int(2*s2+1); dr2 = int(d2); df2 = dg2*dr2
          of2 = off_ful2[i2]
-	 # Combine SaMa,SbMb=>SM
+         # Combine SaMa,SbMb=>SM
          smin = abs(s1-s2)
          smax = s1+s2
          ns = int(smax-smin)+1
          for ij in range(ns):
- 	    i12 += 1		 
-   	    sij = smin+ij
-	    dg12 = int(2*sij+1); dr12 = dr1*dr2; df12 = dg12*dr12
-	    or12 = off_red12[i12]
-	    of12 = off_ful12[i12]
-	    # Locate (n1+n2,sij) sectors in the reduced dimensions
-	    key = str(numpy.array([n1+n2,sij]))
-	    if key not in dic: continue
-	    i3 = dic[key]
+            i12 += 1             
+            sij = smin+ij
+            dg12 = int(2*sij+1); dr12 = dr1*dr2; df12 = dg12*dr12
+            or12 = off_red12[i12]
+            of12 = off_ful12[i12]
+            # Locate (n1+n2,sij) sectors in the reduced dimensions
+            key = str(numpy.array([n1+n2,sij]))
+            if key not in dic: continue
+            i3 = dic[key]
             q3 = qr3[i3]
             n3,s3,d3 = q3
-	    dg3 = int(2*s3+1); dr3 = int(d3); df3 = dg3*dr3
-	    or3 = off_red3[i3]
-	    of3 = off_ful3[i3] 
-	    # Reshaping the reduced-dense tensor <SaNaSbNb||ScNc>
-	    tmp = rotL[or12:or12+dr12,or3:or3+dr3].copy()
-	    tmp = tmp.reshape(dr1,dr2,dr3) # (a,b,c)
-	    # Get CG coefficient
-	    ift,cgt = util_angular.cgtensor(s1,s2,sij)
-	    assert ift == True
-	    # Expansion
-	    tmp = numpy.einsum('mnl,abc->manblc',cgt,tmp)
-	    tmp = tmp.reshape(df1,df2,df3)
-	    # Save into full tensor
-	    tful[of1:of1+df1,of2:of2+df2,of3:of3+df3] = tmp.copy()
+            dg3 = int(2*s3+1); dr3 = int(d3); df3 = dg3*dr3
+            or3 = off_red3[i3]
+            of3 = off_ful3[i3] 
+            # Reshaping the reduced-dense tensor <SaNaSbNb||ScNc>
+            tmp = rotL[or12:or12+dr12,or3:or3+dr3].copy()
+            tmp = tmp.reshape(dr1,dr2,dr3) # (a,b,c)
+            # Get CG coefficient
+            ift,cgt = util_angular.cgtensor(s1,s2,sij)
+            assert ift == True
+            # Expansion
+            tmp = numpy.einsum('mnl,abc->manblc',cgt,tmp)
+            tmp = tmp.reshape(df1,df2,df3)
+            # Save into full tensor
+            tful[of1:of1+df1,of2:of2+df2,of3:of3+df3] = tmp.copy()
    return tful
 
 # |Psi>
@@ -197,7 +197,7 @@ def lastSite(rotL1,site1,srotR,qnumsl,ne,ms,sval):
       site = numpy.zeros(0)
       wt   = 0.
    else:
-      info = 1	
+      info = 1  
       i1 = dic[key]
       n1,s1,d1 = qnumsl[i1] 
       dg1 = int(2*s1+1); dr1 = int(d1); df1 = dg1*dr1

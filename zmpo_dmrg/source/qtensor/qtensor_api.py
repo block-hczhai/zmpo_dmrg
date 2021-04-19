@@ -117,19 +117,19 @@ def mps_dot(bmps,kmps,status='L'):
       tmp = tmp.merge([[0,1],[2,3]])
       for i in range(1,nsite):
          # t[l,r]*k[r,n,r'] = t[l,n,r']
-	 # b[l,n,l']*t[l,n,r'] = t[l',r']
-	 tmp = qtensor.tensordot(tmp,kmps[i],axes=([1],[0]))
-	 tmp = qtensor.tensordot(bmps[i],tmp,axes=([0,1],[0,1]))
+         # b[l,n,l']*t[l,n,r'] = t[l',r']
+         tmp = qtensor.tensordot(tmp,kmps[i],axes=([1],[0]))
+         tmp = qtensor.tensordot(bmps[i],tmp,axes=([0,1],[0,1]))
    elif status == 'R':
       tmp = qtensor.tensordot(bmps[nsite-1],kmps[nsite-1],axes=([1],[1]))
       tmp.status[1] = ~tmp.status[1]
       tmp.status[3] = ~tmp.status[3]
       tmp = tmp.merge([[0,1],[2,3]])
       for i in range(nsite-2,-1,-1):
-	 # b[l,n,l']*t[l',r'] = t[l,n,r']
-	 # t[l,n,r']*k[r,n,r'] = t[l,r]
-	 tmp = qtensor.tensordot(bmps[i],tmp,axes=([2],[0]))
-	 tmp = qtensor.tensordot(tmp,kmps[i],axes=([1,2],[1,2]))
+         # b[l,n,l']*t[l',r'] = t[l,n,r']
+         # t[l,n,r']*k[r,n,r'] = t[l,r]
+         tmp = qtensor.tensordot(bmps[i],tmp,axes=([2],[0]))
+         tmp = qtensor.tensordot(tmp,kmps[i],axes=([1,2],[1,2]))
    assert len(tmp.value)==1
    ovlp = tmp.value[0]
    return ovlp

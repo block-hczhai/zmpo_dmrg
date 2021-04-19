@@ -78,11 +78,11 @@ def blks_allowed1(nblks,rank,nqnum,nsyms,status,qsyms,debug=False):
    args = [qsyms[i].ctypes.data_as(ctypes.c_void_p) for i in range(rank)]\
         + [null]*(maxn-rank)
    libqsym.symAllowed(ctypes.c_int(rank),
-      	              ctypes.c_int(nqnum),
-      	              nsyms.ctypes.data_as(ctypes.c_void_p),
-      	              sint.ctypes.data_as(ctypes.c_void_p),
-      	              blks_allowed.ctypes.data_as(ctypes.c_void_p),
-      	              *args)
+                      ctypes.c_int(nqnum),
+                      nsyms.ctypes.data_as(ctypes.c_void_p),
+                      sint.ctypes.data_as(ctypes.c_void_p),
+                      blks_allowed.ctypes.data_as(ctypes.c_void_p),
+                      *args)
    if debug: 
       tmp = blks_allowed0(nblks,rank,nqnum,nsyms,status,qsyms)
       diff = numpy.linalg.norm(tmp-blks_allowed)
@@ -91,7 +91,7 @@ def blks_allowed1(nblks,rank,nqnum,nsyms,status,qsyms,debug=False):
    return blks_allowed
 
 def genOffset(nsyms):
-  rank = len(nsyms)	
+  rank = len(nsyms)     
   noff = numpy.zeros(rank,dtype=numpy.int32)
   noff[rank-1] = 1
   for i in range(rank-1,0,-1):

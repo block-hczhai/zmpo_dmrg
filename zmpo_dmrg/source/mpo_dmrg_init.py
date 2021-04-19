@@ -110,65 +110,65 @@ def genHopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 
       genBopsNQt(fname,nop,-1)
       for isite in range(0,nsite):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite-1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
-	 f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
+         f1 = h5py.File(f1name,"w")
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-	    tmp = f0['opers'+str(iop)].value
-	    #--- kernel ---
-	    tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1])) # imj,pia->mjpa
-	    tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))      # pqmn,mjpa->qnja
-	    tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))    # qnja,anb->qjb
-	    #--- kernel ---
-	    f1['opers'+str(iop)] = tmp
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == nsite-1: exphop[iop] = tmp[0,0,0]
-	 f0.close()
-	 f1.close()
+            if debug: print('    iop=',iop,' of nop=',nop)
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
+            tmp = f0['opers'+str(iop)].value
+            #--- kernel ---
+            tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1])) # imj,pia->mjpa
+            tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))      # pqmn,mjpa->qnja
+            tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))    # qnja,anb->qjb
+            #--- kernel ---
+            f1['opers'+str(iop)] = tmp
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == nsite-1: exphop[iop] = tmp[0,0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],\
-	       	  ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],\
+                  ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
       genBopsNQt(fname,nop,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite+1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
          f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-	    tmp = f0['opers'+str(iop)].value
-	    #--- kernel ---
-	    tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1])) # imj,qjb->imqb
-	    tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))      # pqmn,imqb->pnib
-	    tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))    # pnib,anb->pia
-	    #--- kernel ---
-	    f1['opers'+str(iop)] = tmp
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == 0: exphop[iop] = tmp[0,0,0]
-	 f0.close()
-	 f1.close()
+            if debug: print('    iop=',iop,' of nop=',nop)
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
+            tmp = f0['opers'+str(iop)].value
+            #--- kernel ---
+            tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1])) # imj,qjb->imqb
+            tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))      # pqmn,imqb->pnib
+            tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))    # pnib,anb->pia
+            #--- kernel ---
+            f1['opers'+str(iop)] = tmp
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == 0: exphop[iop] = tmp[0,0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],\
+                  ' nop =',nop,' t = %.2f s'%(tf-ti))
    
    t1=time.time()
    dmrg.comm.Barrier()
@@ -203,70 +203,70 @@ def genSopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 
       genBmatNQt(fname,-1)
       for isite in range(0,nsite):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite-1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
-	 f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 #
-	 #   i-------j
-	 #  /	 |
-	 # *	 |m
-	 #  \	 |
-	 #   a-------b
-	 #
-	 tmp = f0['mat'].value
-	 #--- kernel ---
-	 tmp = numpy.tensordot(tmp,bsite.conj(),axes=([0],[0])) # ia,imj->amj
-	 tmp = numpy.tensordot(tmp,ksite,axes=([0,1],[0,1]))    # amj,amb->jb
-	 #--- kernel ---
-	 f1['mat'] = tmp
-	 # Get the expectation value <psi|Hx|psi> at the boundary,
-	 # Here, unlike the exphop, expsop is just a scalar <l|r>.
-	 if isite == nsite-1: expsop = tmp[0,0]
-	 f0.close()
-	 f1.close()
+         f1 = h5py.File(f1name,"w")
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         #
+         #   i-------j
+         #  /    |
+         # *     |m
+         #  \    |
+         #   a-------b
+         #
+         tmp = f0['mat'].value
+         #--- kernel ---
+         tmp = numpy.tensordot(tmp,bsite.conj(),axes=([0],[0])) # ia,imj->amj
+         tmp = numpy.tensordot(tmp,ksite,axes=([0,1],[0,1]))    # amj,amb->jb
+         #--- kernel ---
+         f1['mat'] = tmp
+         # Get the expectation value <psi|Hx|psi> at the boundary,
+         # Here, unlike the exphop, expsop is just a scalar <l|r>.
+         if isite == nsite-1: expsop = tmp[0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],\
-	          ' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],\
+                  ' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
       genBmatNQt(fname,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite+1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
          f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 #
-	 #   i-------j
-	 #  	 |    \
-	 #      m|     *
-	 #  	 |    /
-	 #   a-------b
-	 #
-	 tmp = f0['mat'].value
-	 #--- kenerl ---
-	 tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[0])) # imj,jb->imb
-	 tmp = numpy.tensordot(tmp,ksite,axes=([1,2],[1,2]))    # imb,amb->ia
-	 #--- kenerl ---
-	 f1['mat'] = tmp
-	 # Get the expectation value <psi|Hx|psi> at the boundary
-	 if isite == 0: expsop = tmp[0,0]
-	 f0.close()
-	 f1.close()
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         #
+         #   i-------j
+         #       |    \
+         #      m|     *
+         #       |    /
+         #   a-------b
+         #
+         tmp = f0['mat'].value
+         #--- kenerl ---
+         tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[0])) # imj,jb->imb
+         tmp = numpy.tensordot(tmp,ksite,axes=([1,2],[1,2]))    # imb,amb->ia
+         #--- kenerl ---
+         f1['mat'] = tmp
+         # Get the expectation value <psi|Hx|psi> at the boundary
+         if isite == 0: expsop = tmp[0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],\
-	          ' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],\
+                  ' t = %.2f s'%(tf-ti))
 
    t1=time.time()
    print(' time for genSops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)
@@ -305,65 +305,65 @@ def genPopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
 
       genBopsNQt(fname,nop,-1)
       for isite in range(0,nsite):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite-1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite-1),"r")
          f1name = prefix+str(isite)
-	 f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 if isite == nsite-1: exppop = numpy.zeros(nop,dtype=dmrg_dtype)
+         f1 = h5py.File(f1name,"w")
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         if isite == nsite-1: exppop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    cop = dmrg.fpop['op'+str(iop)].value
-	    tmp = f0['opers'+str(iop)].value
-	    #--- kernel ---
-	    tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1])) # imj,pia->mjpa
-	    tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))      # pqmn,mjpa->qnja
-	    tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))    # qnja,anb->qjb
-	    #--- kernel ---
-	    f1['opers'+str(iop)] = tmp
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == nsite-1: exppop[iop] = tmp[0,0,0]
-	 f0.close()
-	 f1.close()
+            if debug: print('    iop=',iop,' of nop=',nop)
+            cop = dmrg.fpop['op'+str(iop)].value
+            tmp = f0['opers'+str(iop)].value
+            #--- kernel ---
+            tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1])) # imj,pia->mjpa
+            tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))      # pqmn,mjpa->qnja
+            tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))    # qnja,anb->qjb
+            #--- kernel ---
+            f1['opers'+str(iop)] = tmp
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == nsite-1: exppop[iop] = tmp[0,0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],\
+                  ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    elif status == 'R':
 
       genBopsNQt(fname,nop,nsite)
       for isite in range(nsite-1,-1,-1):
-	 if debug: print(' isite=',isite,' of nsite=',nsite)
-	 ti = time.time()
-	 f0 = h5py.File(prefix+str(isite+1),"r")
+         if debug: print(' isite=',isite,' of nsite=',nsite)
+         ti = time.time()
+         f0 = h5py.File(prefix+str(isite+1),"r")
          f1name = prefix+str(isite)
          f1 = h5py.File(f1name,"w")
-	 bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-	 ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
-	 if isite == 0: exppop = numpy.zeros(nop,dtype=dmrg_dtype)
+         bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
+         ksite = mpo_dmrg_io.loadSite(fkmps,isite,dmrg.ifQt)
+         if isite == 0: exppop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
-	    if debug: print('    iop=',iop,' of nop=',nop)
-	    cop = dmrg.fpop['op'+str(iop)].value
-	    tmp = f0['opers'+str(iop)].value
-	    #--- kernel --- 
-	    tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1])) # imj,qjb->imqb
-	    tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))      # pqmn,imqb->pnib
-	    tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))    # pnib,anb->pia
-	    #--- kernel --- 
-	    f1['opers'+str(iop)] = tmp
-	    # Get the expectation value <psi|Hx|psi> at the boundary
-	    if isite == 0: exppop[iop] = tmp[0,0,0]
-	 f0.close()
-	 f1.close()
+            if debug: print('    iop=',iop,' of nop=',nop)
+            cop = dmrg.fpop['op'+str(iop)].value
+            tmp = f0['opers'+str(iop)].value
+            #--- kernel --- 
+            tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1])) # imj,qjb->imqb
+            tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))      # pqmn,imqb->pnib
+            tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))    # pnib,anb->pia
+            #--- kernel --- 
+            f1['opers'+str(iop)] = tmp
+            # Get the expectation value <psi|Hx|psi> at the boundary
+            if isite == 0: exppop[iop] = tmp[0,0,0]
+         f0.close()
+         f1.close()
          # final isite
-	 tf = time.time()
-	 if dmrg.comm.rank == 0:
-	    print(' isite =',os.path.split(f1name)[-1],\
-	          ' nop =',nop,' t = %.2f s'%(tf-ti))
+         tf = time.time()
+         if dmrg.comm.rank == 0:
+            print(' isite =',os.path.split(f1name)[-1],\
+                  ' nop =',nop,' t = %.2f s'%(tf-ti))
 
    t1=time.time()
    print(' time for genPops = %.2f s'%(t1-t0),' rank =',dmrg.comm.rank)

@@ -38,7 +38,7 @@ def sweep(dmrg,sitelst,ncsite,status,ifsym=False):
    actlst = sweep_checkOpersList(dmrg,nsite,sitelst,ncsite,status)
    if rank == 0: 
       mpo_dmrg_prt.parameters(dmrg.Dmax,dmrg.crit_e,dmrg.noise,\
-           	      	      ncsite,sitelst,actlst,status)
+                              ncsite,sitelst,actlst,status)
    # Start sweep
    elst = []
    dlst = []
@@ -100,11 +100,11 @@ def solver(dmrg,isite,ncsite,actlst,flst,status,ifsym):
    if rank == 0: 
       print('[mpo_dmrg_opt.solver] isweep =',dmrg.isweep)
       print(' * isym/ifsym/s2proj =',\
-	       (dmrg.isym,ifsym,dmrg.ifs2proj))
+               (dmrg.isym,ifsym,dmrg.ifs2proj))
       print(' * ifQt/guess/precond =',\
-	       (dmrg.ifQt,dmrg.ifguess,dmrg.ifprecond))
+               (dmrg.ifQt,dmrg.ifguess,dmrg.ifprecond))
       print(' * ifex/ifpt/ifH0/nref =',\
-	       (dmrg.ifex,dmrg.ifpt,dmrg.ifH0,dmrg.nref))
+               (dmrg.ifex,dmrg.ifpt,dmrg.ifH0,dmrg.nref))
       print(' Check file lists:')
       print(' * flst0(lrop[0],lrpop[0]) =',flst[0])
       print(' * flst1(lrsop/lrpop[iex]) =',flst[1])
@@ -137,13 +137,13 @@ def sweep_checkOpersList(dmrg,nsite,sitelst,ncsite,status):
             fnamel = dmrg.path+'/ref'+str(iref)+'_lpop'
             fnamer = dmrg.path+'/ref'+str(iref)+'_rpop'
             checkOpers(nsite,sitelst,ncsite,fnamel,fnamer,status)
-   # PT case	    
+   # PT case        
    if dmrg.ifpt:
       for iref in range(dmrg.nref):
          fnamel = dmrg.path+'/ref'+str(iref)+'_lhop'
          fnamer = dmrg.path+'/ref'+str(iref)+'_rhop'
          checkOpers(nsite,sitelst,ncsite,fnamel,fnamer,status)
-      if dmrg.ifH0:	 
+      if dmrg.ifH0:      
          for iref in range(dmrg.nref):
             fnamel = dmrg.path+'/ref'+str(iref)+'_ldop'
             fnamer = dmrg.path+'/ref'+str(iref)+'_rdop'
@@ -212,9 +212,9 @@ def sweep_fileOpenOpers(dmrg,ncsite,isite):
          if not dmrg.ifs2proj: 
             fnameL = dmrg.path+'/ref'+str(iref)+'_lsop'+'_site_'+str(isite-1) 
             fnameR = dmrg.path+'/ref'+str(iref)+'_rsop'+'_site_'+str(isite+ncsite)
-	    flst1[2*iref  ] = h5py.File(fnameL,"r")
-	    flst1[2*iref+1] = h5py.File(fnameR,"r")
- 	 else:
+            flst1[2*iref  ] = h5py.File(fnameL,"r")
+            flst1[2*iref+1] = h5py.File(fnameR,"r")
+         else:
             fnameL = dmrg.path+'/ref'+str(iref)+'_lpop'+'_site_'+str(isite-1) 
             fnameR = dmrg.path+'/ref'+str(iref)+'_rpop'+'_site_'+str(isite+ncsite)
             flst1[2*iref  ] = h5py.File(fnameL,"r")
@@ -228,7 +228,7 @@ def sweep_fileOpenOpers(dmrg,ncsite,isite):
          fnameR = dmrg.path+'/ref'+str(iref)+'_rhop'+'_site_'+str(isite+ncsite)
          flst2[2*iref  ] = h5py.File(fnameL,"r")
          flst2[2*iref+1] = h5py.File(fnameR,"r")
-      if dmrg.ifH0:	 
+      if dmrg.ifH0:      
          for iref in range(dmrg.nref):
             fnameL = dmrg.path+'/ref'+str(iref)+'_ldop'+'_site_'+str(isite-1)
             fnameR = dmrg.path+'/ref'+str(iref)+'_rdop'+'_site_'+str(isite+ncsite)
@@ -246,14 +246,14 @@ def sweep_fileOpenOpersN(dmrg,isite,ncsite,status):
       fnameN = dmrg.path+'/lop'+'_site_'+str(isite)
       flst0[0] = h5py.File(fnameN,"w")
       if dmrg.comm.rank == 0 and dmrg.ifs2proj:
-	 fnameN = dmrg.path+'/lpop'+'_site_'+str(isite)
+         fnameN = dmrg.path+'/lpop'+'_site_'+str(isite)
          flst0[1] = h5py.File(fnameN,"w")
       # Excited state case
       flst1 = [0]*dmrg.nref
       if dmrg.ifex and dmrg.comm.rank == 0:
          for iref in range(dmrg.nref):
-	    if not dmrg.ifs2proj:
-	       fnameN = dmrg.path+'/ref'+str(iref)+'_lsop'+'_site_'+str(isite) 
+            if not dmrg.ifs2proj:
+               fnameN = dmrg.path+'/ref'+str(iref)+'_lsop'+'_site_'+str(isite) 
                flst1[iref] = h5py.File(fnameN,"w")
             else:
                fnameN = dmrg.path+'/ref'+str(iref)+'_lpop'+'_site_'+str(isite) 
@@ -265,8 +265,8 @@ def sweep_fileOpenOpersN(dmrg,isite,ncsite,status):
          for iref in range(dmrg.nref):
             fnameN = dmrg.path+'/ref'+str(iref)+'_lhop'+'_site_'+str(isite)
             flst2[iref] = h5py.File(fnameN,"w")
-	 if dmrg.ifH0:
-	    for iref in range(dmrg.nref):
+         if dmrg.ifH0:
+            for iref in range(dmrg.nref):
                fnameN = dmrg.path+'/ref'+str(iref)+'_ldop'+'_site_'+str(isite)
                flst3[iref] = h5py.File(fnameN,"w")
  
@@ -282,7 +282,7 @@ def sweep_fileOpenOpersN(dmrg,isite,ncsite,status):
       flst1 = [0]*dmrg.nref
       if dmrg.ifex and dmrg.comm.rank == 0:
          for iref in range(dmrg.nref):
-	    if not dmrg.ifs2proj:
+            if not dmrg.ifs2proj:
                fnameN = dmrg.path+'/ref'+str(iref)+'_rsop'+'_site_'+str(jsite) 
                flst1[iref] = h5py.File(fnameN,"w")
             else:
@@ -295,8 +295,8 @@ def sweep_fileOpenOpersN(dmrg,isite,ncsite,status):
          for iref in range(dmrg.nref):
             fnameN = dmrg.path+'/ref'+str(iref)+'_rhop'+'_site_'+str(jsite)
             flst2[iref] = h5py.File(fnameN,"w")
-	 if dmrg.ifH0:
-	    for iref in range(dmrg.nref):
+         if dmrg.ifH0:
+            for iref in range(dmrg.nref):
                fnameN = dmrg.path+'/ref'+str(iref)+'_rdop'+'_site_'+str(jsite)
                flst3[iref] = h5py.File(fnameN,"w")
 
@@ -318,8 +318,8 @@ def sweep_updateSite(dmrg,isite,ncsite,sigs,qred,site,status):
       dmrg.qnuml[isite+1] = qred.copy()
       if dmrg.ifQt:
          qtmp = qtensor.qtensor([False,False,True])
-         #				Ql[i-1]  +  Qn[i]  =  Ql[i]
-	 qtmp.fromDenseTensor(site,[dmrg.qlst[0],dmrg.qlst[1],qred])
+         #                              Ql[i-1]  +  Qn[i]  =  Ql[i]
+         qtmp.fromDenseTensor(site,[dmrg.qlst[0],dmrg.qlst[1],qred])
          siteN = qtmp
       else:
          siteN = site.copy()
@@ -333,11 +333,11 @@ def sweep_updateSite(dmrg,isite,ncsite,sigs,qred,site,status):
       dmrg.qnumr[jsite] = qred.copy()
       if dmrg.ifQt:
          qtmp = qtensor.qtensor([True,False,False])
-         #		          Qr[i-1]  =  Qn[i]   +   Qr[i]
+         #                        Qr[i-1]  =  Qn[i]   +   Qr[i]
          qtmp.fromDenseTensor(site,[qred,dmrg.qlst[-2],dmrg.qlst[-1]])
          siteN = qtmp
       else:
-	 siteN = site.copy()
+         siteN = site.copy()
       # DUMP
       mpo_dmrg_io.saveQnum(dmrg.frmps,jsite,qred)
       mpo_dmrg_io.saveSite(dmrg.frmps,jsite,siteN)
@@ -347,31 +347,31 @@ def sweep_updateSite(dmrg,isite,ncsite,sigs,qred,site,status):
 def sweep_updateBoundary(dmrg,ncsite,sitelst,qred,srotR,status):
    if ncsite == 2:
       if status == 'L' and sitelst[-1] == dmrg.nsite-1: 
-	 # >>> Only the gs state is saved for generating MPS.
-	 smat = srotR[0]
-         norm = numpy.linalg.norm(smat)
-	 if (not dmrg.ifpt) or (dmrg.ifpt and dmrg.ifcompression): smat = smat/norm
-	 key  = mpo_dmrg_dotutil.floatKey(list(dmrg.qsectors.keys())[0])
-	 qsym = [numpy.array(eval(key))]
-	 if dmrg.ifQt:
-   	    qtmp = qtensor.qtensor([False,False,True])
-	    qtmp.fromDenseTensor(smat,[qred,dmrg.qphys[dmrg.nsite-1],qsym])
-	    smat = qtmp
-	 # DUMP
-	 mpo_dmrg_io.saveQnum(dmrg.flmps,dmrg.nsite,qsym)
-	 mpo_dmrg_io.saveSite(dmrg.flmps,dmrg.nsite-1,smat)
-      elif status == 'R' and sitelst[0] == 0:
-	 # >>> Only the gs state is saved for generating MPS.
+         # >>> Only the gs state is saved for generating MPS.
          smat = srotR[0]
          norm = numpy.linalg.norm(smat)
-	 if (not dmrg.ifpt) or (dmrg.ifpt and dmrg.ifcompression): smat = smat/norm
-	 key  = mpo_dmrg_dotutil.floatKey(list(dmrg.qsectors.keys())[0])
-	 qsym = [numpy.array(eval(key))]
-	 if dmrg.ifQt:
-   	    qtmp = qtensor.qtensor([True,False,False])
-	    qtmp.fromDenseTensor(smat,[qsym,dmrg.qphys[0],qred])
-  	    smat = qtmp	
-	 # DUMP
-	 mpo_dmrg_io.saveQnum(dmrg.frmps,0,qsym)
-	 mpo_dmrg_io.saveSite(dmrg.frmps,0,smat)
+         if (not dmrg.ifpt) or (dmrg.ifpt and dmrg.ifcompression): smat = smat/norm
+         key  = mpo_dmrg_dotutil.floatKey(list(dmrg.qsectors.keys())[0])
+         qsym = [numpy.array(eval(key))]
+         if dmrg.ifQt:
+            qtmp = qtensor.qtensor([False,False,True])
+            qtmp.fromDenseTensor(smat,[qred,dmrg.qphys[dmrg.nsite-1],qsym])
+            smat = qtmp
+         # DUMP
+         mpo_dmrg_io.saveQnum(dmrg.flmps,dmrg.nsite,qsym)
+         mpo_dmrg_io.saveSite(dmrg.flmps,dmrg.nsite-1,smat)
+      elif status == 'R' and sitelst[0] == 0:
+         # >>> Only the gs state is saved for generating MPS.
+         smat = srotR[0]
+         norm = numpy.linalg.norm(smat)
+         if (not dmrg.ifpt) or (dmrg.ifpt and dmrg.ifcompression): smat = smat/norm
+         key  = mpo_dmrg_dotutil.floatKey(list(dmrg.qsectors.keys())[0])
+         qsym = [numpy.array(eval(key))]
+         if dmrg.ifQt:
+            qtmp = qtensor.qtensor([True,False,False])
+            qtmp.fromDenseTensor(smat,[qsym,dmrg.qphys[0],qred])
+            smat = qtmp 
+         # DUMP
+         mpo_dmrg_io.saveQnum(dmrg.frmps,0,qsym)
+         mpo_dmrg_io.saveSite(dmrg.frmps,0,smat)
    return 0

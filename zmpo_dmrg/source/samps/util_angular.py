@@ -25,7 +25,7 @@ def iftriangle(j1,j2,j3):
    for i in range(ncase):
       if abs(j3-jmin-i)<1.e-10: 
          ift = True
-	 break
+         break
    return ift
 
 def cgcoeff(j1,m1,j2,m2,j3,m3):
@@ -41,7 +41,7 @@ def cgtensor_slow(j1,j2,j3):
    if ift:
       for i1 in range(d1):
          m1 = -j1+i1
-	 for i2 in range(d2):
+         for i2 in range(d2):
             m2 = -j2+i2
             for i3 in range(d3):
                m3 = -j3+i3
@@ -58,13 +58,13 @@ def cgtensor(j1,j2,j3):
    if ift:
       for i1 in range(d1):
          m1 = -j1+i1
-	 for i2 in range(d2):
+         for i2 in range(d2):
             m2 = -j2+i2
             for i3 in range(d3):
                m3 = -j3+i3
                cgt[i1,i2,i3] = libangular.anglib.cleb(int(2*j1),int(2*m1),\
-			       			      int(2*j2),int(2*m2),\
-						      int(2*j3),int(2*m3))
+                                                      int(2*j2),int(2*m2),\
+                                                      int(2*j3),int(2*m3))
    return ift,cgt
 
 # Return tensor version
@@ -92,10 +92,10 @@ def cgtensor_fast2(j1,j2,j3):
    cgt = numpy.zeros((tj1+1,tj2+1,tj3+1),order='F')
    tmp = ctypes.c_int(0)
    lib.f2pywrap_anglib_cgtensor2_(ctypes.byref(tmp),\
-		   	          ctypes.byref(ctj1),\
-		   		  ctypes.byref(ctj2),\
-		   		  ctypes.byref(ctj3),\
-	 		          cgt.ctypes.data_as(ctypes.c_void_p))
+                                  ctypes.byref(ctj1),\
+                                  ctypes.byref(ctj2),\
+                                  ctypes.byref(ctj3),\
+                                  cgt.ctypes.data_as(ctypes.c_void_p))
    return ift,cgt
 
 if __name__ == '__main__':

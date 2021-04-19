@@ -127,8 +127,8 @@ def rdm_blkdiag(rho0,classes,thresh,Dcut=-1,debug=False):
       # Renormalize
       sig2 = numpy.abs(sig2)
       if debug: 
-	 print(' idx=%5d'%idx,' isym=',item,' ndiml/ndimr=',qrow.shape)
-	 print('    sig2=',sig2)
+         print(' idx=%5d'%idx,' isym=',item,' ndiml/ndimr=',qrow.shape)
+         print('    sig2=',sig2)
       ndim  = len(sig2) # min(dimL,dimR)
       key   = eval(item)
       qsymL = qsymL + [key]*ndim
@@ -155,8 +155,8 @@ def rdm_blkdiag(rho0,classes,thresh,Dcut=-1,debug=False):
    tsig = sigs[indx].copy()  
    for i in range(nres):
       if(tsig[i]<thresh*1.01):
-	 nres=i
-	 break
+         nres=i
+         break
    if nres==0: nres = 1 
    if Dcut>0: nres = min(nres,Dcut)
    indx = indx[:nres] 
@@ -207,8 +207,8 @@ def rdm_sci(rho0,classes,trsci,Dcut=-1,debug=False):
       # Renormalize
       sig2 = numpy.abs(sig2)
       if debug: 
-	 print(' idx=%5d'%idx,' isym=',item,' ndiml/ndimr=',qrow.shape)
-	 print('    sig2=',sig2)
+         print(' idx=%5d'%idx,' isym=',item,' ndiml/ndimr=',qrow.shape)
+         print('    sig2=',sig2)
       ndim  = len(sig2) # min(dimL,dimR)
       key   = eval(item)
       qsymL = qsymL + [key]*ndim
@@ -235,8 +235,8 @@ def rdm_sci(rho0,classes,trsci,Dcut=-1,debug=False):
    tsig = sigs[indx].copy() 
    for i in range(nres):
       if(tsig[i]<trsci):
-	 nres = i
-	 break
+         nres = i
+         break
    if nres==0: nres = 1
    if Dcut>0: nres = min(nres,Dcut)  
    indx = indx[:nres] 

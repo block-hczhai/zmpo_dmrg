@@ -8,7 +8,7 @@
 # 
 # def genSpinOpersQnums(nsite,isite,key):
 #
-# def genS2GlobalSpatialQt(nsite,isite):	# for normal MPS
+# def genS2GlobalSpatialQt(nsite,isite):        # for normal MPS
 # def genGlobalSpatialQt(nsite,isite,key):
 # def genLocalSpatialQt(nsite,isite,ig,key):
 # def genLocal2SpatialQt(nsite,isite,ig,jg,ikey,jkey):
@@ -29,44 +29,44 @@ from zmpo_dmrg.source import mpo_dmrg_spinopers
 def genSpinOpersQnums(nsite,isite,key):
    if key in ['N','Sz','Omega','NaNb']: 
       if isite == 0:
-	 ql = [[0.,0.]]
-	 qr = [[0.,0.],[0.,0.]]
+         ql = [[0.,0.]]
+         qr = [[0.,0.],[0.,0.]]
       elif isite == nsite-1:
-	 ql = [[0.,0.],[0.,0.]]
-	 qr = [[0.,0.]]
+         ql = [[0.,0.],[0.,0.]]
+         qr = [[0.,0.]]
       else:
-	 ql = [[0.,0.],[0.,0.]]
-	 qr = [[0.,0.],[0.,0.]]
+         ql = [[0.,0.],[0.,0.]]
+         qr = [[0.,0.],[0.,0.]]
    elif key in ['Sp']:
       if isite == 0:
-	 ql = [[0.,0.]]
-	 qr = [[0.,0.],[0.,1.0]]
+         ql = [[0.,0.]]
+         qr = [[0.,0.],[0.,1.0]]
       elif isite == nsite-1:
-	 ql = [[0.,0.],[0.,1.0]]
-	 qr = [[0.,1.0]]
+         ql = [[0.,0.],[0.,1.0]]
+         qr = [[0.,1.0]]
       else:
-	 ql = [[0.,0.],[0.,1.0]]
-	 qr = [[0.,0.],[0.,1.0]]
+         ql = [[0.,0.],[0.,1.0]]
+         qr = [[0.,0.],[0.,1.0]]
    elif key in ['Sm']:
       if isite == 0:
-	 ql = [[0.,0.]]
-	 qr = [[0.,0.],[0.,-1.0]]
+         ql = [[0.,0.]]
+         qr = [[0.,0.],[0.,-1.0]]
       elif isite == nsite-1:
-	 ql = [[0.,0.],[0.,-1.0]]
-	 qr = [[0.,-1.0]]
+         ql = [[0.,0.],[0.,-1.0]]
+         qr = [[0.,-1.0]]
       else:
-	 ql = [[0.,0.],[0.,-1.0]]
-	 qr = [[0.,0.],[0.,-1.0]]
+         ql = [[0.,0.],[0.,-1.0]]
+         qr = [[0.,0.],[0.,-1.0]]
    elif key in ['S2']:
       if isite == 0:
-	 ql = [[0.,0.]]
-	 qr = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
+         ql = [[0.,0.]]
+         qr = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
       elif isite == nsite-1:
-	 ql = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
-	 qr = [[0.,0.]]    
+         ql = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
+         qr = [[0.,0.]]    
       else:                
-	 ql = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
-	 qr = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
+         ql = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
+         qr = [[0.,0.],[0.,-1.0],[0.,1.0],[0.,0.],[0.,0.]]
    ql = numpy.array(ql)
    qr = numpy.array(qr)
    return ql,qr

@@ -144,9 +144,9 @@ def genEmbedBasis(mol,mo_coeff,selectionRule,thresh=0.001,lao='meta_lowdin',debu
       print(' Eigen_na =\n',ec[aindx])
       if ifplot:
          import matplotlib.pyplot as plt
-	 plt.plot(abs(ef),marker='o',linewidth=2.0)
-	 plt.plot(abs(ec),marker='o',linewidth=2.0)
-	 plt.show()
+         plt.plot(abs(ef),marker='o',linewidth=2.0)
+         plt.plot(abs(ec),marker='o',linewidth=2.0)
+         plt.show()
    else:
       ne_c = 0.0
       ucoeff = uf.copy()
@@ -192,7 +192,7 @@ if __name__ == '__main__':
       if item[0] == 13 and item[1] == 'Fe' and (item[2] == '3d' or item[2] == '4d'):
          return True
       else:
-	 return False
+         return False
    basis,ua,ub = genEmbedBasis(mol,mocoeff,rule,thresh=0.01)
    
    from . import detToMPS

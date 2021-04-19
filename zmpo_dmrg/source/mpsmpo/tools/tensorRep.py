@@ -36,7 +36,7 @@ def string_sgn(string):
    sgn=1.0
    for i in range(n):
       for j in range(i+1,n):
-         if string[i]>string[j]: sgn=-sgn	      
+         if string[i]>string[j]: sgn=-sgn             
    return sgn
 
 # FROM QIMING'S CODE:
@@ -97,10 +97,10 @@ def toCIanalyze(norb,ne,civec):
       # 000111 & 101001 => no. of bit that is not moved. 
       rkA=ne[0]-bin(bsA&refA).count("1")
       for isB in range(nsB):
-	 bsB=addr2str_o1(norb,ne[1],isB)
-	 rkB=ne[1]-bin(bsB&refB).count("1")
-	 rCount[rkA+rkB]+=1
-	 cCount[rkA+rkB]+=civec[isA,isB]**2
+         bsB=addr2str_o1(norb,ne[1],isB)
+         rkB=ne[1]-bin(bsB&refB).count("1")
+         rCount[rkA+rkB]+=1
+         cCount[rkA+rkB]+=civec[isA,isB]**2
    # PRINT
    print("Statistics of CI coeff:")
    for rc in enumerate(zip(rCount,cCount)):
@@ -125,19 +125,19 @@ def toCIspinorb(norb,ne,civec):
       for isB in range(nsB):
          bsB =addr2str_o1(norb,ne[1],isB)
          strB=bit2string(bsB,norb)
-	 strB=[2*i+1 for i in strB]
-	 # conversion
-	 string=strA+strB
-	 sgn = string_sgn(string)
-	 string.sort()
-	 #print string2bit(string)
-	 #print string
-	 #print civec[isA,isB]
-	 #print addr
-	 #addr=fci.cistring.str2addr_o1(nsorb,nelec,string2bit(string))
-	 addr=str2addr_o1(nsorb,nelec,string2bit(string))
-	 #print nsorb,string,sgn,addr,bin(string2bit(string))
-	 civec2[addr]=civec[isA,isB]*sgn
+         strB=[2*i+1 for i in strB]
+         # conversion
+         string=strA+strB
+         sgn = string_sgn(string)
+         string.sort()
+         #print string2bit(string)
+         #print string
+         #print civec[isA,isB]
+         #print addr
+         #addr=fci.cistring.str2addr_o1(nsorb,nelec,string2bit(string))
+         addr=str2addr_o1(nsorb,nelec,string2bit(string))
+         #print nsorb,string,sgn,addr,bin(string2bit(string))
+         civec2[addr]=civec[isA,isB]*sgn
    #print civec2[numpy.argwhere(civec2>1.e-10)]
    norm=numpy.linalg.norm(civec2)
    print("NORM1=",norm)
@@ -161,15 +161,15 @@ def toCItensor(nsorb,nelec,civec,iop=0):
       for i in range(civec.size):
          bstring=bin(addr2str_o1(nsorb,nelec,i))
          orblst=tuple(bit2string( int(bstring,2),nsorb ))
-	 addr  =numpy.dot(orblst,stride)
+         addr  =numpy.dot(orblst,stride)
          citensor[addr]=civec[i]
    else:
       for i in range(civec.size):
          bstring=bin(addr2str_o1(nsorb,nelec,i))
          orblst=tuple(bit2string( int(bstring,2),nsorb ))
-	 for j in itools.permutations(orblst,nelec):
-	    addr=numpy.dot(j,stride)
-	    citensor[addr]=string_sgn(j)*civec[i]
+         for j in itools.permutations(orblst,nelec):
+            addr=numpy.dot(j,stride)
+            citensor[addr]=string_sgn(j)*civec[i]
       fac=1.0/math.sqrt(math.factorial(nelec))
       citensor=citensor*fac
    print('NORM of Tensor=',numpy.linalg.norm(citensor))
@@ -239,13 +239,13 @@ def toCIspinorbReverse(norb,ne,civec2):
       for isB in range(nsB):
          bsB =addr2str_o1(norb,ne[1],isB)
          strB=bit2string(bsB,norb)
-	 strB=[2*i+1 for i in strB]
-	 # conversion
-	 string=strA+strB
-	 sgn = string_sgn(string)
-	 string.sort()
-	 addr=str2addr_o1(nsorb,nelec,string2bit(string))
-	 civec[isA,isB]=civec2[addr]*sgn
+         strB=[2*i+1 for i in strB]
+         # conversion
+         string=strA+strB
+         sgn = string_sgn(string)
+         string.sort()
+         addr=str2addr_o1(nsorb,nelec,string2bit(string))
+         civec[isA,isB]=civec2[addr]*sgn
    #print civec2[numpy.argwhere(civec2>1.e-10)]
    norm=numpy.linalg.norm(civec)
    print("NORM1=",norm)

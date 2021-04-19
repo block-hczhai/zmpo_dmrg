@@ -64,7 +64,7 @@ import scipy
 #      # In this case, u = I. 
 #      vmat2 = vmat
 #      sgn = 1.0
-#   else:	   
+#   else:          
 #      v0 = vmat[0]/norm1
 #      u = genU(v0)
 #      # faster computation?
@@ -74,7 +74,7 @@ import scipy
 #   norm2 = numpy.linalg.norm(vb)
 #   if norm2>thresh: vmat2[1:,0] = vb/norm2
 #   return [[idx,1,sgn*norm1,wfac,vmat2[1:,1:]],\
-#	   [idx,0,sgn*norm2,wfac,vmat2[1:,:]]]
+#          [idx,0,sgn*norm2,wfac,vmat2[1:,:]]]
 #
 #------------------------------
 # Binary Tree Construction
@@ -101,17 +101,17 @@ import scipy
 #      atmp = numpy.zeros((bdims[-2],2,bdims[-1])) 
 #      states = []
 #      for idx in range(nstate):
-#	 info = lst[indices[idx]]
-#	 #if debug: print info[0],info[1],idx,info[2],info[2]*info[3],\
-#	 #       	 info[4].shape,info[4]
-#	 atmp[info[0],info[1],idx] = info[2]
-#	 prodWfac = info[2]*info[3]
+#        info = lst[indices[idx]]
+#        #if debug: print info[0],info[1],idx,info[2],info[2]*info[3],\
+#        #               info[4].shape,info[4]
+#        atmp[info[0],info[1],idx] = info[2]
+#        prodWfac = info[2]*info[3]
 #         states += [[idx,prodWfac,info[4]]]
 #      if irow == 0:
-#	 shape = atmp.shape     
-#	 atmp = atmp.reshape(shape[1],shape[2]) 
+#        shape = atmp.shape     
+#        atmp = atmp.reshape(shape[1],shape[2]) 
 #      elif irow == k-1: 
-#	 atmp = numpy.einsum('ipj->ip',atmp)
+#        atmp = numpy.einsum('ipj->ip',atmp)
 #      sites.append(atmp)
 #   print ' Bdims =',mpslib.mps_bdim(sites)
 #   return sites
@@ -136,7 +136,7 @@ def genFSstates(wts,state=None,thresh=1.e-10):
    else:
       if n == 0:
          iwts,istate = state
-	 if abs(iwts)>thresh: yield state
+         if abs(iwts)>thresh: yield state
       else:
          iwts,istate = state
          if abs(iwts*wts[0][0])>thresh:
@@ -198,12 +198,12 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       nc = k-nf
       tmp = vmat[:irow+1].copy()
       try:
-	 u,sigs,vt = scipy.linalg.svd(tmp)
+         u,sigs,vt = scipy.linalg.svd(tmp)
          #print sigs
       except numpy.linalg.linalg.LinAlgError:
-	 print('\nerror: numpy.linalg.linalg.LinAlgError')     
-	 print(tmp.shape)
-	 print(tmp.dump('tmpMatrix'))
+         print('\nerror: numpy.linalg.linalg.LinAlgError')     
+         print(tmp.shape)
+         print(tmp.dump('tmpMatrix'))
          exit()
       #>>> The global sign is not important in screening! 
       #sgn = numpy.linalg.det(vt)
@@ -220,15 +220,15 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       #>>> Transform to a data structure [o1,o2,...,oN] 
       weights = []
       for i in range(nsigs):
-	 cf = sgn*sigs[i]
-	 vr = rc[:,i]
-	 norm = numpy.linalg.norm(vr)
-	 if norm>thresh: 
-	    cr = sgn*norm
-	 else:
-	    cr = 0.0
-	 # Combination coefficients   
- 	 weights.append([cf,cr])
+         cf = sgn*sigs[i]
+         vr = rc[:,i]
+         norm = numpy.linalg.norm(vr)
+         if norm>thresh: 
+            cr = sgn*norm
+         else:
+            cr = 0.0
+         # Combination coefficients   
+         weights.append([cf,cr])
       # Generate Fock space states.
       ispace = genFSstates(weights,thresh=threshVal)
       dim,dic = classification(ispace,ifclass)
@@ -246,8 +246,8 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       commonBasis.append(u[:,:nsigs])
       # Only for testing
       if ifbdim and dim == 1: 
-	 keff = irow
-	 break
+         keff = irow
+         break
    print()
    print(' Summary: intermediate states on each layer (bdims) for keff/k =',(keff,k))
    print([intermediates[i][0] for i in range(keff)])
@@ -270,76 +270,76 @@ def network(vmat,thresh=1.e-8,threshVal=1.e-8,debug=False,ifclass=False,ifbdim=F
       # <n[1]|a[1]>
       #
       if irow == 0:
-	 site = numpy.zeros((2,dim1))
-	 idx = 0
-	 for isym in list(space1.keys()):
-	    ispace = space1[isym]
-	    ndim = len(ispace)
-	    assert ndim == 1
-	    istate = ispace[0]
-	    # <n1=0|a1>
-	    if isym == 0:
-	       site[0,idx] = 1.0
-	    # <n1=1|a1>
-	    elif isym == 1:
-	       site[1,idx] = u1[0,0]
-	    idx += 1
+         site = numpy.zeros((2,dim1))
+         idx = 0
+         for isym in list(space1.keys()):
+            ispace = space1[isym]
+            ndim = len(ispace)
+            assert ndim == 1
+            istate = ispace[0]
+            # <n1=0|a1>
+            if isym == 0:
+               site[0,idx] = 1.0
+            # <n1=1|a1>
+            elif isym == 1:
+               site[1,idx] = u1[0,0]
+            idx += 1
       #
       # <a[k-1]n[k]|a[k]>     
       #
       else:
-	 u0 = commonBasis[irow-1]
+         u0 = commonBasis[irow-1]
          dim0,space0 = intermediates[irow-1]
-	 site = numpy.zeros((dim0,2,dim1))
-	 idx0 = 0
-	 for isym0 in list(space0.keys()):
-	    ispace0 = space0[isym0]
-	    ndim0 = len(ispace0)
-	    idx1 = 0
-	    for isym1 in list(space1.keys()):
-	       ispace1 = space1[isym1]
-	       ndim1 = len(ispace1)
-	       #
-	       # Case1: <a[k-1]n[k](=0)|a[k]>
-	       #
-	       if isym1 == isym0:
-		  for id0,istate0 in enumerate(ispace0):
-		     orbs0 = numpy.argwhere(numpy.array(istate0)==1)
-		     orbs0 = [x[0] for x in orbs0]
-		     umat0 = numpy.vstack((u0[:,orbs0],numpy.zeros((1,isym1))))
-	             for id1,istate1 in enumerate(ispace1):
-			orbs1 = numpy.argwhere(numpy.array(istate1)==1)
-			orbs1 = [x[0] for x in orbs1]
-			umat1 = u1[:,orbs1]
-			if isym0 == 0:
-			   site[idx0+id0,0,idx1+id1] = 1.0
-		 	else:
-			   s01 = numpy.dot(umat0.T,umat1)
-			   site[idx0+id0,0,idx1+id1] = numpy.linalg.det(s01)
-	       #
-	       # Case2: <a[k-1]n[k](=1)|a[k]>
-	       #
-       	       elif isym1 == isym0+1:
-		  for id0,istate0 in enumerate(ispace0):
-		     orbs0 = numpy.argwhere(numpy.array(istate0)==1)
-		     orbs0 = [x[0] for x in orbs0]
-		     nelec0 = len(orbs0) 
-		     umat0 = numpy.zeros((irow+1,nelec0+1))
-		     umat0[:irow,:nelec0] = u0[:,orbs0]
-		     umat0[ irow, nelec0] = 1.0
-	             for id1,istate1 in enumerate(ispace1):
-			orbs1 = numpy.argwhere(numpy.array(istate1)==1)
-			orbs1 = [x[0] for x in orbs1]
-			umat1 = u1[:,orbs1]
-			s01 = numpy.dot(umat0.T,umat1)
-			site[idx0+id0,1,idx1+id1] = numpy.linalg.det(s01)
-	       idx1 += ndim1
-	    idx0 += ndim0
+         site = numpy.zeros((dim0,2,dim1))
+         idx0 = 0
+         for isym0 in list(space0.keys()):
+            ispace0 = space0[isym0]
+            ndim0 = len(ispace0)
+            idx1 = 0
+            for isym1 in list(space1.keys()):
+               ispace1 = space1[isym1]
+               ndim1 = len(ispace1)
+               #
+               # Case1: <a[k-1]n[k](=0)|a[k]>
+               #
+               if isym1 == isym0:
+                  for id0,istate0 in enumerate(ispace0):
+                     orbs0 = numpy.argwhere(numpy.array(istate0)==1)
+                     orbs0 = [x[0] for x in orbs0]
+                     umat0 = numpy.vstack((u0[:,orbs0],numpy.zeros((1,isym1))))
+                     for id1,istate1 in enumerate(ispace1):
+                        orbs1 = numpy.argwhere(numpy.array(istate1)==1)
+                        orbs1 = [x[0] for x in orbs1]
+                        umat1 = u1[:,orbs1]
+                        if isym0 == 0:
+                           site[idx0+id0,0,idx1+id1] = 1.0
+                        else:
+                           s01 = numpy.dot(umat0.T,umat1)
+                           site[idx0+id0,0,idx1+id1] = numpy.linalg.det(s01)
+               #
+               # Case2: <a[k-1]n[k](=1)|a[k]>
+               #
+               elif isym1 == isym0+1:
+                  for id0,istate0 in enumerate(ispace0):
+                     orbs0 = numpy.argwhere(numpy.array(istate0)==1)
+                     orbs0 = [x[0] for x in orbs0]
+                     nelec0 = len(orbs0) 
+                     umat0 = numpy.zeros((irow+1,nelec0+1))
+                     umat0[:irow,:nelec0] = u0[:,orbs0]
+                     umat0[ irow, nelec0] = 1.0
+                     for id1,istate1 in enumerate(ispace1):
+                        orbs1 = numpy.argwhere(numpy.array(istate1)==1)
+                        orbs1 = [x[0] for x in orbs1]
+                        umat1 = u1[:,orbs1]
+                        s01 = numpy.dot(umat0.T,umat1)
+                        site[idx0+id0,1,idx1+id1] = numpy.linalg.det(s01)
+               idx1 += ndim1
+            idx0 += ndim0
       # Last site
       if irow == k-1:
          s = site.shape
-	 assert s[2] == 1
-	 site = sgn*site.reshape(s[0],s[1])
+         assert s[2] == 1
+         site = sgn*site.reshape(s[0],s[1])
       print(' irow =',irow,' isite.shape =',site.shape)
       sites.append(site)
    return sites

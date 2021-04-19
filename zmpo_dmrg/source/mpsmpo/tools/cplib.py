@@ -29,7 +29,7 @@ def cp_prod(cp,iprt=0):
    Rcp=len(cp_core)
    pindx=cp_pdim(cp)
    #for r in range(Rcp):
-   #   tmp=numpy.array([1.0])	   
+   #   tmp=numpy.array([1.0])      
    #   for i in range(N):
    #      # a1r[p1]*a2r[p2]...     
    #      tmp=numpy.kron(tmp,cp_site[i][r])

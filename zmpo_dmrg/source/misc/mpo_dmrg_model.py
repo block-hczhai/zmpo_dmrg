@@ -16,7 +16,7 @@ from zmpo_dmrg.source import mpo_dmrg_opers
 from zmpo_dmrg.source import mpo_dmrg_spinopers
 
 def genSaSpatialMat():
-   # signAlpha*idenBeta	
+   # signAlpha*idenBeta 
    # [ 1    ]  [ 1    ]
    # [   -1 ]  [    1 ] 
    mat = numpy.identity(4)
@@ -74,7 +74,7 @@ def genHubbardSpatial(dmrg,isite):
       cop[0,4] = -dmrg.model_t * annBs
       cop[0,5] = dmrg.model_u * nanb 
    elif isite == dmrg.nsite-1:
-      # [D B I]^T 	   
+      # [D B I]^T          
       cop = numpy.zeros((6,1,4,4))
       cop[0,0] = dmrg.model_u * nanb 
       cop[1,0] = annA  

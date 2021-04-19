@@ -92,9 +92,9 @@ def genHRfacSpatialQt(pindx,nsite,isite,int1e,qpts,maxslc=1,model_u=0.):
       slc0 = parallel_util.partitionSites(nql,qts.maxslc[0],islc)
       for jslc in range(qts.maxslc[1]):
          slc1 = parallel_util.partitionSites(nqr,qts.maxslc[1],jslc)
-	 ijdx = qts.ravel([islc,jslc])
+         ijdx = qts.ravel([islc,jslc])
          qts.dic[ijdx] = qtensor.qtensor([False,True,False,True])
          # Note that the qsyms for the last two dimensions are not collected
          qts.dic[ijdx].fromDenseTensor(site[numpy.ix_(slc0,slc1)],[ql[slc0],qr[slc1],qu,qd],ifcollect=[1,1,0,0])
-	 qts.size[ijdx] = qts.dic[ijdx].size_allowed
+         qts.size[ijdx] = qts.dic[ijdx].size_allowed
    return qts

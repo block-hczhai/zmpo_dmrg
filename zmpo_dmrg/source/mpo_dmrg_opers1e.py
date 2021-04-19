@@ -40,17 +40,17 @@ def addLocalOpers(p,nsite,isite,op12,model_u):
       op12new[0,0] = op12[0,0].copy()
       op12new[0,1] = op12[0,1].copy()
       if psite == 0:
-	 op12new[0,2] = mpo_dmrg_spinopers.genNaNbMat()*model_u*0.5
+         op12new[0,2] = mpo_dmrg_spinopers.genNaNbMat()*model_u*0.5
       else:
-	 op12new[0,2] = mpo_dmrg_spinopers.genIpMat()
+         op12new[0,2] = mpo_dmrg_spinopers.genIpMat()
    elif isite == nsite//2-1:
       op12new = numpy.zeros((3,1,4,4),dtype=dmrg_dtype)
       op12new[0,0] = op12[0,0].copy()
       op12new[1,0] = op12[1,0].copy()
       if psite == nsite//2-1:
-	 op12new[2,0] = mpo_dmrg_spinopers.genNaNbMat()*model_u*0.5
+         op12new[2,0] = mpo_dmrg_spinopers.genNaNbMat()*model_u*0.5
       else:
-	 op12new[2,0] = mpo_dmrg_spinopers.genIpMat() 
+         op12new[2,0] = mpo_dmrg_spinopers.genIpMat() 
    else:
       op12new = numpy.zeros((3,3,4,4),dtype=dmrg_dtype)
       op12new[0,0] = op12[0,0].copy()
@@ -58,9 +58,9 @@ def addLocalOpers(p,nsite,isite,op12,model_u):
       op12new[1,0] = op12[1,0].copy()
       op12new[1,1] = op12[1,1].copy()
       if psite == isite:
-	 op12new[2,2] = mpo_dmrg_spinopers.genNaNbMat()*model_u*0.5
+         op12new[2,2] = mpo_dmrg_spinopers.genNaNbMat()*model_u*0.5
       else:
-	 op12new[2,2] = mpo_dmrg_spinopers.genIpMat() 
+         op12new[2,2] = mpo_dmrg_spinopers.genIpMat() 
    return op12new
 
 #============================================================================
@@ -79,14 +79,14 @@ def genHfacSpin(p,nsite,isite,hq):
    wfac = genWfacSpin(nsite,isite,hq)
    elem = mpo_dmrg_opers.genElemSpinMat(p,isite)
    hfac = numpy.tensordot(wfac,elem,axes=([2],[1])) # abjk,ij-> abki
-   hfac = hfac.transpose(0,1,3,2).copy() 	    # abki->abik
+   hfac = hfac.transpose(0,1,3,2).copy()            # abki->abik
    return hfac
 
 # On-the-fly generatation of W[isite,iop] based on three index integrals
 #
-#  	       [ Ik'  hk*ak ]  [ hk*ak ]
-# [Ik' hk*ak]  [  	    ]  [       ] 
-# 	       [ 0k     Ik  ]  [   Ik  ]
+#              [ Ik'  hk*ak ]  [ hk*ak ]
+# [Ik' hk*ak]  [            ]  [       ] 
+#              [ 0k     Ik  ]  [   Ik  ]
 #
 # isite is the spin-orbital site here.
 def genWfacSpin(nsite,isite,hq):

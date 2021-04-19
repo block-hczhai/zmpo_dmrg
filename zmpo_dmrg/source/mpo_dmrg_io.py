@@ -58,10 +58,10 @@ def copyMPS(fmps1,fmps0,ifQt):
       for isite in range(nsite):
          key = 'site'+str(isite)
          if key in fmps1: del fmps1[key]
-	 fmps1[key] = fmps0[key].value
+         fmps1[key] = fmps0[key].value
    else:
       for isite in range(nsite):
-	 key = 'site'+str(isite)
+         key = 'site'+str(isite)
          if key in fmps1: del fmps1[key]
          site = qtensor.qtensor()
          site.load(fmps0,key)
@@ -84,18 +84,18 @@ def dumpMPS(fmps,mpslst,icase=0):
       for isite in range(nsite):
          fmps['site'+str(isite)] = sites[isite]
       for isite in range(nsite+1):
-	 fmps['qnum'+str(isite)] = qnums[isite]
-   # With qnums and Qt	   
+         fmps['qnum'+str(isite)] = qnums[isite]
+   # With qnums and Qt     
    elif icase == 2:
       nsite = len(mpslst[0])
       sites = mpslst[0]
       qnums = mpslst[1]
       fmps['nsite'] = nsite
       for isite in range(nsite):
-	 key = 'site'+str(isite)
+         key = 'site'+str(isite)
          sites[isite].dump(fmps,key)
       for isite in range(nsite+1):
-	 fmps['qnum'+str(isite)] = qnums[isite]
+         fmps['qnum'+str(isite)] = qnums[isite]
    return 0
 
 def loadMPS(fmps,icase=0):
@@ -111,18 +111,18 @@ def loadMPS(fmps,icase=0):
       sites = [0]*nsite
       qnums = [0]*(nsite+1)
       for isite in range(nsite):
-	 sites[isite] = loadSite(fmps,isite,False)
+         sites[isite] = loadSite(fmps,isite,False)
       for isite in range(nsite+1):
-	 qnums[isite] = fmps['qnum'+str(isite)].value
+         qnums[isite] = fmps['qnum'+str(isite)].value
       result = [sites,qnums]
-   # With qnums and Qt	   
+   # With qnums and Qt     
    elif icase == 2:
       sites = [0]*nsite
       qnums = [0]*(nsite+1)
       for isite in range(nsite):
-	 sites[isite] = loadSite(fmps,isite,True)
+         sites[isite] = loadSite(fmps,isite,True)
       for isite in range(nsite+1):
-	 qnums[isite] = fmps['qnum'+str(isite)].value
+         qnums[isite] = fmps['qnum'+str(isite)].value
       result = [sites,qnums]
    return result
 
@@ -177,12 +177,12 @@ def dumpMPO_H(dmrg,debug=False):
       gname = 'site'+str(isite)
       grp = dmrg.fhop.create_group(gname)
       if not dmrg.ifQt:
-	 # Loop over operators
+         # Loop over operators
          for iop in range(dmrg.nops):
             pindx = dmrg.opers[iop]
             cop = mpo_dmrg_opers.genHRfacSpatial(pindx,dmrg.sbas,isite,\
-              		       		         dmrg.int1e,dmrg.int2e,\
-              		       		         dmrg.qpts,dmrg.pdic)
+                                                 dmrg.int1e,dmrg.int2e,\
+                                                 dmrg.qpts,dmrg.pdic)
             grp['op'+str(iop)] = cop
       else:
          # Significantly compressed by a factor of 1/10 !
@@ -191,12 +191,12 @@ def dumpMPO_H(dmrg,debug=False):
          #        GROUP "site0" {
          #           GROUP "op0" {
          #              DATASET "dims_allowed" {
-	 # Loop over operators
+         # Loop over operators
          for iop in range(dmrg.nops):
             pindx = dmrg.opers[iop]
             cop = qtensor_opers.genHRfacSpatialQt(pindx,dmrg.sbas,isite,\
-              		         	          dmrg.int1e,dmrg.int2e,\
-              		         	          dmrg.qpts,dmrg.pdic,dmrg.maxslc)
+                                                  dmrg.int1e,dmrg.int2e,\
+                                                  dmrg.qpts,dmrg.pdic,dmrg.maxslc)
             cop.dump(grp,'op'+str(iop))
       tf = time.time()
       if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -256,23 +256,23 @@ def dumpMPO_H0(dmrg,debug=False):
             for iop in range(dmrg.nops):
                pindx = dmrg.opers[iop]
                cop = mpo_dmrg_opers.genHRfacSpatial(pindx,dmrg.sbas,isite,\
-                 		       		    dmrg.int1e,dmrg.int2e,\
-                 		       		    dmrg.qpts,dmrg.pdic)
-	       dim = cop.shape[-1]
-	       cop[...,~numpy.eye(dim,dtype=bool)] = 0.
+                                                    dmrg.int1e,dmrg.int2e,\
+                                                    dmrg.qpts,dmrg.pdic)
+               dim = cop.shape[-1]
+               cop[...,~numpy.eye(dim,dtype=bool)] = 0.
                grp['op'+str(iop)] = cop
          else:
             for iop in range(dmrg.nops):
                pindx = dmrg.opers[iop]
                cop = qtensor_opers.genHRfacSpatialQt(pindx,dmrg.sbas,isite,\
-                 		         	     dmrg.int1e,dmrg.int2e,\
-                 		         	     dmrg.qpts,dmrg.pdic,dmrg.maxslc)
-	       cop = cop.diagH()
+                                                     dmrg.int1e,dmrg.int2e,\
+                                                     dmrg.qpts,dmrg.pdic,dmrg.maxslc)
+               cop = cop.diagH()
                cop.dump(grp,'op'+str(iop))
 
       elif dmrg.ifH0 in [2,3,4]:          
 
-	 icase = dmrg.ifH0-2
+         icase = dmrg.ifH0-2
          if not dmrg.ifQt:
             for iop in range(dmrg.nops):
                pindx = dmrg.opers[iop]
@@ -285,8 +285,8 @@ def dumpMPO_H0(dmrg,debug=False):
                cop.dump(grp,'op'+str(iop))
 
       else:  
-	 print('\nerror: No such option for dumpMPO_H0!')
-	 exit(1)
+         print('\nerror: No such option for dumpMPO_H0!')
+         exit(1)
 
       tf = time.time()
       if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -306,13 +306,13 @@ def dumpMPO_Hubbard(dmrg,debug=False):
       gname = 'site'+str(isite)
       grp = dmrg.fhop.create_group(gname)
       for iop in range(dmrg.nops):
-	 cop = mpo_dmrg_model.genHubbardSpatial(dmrg,isite) 
+         cop = mpo_dmrg_model.genHubbardSpatial(dmrg,isite) 
          if not dmrg.ifQt:
             grp['op'+str(iop)] = cop
          else:
-	    #cop.dump(grp,'op'+str(iop))
+            #cop.dump(grp,'op'+str(iop))
             print('Not implemented yet!')
-	    exit()
+            exit()
          if debug: print(' isite/iop =',isite,iop,' pindx =',pindx)
       tf = time.time()
       if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -333,17 +333,17 @@ def dumpMPO_H1e(dmrg,debug=False):
       gname = 'site'+str(isite)
       grp = dmrg.fhop.create_group(gname)
       if not dmrg.ifQt:
-	 # Loop over operators
+         # Loop over operators
          for iop in range(dmrg.nops):
             pindx = dmrg.opers[iop]
             cop = mpo_dmrg_opers1e.genHRfacSpatial(pindx,dmrg.sbas,isite,dmrg.h1e,\
-              		       		           dmrg.qpts,dmrg.model_u)
+                                                   dmrg.qpts,dmrg.model_u)
             grp['op'+str(iop)] = cop
       else:
          for iop in range(dmrg.nops):
             pindx = dmrg.opers[iop]
             cop = qtensor_opers1e.genHRfacSpatialQt(pindx,dmrg.sbas,isite,dmrg.h1e,\
-              		         	            dmrg.qpts,dmrg.maxslc,dmrg.model_u)
+                                                    dmrg.qpts,dmrg.maxslc,dmrg.model_u)
             cop.dump(grp,'op'+str(iop))
       tf = time.time()
       if rank == 0: print(' isite =',isite,' time = %.2f s'%(tf-ti)) 
@@ -434,7 +434,7 @@ def loadInts(dmrg,mol):
       tmp['int2e'] = dmrg.int2e
       tmp.close()
    if rank == 0: 
-      f.close()	   
+      f.close()    
       t1 = time.time()
       print(" loadInts sucessfully! time = %.2f s"%(t1-t0))
    return 0

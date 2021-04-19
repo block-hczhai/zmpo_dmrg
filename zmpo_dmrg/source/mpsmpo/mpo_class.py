@@ -27,8 +27,8 @@ class class_mpo:
       if sites is None:
          self.sites=[0]*k
       else:
-	 self.sites = copy.deepcopy(sites)
-      # Quantum numbers	 
+         self.sites = copy.deepcopy(sites)
+      # Quantum numbers  
       self.qnums = None
       if qnums is not None:
          self.qnums = copy.deepcopy(qnums)
@@ -37,11 +37,11 @@ class class_mpo:
    def diagonal(self):
       tmpo = class_mpo(self.nsite)
       for i in range(tmpo.nsite):
-	 # l,r,u,d -> u,d,l,r     
-	 tmp1 = self.sites[i].transpose(2,3,0,1).copy()
-	 tmp2 = numpy.zeros(tmp1.shape)
-	 nd = tmp1.shape[0]
-	 tmp2[list(range(nd)),list(range(nd))] = tmp1[list(range(nd)),list(range(nd))]
+         # l,r,u,d -> u,d,l,r     
+         tmp1 = self.sites[i].transpose(2,3,0,1).copy()
+         tmp2 = numpy.zeros(tmp1.shape)
+         nd = tmp1.shape[0]
+         tmp2[list(range(nd)),list(range(nd))] = tmp1[list(range(nd)),list(range(nd))]
          tmpo.sites[i] = tmp2.transpose(2,3,0,1).copy() 
       return tmpo
 
@@ -55,8 +55,8 @@ class class_mpo:
       assert self.nsite == len(t1)
       for i in range(self.nsite):
          shape = t1[i].shape
-	 self.sites[i] = numpy.zeros((1,1,shape[0],shape[1]))
-	 self.sites[i][0,0] = t1[i]
+         self.sites[i] = numpy.zeros((1,1,shape[0],shape[1]))
+         self.sites[i][0,0] = t1[i]
       return 0
 
    def bdim(self):
@@ -69,33 +69,33 @@ class class_mpo:
 
    def prt(self,ifqnums=None):
       print("\nMPOinfo:")
-      print(" nsite = ",self.nsite)	   
+      print(" nsite = ",self.nsite)        
       for i in range(self.nsite):
          print(" Site : ",i," Shape : ",self.sites[i].shape,\
-	       " Val = ",numpy.linalg.norm(self.sites[i]))
+               " Val = ",numpy.linalg.norm(self.sites[i]))
       if self.qnums is not None and ifqnums:
-	 self.prtQnums()
+         self.prtQnums()
       print("End of MPOinfo\n")
       return 0
 
    def prtQnums(self):
       print(" quantum numbers:")
       for i in range(self.nsite):
-	 print(" Bond : ",i," bdim[i] =",len(self.qnums[i]))
-	 print(" Qnums[i] =",self.qnums[i])
+         print(" Bond : ",i," bdim[i] =",len(self.qnums[i]))
+         print(" Qnums[i] =",self.qnums[i])
       return 0
 
    def toMat(self):
       N = self.nsite
       for i in range(N):
-	 if i == 0:
-	    t1 = self.sites[0]
+         if i == 0:
+            t1 = self.sites[0]
          else:
             t2 = self.sites[i]
-	    # t1[l,r,nu,nd]*t2[l,r,nu',nd']
-	    tmp = numpy.einsum('abij,bckl->acikjl',t1,t2)
-	    s = tmp.shape
-	    t1 = tmp.reshape((s[0],s[1],s[2]*s[3],s[4]*s[5]))
+            # t1[l,r,nu,nd]*t2[l,r,nu',nd']
+            tmp = numpy.einsum('abij,bckl->acikjl',t1,t2)
+            s = tmp.shape
+            t1 = tmp.reshape((s[0],s[1],s[2]*s[3],s[4]*s[5]))
       t1 = t1[0,0].copy()
       return t1
 
@@ -114,8 +114,8 @@ class class_mpo:
       # s(1,N-2)[l,r,u,d]
       for i in range(1,N-1):
          s = self.sites[i].shape
-	 t1[i] = self.sites[i].reshape(s[0],s[1],s[2]*s[3]).transpose(0,2,1).copy()
-      return t1	
+         t1[i] = self.sites[i].reshape(s[0],s[1],s[2]*s[3]).transpose(0,2,1).copy()
+      return t1 
 
    #
    # [Split] by reshaping from MPS => MPO
@@ -132,8 +132,8 @@ class class_mpo:
       #
       rr = mpslib.mps_diff(t1,t2,iprt=0)
       if rr > 1.e-5:
-	 print('error: compression error in MPOcompression! rr=',rr)
-	 print('HSnorm = ',self.HSnorm())
+         print('error: compression error in MPOcompression! rr=',rr)
+         print('HSnorm = ',self.HSnorm())
       # from t1 (list) -> MPO
       N = self.nsite
       # t1(0)[ud,r']->s(0)[l=1,r',u,d]
@@ -149,9 +149,9 @@ class class_mpo:
       self.sites[N-1] = t1[N-1].reshape(t[0],1,s[2],s[3]).copy()
       # t1(i)[l',ud,r']->s(i)[l',r',u,d]
       for i in range(1,N-1):
-	 t = t1[i].shape
+         t = t1[i].shape
          s = self.sites[i].shape
-	 self.sites[i] = t1[i].reshape(t[0],s[2],s[3],t[2]).transpose(0,3,1,2).copy()
+         self.sites[i] = t1[i].reshape(t[0],s[2],s[3],t[2]).transpose(0,3,1,2).copy()
       return 0
 
    #--------------------------------
@@ -171,12 +171,12 @@ class class_mpo:
    def trace(self):
       N = self.nsite
       for i in range(N):
-	 tmp = self.sites[i]
-	 mat = numpy.einsum('lrmm->lr',tmp)
-	 if i == 0:
-	    tmat = mat
-	 else:
-	    tmat = numpy.einsum('lr,rt->lt',tmat,mat)
+         tmp = self.sites[i]
+         mat = numpy.einsum('lrmm->lr',tmp)
+         if i == 0:
+            tmat = mat
+         else:
+            tmat = numpy.einsum('lr,rt->lt',tmat,mat)
       assert tmat.shape == (1,1)
       return tmat[0,0]
 
@@ -189,23 +189,23 @@ class class_mpo:
       return norm
 
    # 1. sum of two MPOs: site[1:l1,1:r1,nu,nd]
-   #		         site[l1:l2,r1:r2,nu,nd]	
+   #                     site[l1:l2,r1:r2,nu,nd]        
    #
    def add(self,other):
       assert self.nsite == other.nsite
       N    = self.nsite
       mpo  = class_mpo(N)
       for i in range(N):
-	 # Direct sum structure
-	 (l1,r1,u1,d1) = self.sites[i].shape 
-	 (l2,r2,u2,d2) = other.sites[i].shape 
-	 assert (u1 == u2 and d1 == d2)
-	 l12 = l1+l2
-	 r12 = r1+r2
-	 tmp = numpy.zeros((l12,r12,u1,d1))
-	 tmp[:l1,:r1] = self.sites[i]
-	 tmp[l1:,r1:] = other.sites[i]
-	 mpo.sites[i] = tmp.copy()
+         # Direct sum structure
+         (l1,r1,u1,d1) = self.sites[i].shape 
+         (l2,r2,u2,d2) = other.sites[i].shape 
+         assert (u1 == u2 and d1 == d2)
+         l12 = l1+l2
+         r12 = r1+r2
+         tmp = numpy.zeros((l12,r12,u1,d1))
+         tmp[:l1,:r1] = self.sites[i]
+         tmp[l1:,r1:] = other.sites[i]
+         mpo.sites[i] = tmp.copy()
       #
       # This is a great simplification.  
       # Partial sum: a[j] = sum_i A[i,j] 
@@ -228,16 +228,16 @@ class class_mpo:
       N    = self.nsite
       mpo  = class_mpo(N)
       for i in range(N):
-	 tmp1 = self.sites[i].copy()
-	 tmp2 = other.sites[i].copy()
-	 #tmp = numpy.einsum('abxy,ijyz->aibjxz',self.sites[i],other.sites[i])
-	 # ijyz->yijz
-	 tmp2 = tmp2.transpose(2,0,1,3).copy()
-	 # abxy,yijz -> abxijz -> aibjxz 
-	 tmp = numpy.tensordot(tmp1,tmp2,axes=([3],[0]))
+         tmp1 = self.sites[i].copy()
+         tmp2 = other.sites[i].copy()
+         #tmp = numpy.einsum('abxy,ijyz->aibjxz',self.sites[i],other.sites[i])
+         # ijyz->yijz
+         tmp2 = tmp2.transpose(2,0,1,3).copy()
+         # abxy,yijz -> abxijz -> aibjxz 
+         tmp = numpy.tensordot(tmp1,tmp2,axes=([3],[0]))
          tmp = tmp.transpose(0,3,1,4,2,5)
-	 s = tmp.shape
-  	 mpo.sites[i] = tmp.reshape((s[0]*s[1],s[2]*s[3],s[4],s[5])).copy()
+         s = tmp.shape
+         mpo.sites[i] = tmp.reshape((s[0]*s[1],s[2]*s[3],s[4],s[5])).copy()
       return mpo
 
    #
@@ -267,21 +267,21 @@ class class_mpo:
       mpslib.mps_mps2rank3(0,mps)
       tmps = []
       for i in range(N):
- 	 # MPO[l,r,u,d]*mps[l',d,r']=MPS(ll',u,rr')
-	 (l1,r1,u1,d1) = self.sites[i].shape 
-	 (l2,d2,r2) = mps[i].shape 
-	 l12 = l1*l2
-	 r12 = r1*r2
-	 #tmp = numpy.einsum('lrud,adb->laurb',self.sites[i],mps[i])
-	 tmp = numpy.tensordot(self.sites[i],mps[i],axes=([3],[1])) # lruab
-	 tmp = tmp.transpose(0,3,2,1,4) # lruab->laurb
-	 tmps.append(tmp.reshape((l12,u1,r12)))
+         # MPO[l,r,u,d]*mps[l',d,r']=MPS(ll',u,rr')
+         (l1,r1,u1,d1) = self.sites[i].shape 
+         (l2,d2,r2) = mps[i].shape 
+         l12 = l1*l2
+         r12 = r1*r2
+         #tmp = numpy.einsum('lrud,adb->laurb',self.sites[i],mps[i])
+         tmp = numpy.tensordot(self.sites[i],mps[i],axes=([3],[1])) # lruab
+         tmp = tmp.transpose(0,3,2,1,4) # lruab->laurb
+         tmps.append(tmp.reshape((l12,u1,r12)))
       mpslib.mps_mps2rank3(1,tmps)
       mpslib.mps_mps2rank3(1,mps)
       return tmps
 
    def dotMPS(self,mps,debug=False):
-      if debug: print('\n[mpo_class.dotMPS]')	   
+      if debug: print('\n[mpo_class.dotMPS]')      
       assert self.nsite == mps.nsite
       mps2 = mps.torank2()
       tmps = self.dot(mps2)
@@ -290,20 +290,20 @@ class class_mpo:
       #
       qnums = None
       if self.qnums is not None and mps.qnums is not None:
-	 if debug: print('Merge quantum numbers:')
-	 q1 = self.qnums
-	 q2 = mps.qnums
-	 b1 = self.bdim()
-	 b2 = mps.bdim()
-	 qnums = [0]*self.nsite
-	 for ibond in range(self.nsite):
-	    q1i = self.qnums[ibond]
-	    q2i = mps.qnums[ibond]
-	    q12 = mpo_qphys.dpt(q1i,q2i)
-	    if debug: print('q12=',q12)
-	    # Some compressions are required to remove negative 
-	    # and large q12 that exceed the allowed qnums.
-	    qnums[ibond] = copy.deepcopy(q12)
+         if debug: print('Merge quantum numbers:')
+         q1 = self.qnums
+         q2 = mps.qnums
+         b1 = self.bdim()
+         b2 = mps.bdim()
+         qnums = [0]*self.nsite
+         for ibond in range(self.nsite):
+            q1i = self.qnums[ibond]
+            q2i = mps.qnums[ibond]
+            q12 = mpo_qphys.dpt(q1i,q2i)
+            if debug: print('q12=',q12)
+            # Some compressions are required to remove negative 
+            # and large q12 that exceed the allowed qnums.
+            qnums[ibond] = copy.deepcopy(q12)
       # Product new MPS
       mps2 = mps_class.class_mps(self.nsite,sites=tmps,qphys=mps.qphys,qnums=qnums)
       return mps2
@@ -326,8 +326,8 @@ class class_mpo:
       print(' Partition =',partition)
       nsite = len(partition)
       if nsite == 0:
- 	 print('error: empty partition!')
-	 exit()
+         print('error: empty partition!')
+         exit()
       # Start construction
       tmpo = [0]*nsite
       qnums = [0]*nsite
@@ -339,14 +339,14 @@ class class_mpo:
                tmp = self.sites[isite].copy()
                #tmp = numpy.einsum('abij,bckl->acikjl',cop,tmp)
                tmp = numpy.tensordot(cop,tmp,axes=([1],[0]))
-	       # abij,bckl->aijckl->acikjl
-	       tmp = tmp.transpose(0,3,1,4,2,5).copy()
+               # abij,bckl->aijckl->acikjl
+               tmp = tmp.transpose(0,3,1,4,2,5).copy()
                s = tmp.shape
                cop = tmp.reshape((s[0],s[1],s[2]*s[3],s[4]*s[5])).copy()
          tmpo[idx] = cop.copy()
-	 # Taken the quantum numbers of the last site in each group: o---
-	 if self.qnums is not None: 
-	    qnums[idx] = self.qnums[item[-1]]
+         # Taken the quantum numbers of the last site in each group: o---
+         if self.qnums is not None: 
+            qnums[idx] = self.qnums[item[-1]]
       if self.qnums is None: 
          tmpo = class_mpo(nsite,sites=tmpo)
       else:
@@ -365,7 +365,7 @@ def mpo_r1(k,p,otype):
       mpo[r] = jwtrans.sgn
    # matrix representation   
    if otype == 1:
-      mpo[p] = jwtrans.cre	   
+      mpo[p] = jwtrans.cre         
    elif otype == 0:
       mpo[p] = jwtrans.ann 
    return mpo
@@ -384,9 +384,9 @@ def mpo_r1mat(t1):
    k1 = len(t1)
    for k in range(k1):
       if k == 0:
-	 mat = t1[k] 
+         mat = t1[k] 
       else:
-	 mat = numpy.kron(mat,t1[k])
+         mat = numpy.kron(mat,t1[k])
    return mat
 
 # Diff <P-Q|P-Q>
@@ -418,12 +418,12 @@ def u1mpo(k,i,j,arg,iop=0,debug=False):
       tmp[m,m] = numpy.identity(2)
    for m in range(i+1,j):
       u1mpo.sites[m] = tmp.copy()
-   # 1. umat[(u,d),a]	   
+   # 1. umat[(u,d),a]      
    if iop == 0:
       tmp = u1mat(arg)
       if debug: print('\nucore[i,j]= (%d,%d)\n'%(i,j),tmp)
    else:
-      # A kind of random unitary	   
+      # A kind of random unitary           
       tmp = numpy.random.uniform(-1,1,(4,4))
       q,r = scipy.linalg.qr(tmp)
       tmp = q
@@ -501,8 +501,8 @@ def genHmpo1(h1e,thresh=1.e-10):
    op1 = None
    for i in range(nb):
       for j in range(nb):
-	 if abs(h1e[i,j])<thresh: continue
-	 #print '(i,j)=',i,j,h1e[i,j]
+         if abs(h1e[i,j])<thresh: continue
+         #print '(i,j)=',i,j,h1e[i,j]
          ci = mpo_r1(nb,i,1)
          aj = mpo_r1(nb,j,0)
          Aij = mpo_r1mul(ci,aj)
@@ -513,9 +513,9 @@ def genHmpo1(h1e,thresh=1.e-10):
          if idx == 1:
             op1 = op.copy()
          else:
-            op1 = op1.add(op)		
+            op1 = op1.add(op)           
       if op1 is not None:
-	 op1.compress()
+         op1.compress()
          #print 'bdim',j,op1.bdim()
    if idx == 0:
       print('warning: no mpo generated in genHmpo1 with thresh=',thresh)
@@ -530,24 +530,24 @@ def genHmpo2(h2e,thresh=1.e-10):
    for j in range(nb):
       for i in range(j+1):
          for l in range(nb):
-   	    for k in range(l+1):
-	       if abs(h2e[i,j,k,l])<thresh: continue
-   	       #print 'idx=',idx,'(i,j,k,l)=',i,j,k,l,h2e[i,j,k,l]
+            for k in range(l+1):
+               if abs(h2e[i,j,k,l])<thresh: continue
+               #print 'idx=',idx,'(i,j,k,l)=',i,j,k,l,h2e[i,j,k,l]
                ci = mpo_r1(nb,i,1)
                cj = mpo_r1(nb,j,1)
                ak = mpo_r1(nb,k,0)
                al = mpo_r1(nb,l,0)
                Aij = mpo_r1mul(ci,cj)
-   	       Akl = mpo_r1mul(ak,al)
-   	       Aijkl = mpo_r1mul(Aij,Akl)
-   	       op = class_mpo(nb)
-   	       op.fromRank1(Aijkl)
-   	       op.mul(h2e[i,j,k,l])
+               Akl = mpo_r1mul(ak,al)
+               Aijkl = mpo_r1mul(Aij,Akl)
+               op = class_mpo(nb)
+               op.fromRank1(Aijkl)
+               op.mul(h2e[i,j,k,l])
                idx += 1
-   	       if idx == 1:
-   	          op1 = op.copy()
-   	       else:
-    	          op1 = op1.add(op)		
+               if idx == 1:
+                  op1 = op.copy()
+               else:
+                  op1 = op1.add(op)             
       # j
       if op1 is not None:
          op1.compress()
@@ -740,12 +740,12 @@ def genUmpo(k,i,j,arg,targ=1.e-10,tcomp=1.e-10,debug=False):
          smpo.mul(-1.0/float(i))
          smpo.compress(thresh=tcomp)
          norm = smpo.HSnorm()
-	 if norm < 1.e-12: iconv=True; break
+         if norm < 1.e-12: iconv=True; break
          umpo = umpo.add(smpo)
          umpo.compress(thresh=tcomp)
-	 if debug: print('i,bdim1=',i,umpo.bdim(),norm,umpo.HSnorm())
-	 #print smpo.toMat()
-	 #print umpo.toMat()
+         if debug: print('i,bdim1=',i,umpo.bdim(),norm,umpo.HSnorm())
+         #print smpo.toMat()
+         #print umpo.toMat()
       if iconv == False:
          print('Umpo not converged!')
          exit()
@@ -761,7 +761,7 @@ def genUmpo(k,i,j,arg,targ=1.e-10,tcomp=1.e-10,debug=False):
 # Exact MPO expression U1mpoG = exp(-Kij)
 #
 def genU1mpo(k,i,j,arg,thresh_arg=1.e-10):
-   assert i != j	
+   assert i != j        
    umpo = idenmpo(k)
    if abs(arg)>thresh_arg:
       targ = -arg
@@ -941,13 +941,13 @@ def makeRDM1(mps):
    rdm1 = numpy.zeros((nb,nb))
    for i in range(nb):
       for j in range(nb):
-	 print('rdm[i,j] (i,j)=',i,j)  
+         print('rdm[i,j] (i,j)=',i,j)  
          ci = mpo_r1(nb,i,1)
          aj = mpo_r1(nb,j,0)
          Aij = mpo_r1mul(ci,aj)
          op = class_mpo(nb)
          op.fromRank1(Aij)
-	 rdm1[i,j] = mpslib.mps_dot(mps,op.dot(mps))
+         rdm1[i,j] = mpslib.mps_dot(mps,op.dot(mps))
    print('Hermicity=',numpy.linalg.norm(rdm1-rdm1.T))
    return rdm1
 
@@ -1173,7 +1173,7 @@ def testBdim2(h1e,itype,jtype,thresh=1.e-10):
    op1 = None
    for i in range(nb):
       for j in range(nb):
-	 if abs(h1e[i,j])<thresh: continue
+         if abs(h1e[i,j])<thresh: continue
          ci = mpo_r1(nb,i,itype)
          aj = mpo_r1(nb,j,jtype)
          Aij = mpo_r1mul(ci,aj)
@@ -1184,9 +1184,9 @@ def testBdim2(h1e,itype,jtype,thresh=1.e-10):
          if idx == 1:
             op1 = op.copy()
          else:
-            op1 = op1.add(op)		
+            op1 = op1.add(op)           
       if op1 is not None:
-	 op1.compress()
+         op1.compress()
    if idx == 0:
       print('error: no mpo generated in testBdim2 with thresh=',thresh)
       exit()
@@ -1200,7 +1200,7 @@ def testBdim3(t1e,itype,jtype,ktype,thresh=1.e-10):
    for i in range(nb):
       for j in range(nb):
          for k in range(nb):
-	    if abs(t1e[i,j,k])<thresh: continue
+            if abs(t1e[i,j,k])<thresh: continue
             print('(i,j,k)=',i,j,k,t1e[i,j,k])
             ci = mpo_r1(nb,i,itype)
             cj = mpo_r1(nb,j,jtype)
@@ -1214,10 +1214,10 @@ def testBdim3(t1e,itype,jtype,ktype,thresh=1.e-10):
             if idx == 1:
                op1 = op.copy()
             else:
-               op1 = op1.add(op)		
+               op1 = op1.add(op)                
       if op1 is not None:
-	 op1.compress(thresh=1.e-8)
-	 print('bdim=',op1.bdim())
+         op1.compress(thresh=1.e-8)
+         print('bdim=',op1.bdim())
    if idx == 0:
       print('error: no mpo generated in testBdim3 with thresh=',thresh)
       exit()
@@ -1250,7 +1250,7 @@ def localMPO(hp,sz,op):
    # + hk sa * sz * ... * sz     * ap
    #
    # = [a1,s1]^T* [ i2 0 ] * [i3 0 ] * [i4]
-   #		  [ a2 s2] * [a3 s3] * [a4]
+   #              [ a2 s2] * [a3 s3] * [a4]
    #
    k = hp.shape[0]
    idn = numpy.identity(2)
@@ -1277,10 +1277,10 @@ def localMPO(hp,sz,op):
       # middle
       for i in range(1,k-1):
          tmpo = numpy.zeros((2,2,2,2))
-	 tmpo[0,0] = idn
-	 tmpo[1,0] = hp[i]*op
-	 tmpo[1,1] = sz
-	 sites[i] = tmpo.copy()
+         tmpo[0,0] = idn
+         tmpo[1,0] = hp[i]*op
+         tmpo[1,1] = sz
+         sites[i] = tmpo.copy()
    return sites 
 
 
@@ -1305,7 +1305,7 @@ def genHmpo1d(h1e,thresh=1.e-10,ifcomp=False):
    #mpo = class_mpo(nb,localMPO(hp,jwtrans.idn,jwtrans.nii))
    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
    for i in range(nb-1):
-      # phase factor due to jwtrans	   
+      # phase factor due to jwtrans        
       pre0 = [idn]*i
       ## term-1: hpp np
       op1 = pre0 + [h1e[i,i]*nii] + [idn]*(nb-i-1)

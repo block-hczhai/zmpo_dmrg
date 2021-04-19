@@ -89,7 +89,7 @@ def mps_check(tensor,shape,mps):
    return diff
    
 def mps_print(mps):
-   print("MPS=")	
+   print("MPS=")        
    N=len(mps)
    # test MPS
    for i in range(N):
@@ -264,7 +264,7 @@ def mps_svd_lupdate(iop,isite,mps,thresh,D,iprt=2):
    bdim=len(s2)
    if isite == 0:
       mps[isite]=u2.copy()
-   else:	   
+   else:           
       mps[isite]=u2.reshape((s[0],s[1],bdim)).copy()
    # also update A[i+1]
    if iop:
@@ -282,7 +282,7 @@ def mps_svd_rupdate(iop,isite,mps,thresh,D):
    N=len(mps)
    if isite == N-1:
       mat=mps[isite]
-   else:	   
+   else:           
       s=mps[isite].shape
       d1=s[0]
       d2=s[1]*s[2]
@@ -307,8 +307,8 @@ def mps_svd_rupdate(iop,isite,mps,thresh,D):
    return 0
 
 def mps_leftSVD(mps,thresh,D,iprt=0):
-   if iprt == 0:	
-      print("\n[mps_leftSVD]")	
+   if iprt == 0:        
+      print("\n[mps_leftSVD]")  
    elif iprt == 1:
       print("\n[mps_rightSVD]")
    N=len(mps)
@@ -452,12 +452,12 @@ def mps_random(mps,D,iop=0):
       nmps.append(tmp)
       for i in range(1,N-1):
          s=mps[i].shape
-	 K=s[1]
+         K=s[1]
          basis=numpy.identity(K)
          indx=numpy.random.randint(K,size=D*D)
          tmp=basis[indx]
-	 tmp=tmp.reshape((K,D,D))
-	 tmp=tmp.transpose(1,0,2)
+         tmp=tmp.reshape((K,D,D))
+         tmp=tmp.transpose(1,0,2)
          nmps.append(tmp)
       # last site
       s=mps[N-1].shape
@@ -471,7 +471,7 @@ def mps_random(mps,D,iop=0):
 
 def mps_ext(mps,Dincr):
    N=len(mps)
-   # first one	
+   # first one  
    s=mps[0].shape
    tmp=numpy.zeros((s[0],s[1]+Dincr))
    tmp[:,:s[1]]=mps[0]
@@ -556,10 +556,10 @@ def mps_oneSite(mps,thresh):
       # 0. Initialize the Right-renormalize basis
       #    _______ ... _____    MPS approx
       #    | | | |     | | |
-      #    | | | |     | | |	
+      #    | | | |     | | |    
       #    ======= ... =====    MPS exact
       #    0[1 2 3      N-2N-1]   
-      # No. N-2		 1 0   (N-i-1) rbas
+      # No. N-2          1 0   (N-i-1) rbas
       # for the solution of site
       #    0 1 2 3 ...  N-2 
       rbas=[]
@@ -567,71 +567,71 @@ def mps_oneSite(mps,thresh):
       rbas.append(tmp)
       for i in range(N-2,0,-1):
           tmp2=numpy.einsum('iKu,ud->iKd',amps[i],tmp)
-	  tmp =numpy.einsum('iKd,jKd->ij',tmp2,mps[i])
+          tmp =numpy.einsum('iKd,jKd->ij',tmp2,mps[i])
           rbas.append(tmp)
       #print rbas
 
       # 1. sweep
       while micro_error>micro_thresh and micro_iter<=micro_maxiter:
-	 if debug: print("\n   micro_iter = ",micro_iter)
-	 micro_iter=micro_iter+1
+         if debug: print("\n   micro_iter = ",micro_iter)
+         micro_iter=micro_iter+1
 
-	 #--- Start from right canonical form & Sweep to right ---
-	 # 1. Right sweep and construct lbas 
-	 #    [the last site is not touched]
-         #    | | | |     | | |	
+         #--- Start from right canonical form & Sweep to right ---
+         # 1. Right sweep and construct lbas 
+         #    [the last site is not touched]
+         #    | | | |     | | | 
          #    ======= ... =====    MPS exact
          # No.[0 1 2 3      N-2]N-1 lbas
-	 lbas=[]
-	 amps[0]=numpy.einsum("Kl,ul->Ku",mps[0],rbas[N-2])
-	 mps_svd_lupdate(True,0,amps,-0.1,D)
-	 tmp =numpy.einsum("Ki,Kj->ij",amps[0],mps[0])
-	 lbas.append(tmp)
-	 for i in range(1,N-1):
-	    string="   r-sweep[i] ="+str(i)
-	    # Update amps[i]=((L*mps[i])*R)
-	    tmp    =numpy.einsum('ij,jKl->iKl',lbas[i-1],mps[i])
-	    amps[i]=numpy.einsum('iKl,ul->iKu',tmp,rbas[N-i-2])
-	    # Recast A[i] into L-canonical form without cut off
-	    # >>> QR can be used here actually <<<
-	    mps_svd_lupdate(True,i,amps,-0.1,D)
-	    #if mps_dot(amps,mps)<0.0:
-	    #   amps[i]=-amps[i]
-	    # Construct lbas via amps[i]*(lbas[i-1],mps[i])
-	    lbas.append( numpy.einsum('iKu,iKd->ud',amps[i],tmp) )
-	    sweep_error_new=mps_diff(amps,mps,0)
-	    if debug: print(string+" error = "+str(sweep_error_new))
+         lbas=[]
+         amps[0]=numpy.einsum("Kl,ul->Ku",mps[0],rbas[N-2])
+         mps_svd_lupdate(True,0,amps,-0.1,D)
+         tmp =numpy.einsum("Ki,Kj->ij",amps[0],mps[0])
+         lbas.append(tmp)
+         for i in range(1,N-1):
+            string="   r-sweep[i] ="+str(i)
+            # Update amps[i]=((L*mps[i])*R)
+            tmp    =numpy.einsum('ij,jKl->iKl',lbas[i-1],mps[i])
+            amps[i]=numpy.einsum('iKl,ul->iKu',tmp,rbas[N-i-2])
+            # Recast A[i] into L-canonical form without cut off
+            # >>> QR can be used here actually <<<
+            mps_svd_lupdate(True,i,amps,-0.1,D)
+            #if mps_dot(amps,mps)<0.0:
+            #   amps[i]=-amps[i]
+            # Construct lbas via amps[i]*(lbas[i-1],mps[i])
+            lbas.append( numpy.einsum('iKu,iKd->ud',amps[i],tmp) )
+            sweep_error_new=mps_diff(amps,mps,0)
+            if debug: print(string+" error = "+str(sweep_error_new))
 
-	 # 2. left sweep and construct rbas again
+         # 2. left sweep and construct rbas again
          #     | | | |     | | |
-	 #     ======= ... =====    MPS 
+         #     ======= ... =====    MPS 
          #     0[1 2 3      N-2N-1]   
          # No.[0 1 2 3      N-2]N-1 lbas
-         # No.  N-2	      1 0   (N-i-1) rbas
-	 rbas=[]
-	 amps[N-1]=numpy.einsum('ui,iK->uK',lbas[N-2],mps[N-1])
-	 mps_svd_rupdate(True,N-1,amps,-0.1,D)
-	 tmp=numpy.einsum('iJ,kJ->ik',amps[N-1],mps[N-1])
+         # No.  N-2           1 0   (N-i-1) rbas
+         rbas=[]
+         amps[N-1]=numpy.einsum('ui,iK->uK',lbas[N-2],mps[N-1])
+         mps_svd_rupdate(True,N-1,amps,-0.1,D)
+         tmp=numpy.einsum('iJ,kJ->ik',amps[N-1],mps[N-1])
          rbas.append(tmp)
-	 for i in range(N-2,0,-1):
-	    string="   l-sweep[i] ="+str(i)
-	    # Update amps[i]=(L*(mps[i]*R)) 
-    	    tmp    =numpy.einsum('iKd,ud->iKu',mps[i],rbas[N-i-2])
-	    amps[i]=numpy.einsum('ui,iKd->uKd',lbas[i-1],tmp)
-	    # Recast A[i] into R-canonical form without cut off
-	    # SVD - actually site i-1 is descarded in this case
-	    #       while in eigenvalue problem it can be used as initial guess
-	    mps_svd_rupdate(True,i,amps,-0.1,D)
-	    #if mps_dot(amps,mps)<0.0:
-	    #   amps[i]=-amps[i]
-	    # Construct rbas via amps[i]*(rbas[i-1],mps[i])
-	    rbas.append( numpy.einsum('jKu,iKu->ji',amps[i],tmp) )
-	    sweep_error_new=mps_diff(amps,mps,0)
-	    if debug: print(string+" error = "+str(sweep_error_new))
+         for i in range(N-2,0,-1):
+            string="   l-sweep[i] ="+str(i)
+            # Update amps[i]=(L*(mps[i]*R)) 
+            tmp    =numpy.einsum('iKd,ud->iKu',mps[i],rbas[N-i-2])
+            amps[i]=numpy.einsum('ui,iKd->uKd',lbas[i-1],tmp)
+            # Recast A[i] into R-canonical form without cut off
+            # SVD - actually site i-1 is descarded in this case
+            #       while in eigenvalue problem it can be used as initial guess
+            mps_svd_rupdate(True,i,amps,-0.1,D)
+            #if mps_dot(amps,mps)<0.0:
+            #   amps[i]=-amps[i]
+            # Construct rbas via amps[i]*(rbas[i-1],mps[i])
+            rbas.append( numpy.einsum('jKu,iKu->ji',amps[i],tmp) )
+            sweep_error_new=mps_diff(amps,mps,0)
+            if debug: print(string+" error = "+str(sweep_error_new))
 
          # define micro_error as error change after a whole sweep
          micro_error = abs(sweep_error_new - sweep_error_old)
-	 sweep_error_old = sweep_error_new
+         sweep_error_old = sweep_error_new
 
       # define macro_error
       diff = mps_diff(amps,mps)
@@ -641,9 +641,9 @@ def mps_oneSite(mps,thresh):
       if macro_error<=thresh:
          break
       else:
-	 D=D+1
-	 print("\nExtend bond dimension:",D)
-	 if D < Dmax: mps_ext(amps,1)
+         D=D+1
+         print("\nExtend bond dimension:",D)
+         if D < Dmax: mps_ext(amps,1)
 
    # check convergence
    print("\nFinal summary:")

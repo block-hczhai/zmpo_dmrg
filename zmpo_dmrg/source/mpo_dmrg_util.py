@@ -96,11 +96,11 @@ def mps0random(dphys,dmax):
    for isite in range(nsite):
       dloc = dphys[isite]
       if isite==0:
-	 sites[isite] = numpy.random.uniform(-1,1,(1,dloc,dmax))
+         sites[isite] = numpy.random.uniform(-1,1,(1,dloc,dmax))
       elif isite==nsite-1:
-	 sites[isite] = numpy.random.uniform(-1,1,(dmax,dloc,1))
+         sites[isite] = numpy.random.uniform(-1,1,(dmax,dloc,1))
       else:
-	 sites[isite] = numpy.random.uniform(-1,1,(dmax,dloc,dmax))
+         sites[isite] = numpy.random.uniform(-1,1,(dmax,dloc,dmax))
    return sites
 
 # A product state, |mixed>=Prod_i (|0i>+|1i>+...)/sqrt(Ni) 
@@ -225,16 +225,16 @@ def initOps(dmrg,fmps):
    #--------------------------------------------------------
    if rank == 0 and dmrg.ifex:
       for iref in range(dmrg.nref):
-	 print('\n ### Ovlps: iref =',iref,' rank =',rank,'###')
+         print('\n ### Ovlps: iref =',iref,' rank =',rank,'###')
          fket = dmrg.wfex[iref]
-	 # <A|B>
+         # <A|B>
          if not dmrg.ifs2proj: 
             fnamel  = dmrg.path+'/ref'+str(iref)+'_lsop'
             fnamer  = dmrg.path+'/ref'+str(iref)+'_rsop'
             mpo_dmrg_init.genBmat(dmrg,fnamer,dmrg.nsite)
-	    mpo_dmrg_init.genSops(dmrg,fbra,fket,fnamel,'L')
-	 # <A|P|B>
-	 else:
+            mpo_dmrg_init.genSops(dmrg,fbra,fket,fnamel,'L')
+         # <A|P|B>
+         else:
             fnamelp = dmrg.path+'/ref'+str(iref)+'_lpop'
             fnamerp = dmrg.path+'/ref'+str(iref)+'_rpop'
             mpo_dmrg_init.genBops(dmrg,fnamerp,dmrg.npts,dmrg.nsite,ifslc=False)
@@ -242,7 +242,7 @@ def initOps(dmrg,fmps):
    #--------------------------------------------------------
    # RHS of PT equation: <fmps|H|MPS[i]>
    if dmrg.ifpt:
-      # Generate E0	   
+      # Generate E0        
       initE0pt(dmrg,fmps)
       #--------------------------------------------------------
       # Initialization-2: initialization (lrhop)
@@ -250,13 +250,13 @@ def initOps(dmrg,fmps):
       #--------------------------------------------------------
       ln = '#'*10
       for iref in range(dmrg.nref):
-	 print('\n'+ln+' <Psi|H|Psi[i]>: iref =',iref,' rank=',rank,ln)
+         print('\n'+ln+' <Psi|H|Psi[i]>: iref =',iref,' rank=',rank,ln)
          fket = dmrg.wfex[iref]
-	 # <A|H|B>
+         # <A|H|B>
          fnamel = dmrg.path+'/ref'+str(iref)+'_lhop'
          fnamer = dmrg.path+'/ref'+str(iref)+'_rhop'
-	 mpo_dmrg_init.genBops(dmrg,fnamer,dmrg.nops,dmrg.nsite,ifslc=True)
-	 mpo_dmrg_init.genHops(dmrg,fbra,fket,fnamel,'L')
+         mpo_dmrg_init.genBops(dmrg,fnamer,dmrg.nops,dmrg.nsite,ifslc=True)
+         mpo_dmrg_init.genHops(dmrg,fbra,fket,fnamel,'L')
       #--------------------------------------------------------
       # Initialization-3: initialization (lrdop)
       # Blocks for <Psi|H0|Psi[i]>
@@ -264,13 +264,13 @@ def initOps(dmrg,fmps):
       if dmrg.ifH0:
          dmrg.fdopXfhop()
          for iref in range(dmrg.nref):
-   	    print('\n'+ln+' <Psi|H0|Psi[i]>: iref =',iref,' rank=',rank,ln)
+            print('\n'+ln+' <Psi|H0|Psi[i]>: iref =',iref,' rank=',rank,ln)
             fket = dmrg.wfex[iref]
-   	    # <A|H|B>
+            # <A|H|B>
             fnamel = dmrg.path+'/ref'+str(iref)+'_ldop'
             fnamer = dmrg.path+'/ref'+str(iref)+'_rdop'
-   	    mpo_dmrg_init.genBops(dmrg,fnamer,dmrg.nops,dmrg.nsite,ifslc=True)
-   	    mpo_dmrg_init.genHops(dmrg,fbra,fket,fnamel,'L')
+            mpo_dmrg_init.genBops(dmrg,fnamer,dmrg.nops,dmrg.nsite,ifslc=True)
+            mpo_dmrg_init.genHops(dmrg,fbra,fket,fnamel,'L')
          dmrg.fdopXfhop()
       #--------------------------------------------------------
    return 0
@@ -290,7 +290,7 @@ def initE0pt(dmrg,fmps):
          assert len(dmrg.coef) == dmrg.nref
          dmrg.coef = numpy.array(dmrg.coef)
          dmrg.e0 = reduce(numpy.dot,(dmrg.coef.T.conj(),hmat,dmrg.coef))/\
-           	   reduce(numpy.dot,(dmrg.coef.T.conj(),smat,dmrg.coef))
+                   reduce(numpy.dot,(dmrg.coef.T.conj(),smat,dmrg.coef))
    # For each rank, only the last one |n-1> 
    # has nonzero coeff used for BVec (V|n-1>).
    if dmrg.ifptn:
@@ -307,13 +307,13 @@ def initE0pt(dmrg,fmps):
          if dmrg.ifs2proj: 
             dmrg.n0 = 1/math.sqrt(smat[0,0])
          print()  
-	 print('='*40)
+         print('='*40)
          print('Summary of partition: ifH0 =',dmrg.ifH0)
-	 print('='*40)
-	 print(' emix = ',dmrg.emix)
+         print('='*40)
+         print(' emix = ',dmrg.emix)
          print(' e0 = ',dmrg.e0)
          print(' e1 = ',dmrg.e1)
-	 print(' eH = ',energy)
+         print(' eH = ',energy)
          print(' et = ',dmrg.et)
          print(' n0 = ',dmrg.n0)
    # Broadcast
@@ -326,7 +326,7 @@ def initE0pt(dmrg,fmps):
 # <I|H|J> & <I|(P)|J> 
 def genCIHamiltonian(dmrg):
    rank = dmrg.comm.rank 
-   if rank == 0: print('\n[mpo_dmrg_ex.genCIHamiltonian] nref=',dmrg.nref)	
+   if rank == 0: print('\n[mpo_dmrg_ex.genCIHamiltonian] nref=',dmrg.nref)      
    dmrg.nref = len(dmrg.wfex)
    hmat = numpy.zeros((dmrg.nref,dmrg.nref),dtype=dmrg_dtype)
    smat = numpy.zeros((dmrg.nref,dmrg.nref),dtype=dmrg_dtype)
@@ -335,15 +335,15 @@ def genCIHamiltonian(dmrg):
       for jref in range(dmrg.nref):
          fket = dmrg.wfex[jref]
          energy,esum,ovlp,psum = dmrg.checkMPS(fbra,fket)
-	 if rank == 0:
-	    print()		 
-	    print('-'*92)
-	    print('<i|O|j>:',(iref,jref),' esum,ovlp,psum=',esum,ovlp,psum)
-	    print('-'*92)
-	 hmat[iref,jref] = esum
-	 if not dmrg.ifs2proj:
+         if rank == 0:
+            print()              
+            print('-'*92)
+            print('<i|O|j>:',(iref,jref),' esum,ovlp,psum=',esum,ovlp,psum)
+            print('-'*92)
+         hmat[iref,jref] = esum
+         if not dmrg.ifs2proj:
             smat[iref,jref] = ovlp
-    	 else:
+         else:
             smat[iref,jref] = psum
    return hmat,smat
 
@@ -496,7 +496,7 @@ def ci(dmrg):
          print('\n Analysis of PT series:')
          esum = 0.
          for n in range(2*norder+2):
-            esum += enlst[n]	    
+            esum += enlst[n]        
             print(' e[%d] = (%20.12f,%20.12f)'%(n,enlst[n],esum))
          enlst = numpy.array(enlst).real
       else:
