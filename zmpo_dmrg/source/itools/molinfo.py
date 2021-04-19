@@ -79,8 +79,8 @@ class class_molinfo:
       # dirname = dateMar_29_13_07_20_2016_rank3_pid71559_mpo_dmrg
       #
       pid=str(os.getpid())
-      dat=string.join(time.asctime().split(':'))
-      dat=string.join(dat.split(' ')[1:],'_')
+      dat=''.join(time.asctime().split(':'))
+      dat='_'.join(dat.split(' ')[1:])
       suffix='date'+dat+'_rank'+str(self.comm.rank)+'_pid'+pid
       dirname = suffix+'_mpo_dmrg'
       self.path = self.tmpdir+dirname

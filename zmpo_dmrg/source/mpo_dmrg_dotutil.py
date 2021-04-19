@@ -295,7 +295,7 @@ def decimation(civecs,info,debug=False):
    neig = civecs.shape[0]
    if status == 'L':
       dim = dmrg.dphys[isite]
-      cdimc = cdim/dim 
+      cdimc = cdim//dim 
       lcdim = ldim*dim
       crdim = cdimc*rdim
       dimSuperBlock = lcdim
@@ -303,7 +303,7 @@ def decimation(civecs,info,debug=False):
    elif status == 'R':
       jsite = isite+ncsite-1
       dim = dmrg.dphys[jsite]
-      cdimc = cdim/dim 
+      cdimc = cdim//dim 
       lcdim = ldim*cdimc
       crdim = dim*rdim
       dimSuperBlock = crdim

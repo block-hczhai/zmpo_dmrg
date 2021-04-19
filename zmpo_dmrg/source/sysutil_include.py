@@ -15,8 +15,7 @@ pth = os.path.dirname(os.path.abspath(__file__))
 pth = os.path.split(pth)[0] 
 path = os.path.join(pth,'libs/libqsym.so')
 libqsym = ctypes.CDLL(path)
-path = os.path.join(pth,'libs/libangular.so')
-libangular = ctypes.CDLL(path)
+from ..libs import libangular
 
 dmrg_type = 'real'
 if dmrg_type == 'real':
