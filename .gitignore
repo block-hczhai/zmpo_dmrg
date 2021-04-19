@@ -1,0 +1,6 @@
+my_test/
+
+.vscode/
+
+__pycache__/
+*.py[cod]
