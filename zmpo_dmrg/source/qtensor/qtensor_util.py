@@ -214,7 +214,7 @@ def direct_sum(subscripts, *operands):
         op = numpy.asarray(operands[i])
         assert(len(symb) == op.ndim)
         if i == 0:
-            if sign[i] is '+':
+            if sign[i] == '+':
                 out = op
             else:
                 out = -op
