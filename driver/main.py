@@ -31,6 +31,17 @@ class ZMPODMRG:
         self.dav_tols = dav_tols
         self.noises = noises
 
+    def clean(self):
+
+        comm.Barrier()
+
+        if comm.rank == 0:
+            for x in os.listdir(self.mol.tmpdir):
+                if x.startswith("date"):
+                    shutil.rmtree(self.mol.tmpdir + "/" + x)
+
+        comm.Barrier()
+
     def convert(self):
 
         if comm.rank == 0:
@@ -246,6 +257,7 @@ def test_1():
     zd.prepare([1, 1, 0, 0, 1, 1, 0, 0])
     zd.run()
     zd.convert()
+    zd.clean()
 
 def test_2():
     E = -107.654122436886396
@@ -255,6 +267,7 @@ def test_2():
     zd.prepare([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0])
     zd.run()
     zd.convert()
+    zd.clean()
 
 if __name__ == "__main__":
 
@@ -309,6 +322,7 @@ if __name__ == "__main__":
         zd.prepare([int(x) for x in occ.split()])
         zd.run()
         zd.convert()
+        zd.clean()
 
     else:
         raise ValueError("""
