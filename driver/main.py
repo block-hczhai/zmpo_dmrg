@@ -245,8 +245,9 @@ class ZMPODMRG:
                     int2e[ind[3], ind[2], ind[1], ind[0]] = float(data[0])
         return e, int1e, int2e
 
-if __name__ == "__main__":
+def test_1():
     E = -2.190384218792720
+    print(E)
     zd = ZMPODMRG('../data/H4.STO6G.R1.8.FCIDUMP',
         bdims=[50]*8, dav_tols=[1E-4]*8, noises=[1E-4]*4 + [0] * 4)
     zd.prepare([1, 1, 0, 0, 1, 1, 0, 0])
@@ -254,10 +255,84 @@ if __name__ == "__main__":
     zd.convert()
     zd.clean()
 
-    # E = -107.654122436886396
-    # zd = ZMPODMRG('../data/N2.STO3G.FCIDUMP',
-    #     bdims=[200]*8, dav_tols=[1E-4]*8, noises=[1E-4]*4 + [0] * 4)
-    # zd.prepare([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0])
-    # zd.run()
-    # zd.convert()
-    # zd.clean()
+def test_2():
+    E = -107.654122436886396
+    print(E)
+    zd = ZMPODMRG('../data/N2.STO3G.FCIDUMP',
+        bdims=[200]*8, dav_tols=[1E-4]*8, noises=[1E-4]*4 + [0] * 4)
+    zd.prepare([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0])
+    zd.run()
+    zd.convert()
+    zd.clean()
+
+if __name__ == "__main__":
+
+    import sys
+    import numpy as np
+    if len(sys.argv) > 1 and sys.argv[1] == 'test':
+        test_1()
+    elif len(sys.argv) > 1 and sys.argv[1] == 'test2':
+        test_2()
+    elif len(sys.argv) > 1:
+
+        fname = sys.argv[1]
+        with open(fname, 'r') as fin:
+            lines = fin.readlines()
+        dic = {}
+        schedule = []
+        schedule_start = -1
+        schedule_end = -1
+        for i, line in enumerate(lines):
+            if "schedule" == line.strip():
+                schedule_start = i
+            elif "end" == line.strip():
+                schedule_end = i
+            elif schedule_start != -1 and schedule_end == -1:
+                a, b, c, d = line.split()
+                schedule.append([int(a), int(b), float(c), float(d)])
+            elif not line.strip().startswith('!'):
+                line_sp = line.split()
+                if len(line_sp) != 0:
+                    if line_sp[0] in dic:
+                        raise ValueError("duplicate key (%s)" % line_sp[0])
+                    dic[line_sp[0]] = " ".join(line_sp[1:])
+        
+        tmp = list(zip(*schedule))
+        nsweeps = np.diff(tmp[0]).tolist()
+        maxiter = int(dic["maxiter"]) - int(np.sum(nsweeps))
+        assert maxiter > 0
+        nsweeps.append(maxiter)
+        
+        schedule = [[], [], []]
+        for nswp, M, tol, noise in zip(nsweeps, *tmp[1:]):
+            schedule[0].extend([M] * nswp)
+            schedule[1].extend([tol] * nswp)
+            schedule[2].extend([noise] * nswp)
+        dic["schedule"] = schedule
+        bond_dims, dav_thrds, noises = dic["schedule"]
+        fints = dic["orbitals"]
+        occ = dic["hf_occ"]
+        scartch = dic.get("prefix", "./tmp")
+
+        zd = ZMPODMRG(fints, bdims=bond_dims, dav_tols=dav_thrds, noises=noises, scartch=scartch)
+        zd.prepare([int(x) for x in occ.split()])
+        zd.run()
+        zd.convert()
+        zd.clean()
+
+    else:
+        raise ValueError("""
+            Usage:
+                (A) python main.py test
+                (A) python main.py test2
+                (B) python main.py zmpo.conf
+            
+            zmpo.conf:
+                orbitals: FCIDUMP
+                hf_occ: integral occ
+                schedule: schedule
+                maxiter: number of sweeps
+                prefix: scartch
+        """)
+
+    
