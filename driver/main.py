@@ -12,14 +12,17 @@ class ZMPODMRG:
     def __init__(self, filename='FCIDUMP', bdims=[50]*8, dav_tols=[1E-4]*8, noises=[1E-4]*4 + [0] * 4, scartch="./tmp"):
         from zmpo_dmrg.source.itools.molinfo import class_molinfo
         info = self.loadERIs(filename)
+
+        fname = scartch + "/mole.h5"
         if comm.rank == 0:
-            self.dump(info)
+            if not os.path.exists(scartch):
+                os.makedirs(scartch)
+            self.dump(info, fname=fname)
         comm.Barrier()
 
         self.mol = class_molinfo()
         self.mol.comm = comm
         self.mol.verbose = 0
-        fname = "mole.h5"
         self.mol.loadHam(fname)
 
         self.mol.tmpdir = scartch + "/"
@@ -33,7 +36,7 @@ class ZMPODMRG:
         if comm.rank == 0:
             from zmpo_dmrg.source.samps import mpo_dmrg_conversion, block_itrf
             from zmpo_dmrg.source.qtensor import qtensor_api
-            fname = './flmpsQt'
+            fname = self.mol.tmpdir + 'flmpsQt'
             flmpsQ = h5py.File(fname, 'r')
             flmps0 = h5py.File(fname + '_NQt0', 'w')
             flmps1 = h5py.File(fname + '_NQt1', 'w')
@@ -46,22 +49,12 @@ class ZMPODMRG:
                 self.twos / 2, thresh=1.e-8, ifcompress=True,
                 ifBlockSingletEmbedding=True, ifBlockSymScreen=True,
                 ifpermute=True)
-            path = './lmps_compact'
+            path = self.mol.tmpdir + 'lmps_compact'
             block_itrf.compact_rotL(flmps1, path)
 
             flmpsQ.close()
             flmps0.close()
             flmps1.close()
-        
-        comm.Barrier()
-
-    def clean(self):
-
-        if comm.rank == 0:
-            shutil.rmtree(self.mol.tmpdir)
-            for x in os.listdir("."):
-                if x.startswith("log_"):
-                    os.remove(x)
         
         comm.Barrier()
 
@@ -97,11 +90,11 @@ class ZMPODMRG:
 
         if comm.rank == 0:
             flmps0 = dmrg.flmps
-            flmps1 = h5py.File(dmrg.path+'/lmpsQt','w')
+            flmps1 = h5py.File(dmrg.path + '/lmpsQt','w')
             qtensor_api.fmpsQt(flmps0,flmps1,'L')
             flmps0.close()
             flmps1.close()
-            shutil.copy(dmrg.path+'/lmpsQt','./lmpsQ0')
+            shutil.copy(dmrg.path + '/lmpsQt', self.mol.tmpdir + 'lmpsQ0')
         
         comm.Barrier()
 
@@ -115,7 +108,7 @@ class ZMPODMRG:
         twosz = self.twosz
 
         # 1. Using an MPS in Qt form
-        flmps1 = h5py.File('./lmpsQ0', 'r')
+        flmps1 = h5py.File(self.mol.tmpdir + 'lmpsQ0', 'r')
         dmrg2 = mpo_dmrg_class.mpo_dmrg()
         dmrg2.iprt = 0
         dmrg2.const = mol.enuc + mol.ecor
@@ -157,7 +150,7 @@ class ZMPODMRG:
         flmps1.close()
 
         if comm.rank == 0:
-            shutil.copy(dmrg2.path + '/lmps', './flmpsQt')
+            shutil.copy(dmrg2.path + '/lmps', self.mol.tmpdir + 'flmpsQt')
         
         comm.Barrier()
 
@@ -253,7 +246,6 @@ def test_1():
     zd.prepare([1, 1, 0, 0, 1, 1, 0, 0])
     zd.run()
     zd.convert()
-    zd.clean()
 
 def test_2():
     E = -107.654122436886396
@@ -263,7 +255,6 @@ def test_2():
     zd.prepare([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0])
     zd.run()
     zd.convert()
-    zd.clean()
 
 if __name__ == "__main__":
 
@@ -318,7 +309,6 @@ if __name__ == "__main__":
         zd.prepare([int(x) for x in occ.split()])
         zd.run()
         zd.convert()
-        zd.clean()
 
     else:
         raise ValueError("""
@@ -334,5 +324,3 @@ if __name__ == "__main__":
                 maxiter: number of sweeps
                 prefix: scartch
         """)
-
-    

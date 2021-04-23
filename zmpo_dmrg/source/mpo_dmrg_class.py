@@ -345,10 +345,10 @@ class mpo_dmrg:
             assert len(self.Dcut) == self.nsite-1
             self.Dcut = [1]+self.Dcut+[1]
          # LogFile in current directory
-         flog_name = 'log_'+os.path.split(self.path)[-1]
-         print(' flog_name =',flog_name)
-         flog = open(flog_name,'w')
-         flog.write('path:'+self.path+'\n')
+         # flog_name = 'log_'+os.path.split(self.path)[-1]
+         # print(' flog_name =',flog_name)
+         # flog = open(flog_name,'w')
+         # flog.write('path:'+self.path+'\n')
       # MPSfile
       self.flmps = h5py.File(self.path+'/lmps','w')
       self.frmps = h5py.File(self.path+'/rmps','w')
@@ -399,7 +399,7 @@ class mpo_dmrg:
          result2 = mpo_dmrg_opt.sweep(self,sitelst,self.ncsite,'L',ifsym=self.ifsym)
          nmvp1,indx1,eav1,dwt1,elst1,dlst1 = result1
          nmvp2,indx2,eav2,dwt2,elst2,dlst2 = result2
-         if rank == 0: mpo_dmrg_prt.flogWrite(self,flog,isweep,result1,result2)          
+         # if rank == 0: mpo_dmrg_prt.flogWrite(self,flog,isweep,result1,result2)          
          self.nmvp.append(nmvp1+nmvp2)
          self.esweeps += elst1+elst2
          if eav1 < eav2:
@@ -429,7 +429,7 @@ class mpo_dmrg:
       # Adjust a little bit to allow isweep = 0.
       # The only problem is the R-MPS is not initialized.
       if rank == 0 and isweep != -1: mpo_dmrg_prt.finalSweep(self,tf-ti)
-      if rank == 0: flog.close()
+      # if rank == 0: flog.close()
       self.comm.Barrier()
       return 0
    
