@@ -6,3 +6,9 @@ __pycache__/
 *.py[cod]
 
 *.mod
+
+log_*
+tmp/
+mole.h5
+lmps*
+flmps*
