@@ -21,15 +21,15 @@ def compact_rotL(flmps1,path,ifaux=False):
       pass         
    os.mkdir(path)
    # Start conversion
-   nsite = flmps1['nsite'].value
+   nsite = flmps1['nsite'][()]
    qnums = [None]*(nsite+1)
    for isite in range(nsite+1):
       key = 'qnumNS'+str(isite)
-      qnums[isite] = flmps1[key].value
+      qnums[isite] = flmps1[key][()]
    # to compact rotL
    qnumsN = numpy.array([[0,0.,1],[1,0.5,1],[2,0.,1]])
    # qnumNS0
-   qnum = flmps1['qnumNS0'].value
+   qnum = flmps1['qnumNS0'][()]
    sval = qnum[0][1]
    naux = int(2*sval)
   
@@ -55,7 +55,7 @@ def compact_rotL(flmps1,path,ifaux=False):
    fp[:] = qnumISite[:]
    for isite in range(nsite):
       key0 = 'rotL'+str(isite)
-      rotL = flmps1[key0].value
+      rotL = flmps1[key0][()]
       print(' * isite=',isite,' rotL=',rotL.shape)
       rdic = merged_rotL(rotL,qnums[isite],qnumsN,qnums[isite+1])
       # Qnums

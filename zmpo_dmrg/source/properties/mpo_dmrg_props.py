@@ -39,11 +39,11 @@ def evalProps(dmrg,fbmps,fkmps,fop,status='L',debug=False):
 def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
    t0 = time.time()
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
-   nop = fop['nop'].value
+   nop = fop['nop'][()]
    if debug:
       print(' nop   = ',nop)
       print(' nsite = ',nsite)
@@ -67,8 +67,8 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
          if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
             if debug: print('    iop=',iop,' of nop=',nop)
-            cop = fop['site'+str(isite)+'/op'+str(iop)].value
-            tmp = f0['opers'+str(iop)].value
+            cop = fop['site'+str(isite)+'/op'+str(iop)][()]
+            tmp = f0['opers'+str(iop)][()]
             #--- kernel ---
             tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1]))
             tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
@@ -98,8 +98,8 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
          if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
             if debug: print('    iop=',iop,' of nop=',nop)
-            cop = fop['site'+str(isite)+'/op'+str(iop)].value
-            tmp = f0['opers'+str(iop)].value
+            cop = fop['site'+str(isite)+'/op'+str(iop)][()]
+            tmp = f0['opers'+str(iop)][()]
             #--- kernel ---
             tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1]))
             tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
@@ -131,11 +131,11 @@ def evalPropsNQt(dmrg,fbmps,fkmps,fop,status,debug=False):
 def evalPropsQt(dmrg,fbmps,fkmps,fop,status,debug=False):
    t0 = time.time()
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
-   nop = fop['nop'].value
+   nop = fop['nop'][()]
    if debug:
       print(' nop   = ',nop)
       print(' nsite = ',nsite)

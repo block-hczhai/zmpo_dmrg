@@ -58,9 +58,9 @@ class class_molinfo:
       self.orbsymO3 = numpy.empty(self.sbas,dtype=numpy.int)
       self.orbsymSz = numpy.empty(self.sbas,dtype=numpy.int)
       if self.comm.rank == 0:
-         self.orboccun = f['occun'].value
-         self.orbsymO3 = f['orbsym'].value
-         self.orbsymSz = f['spinsym'].value
+         self.orboccun = f['occun'][()]
+         self.orbsymO3 = f['orbsym'][()]
+         self.orbsymSz = f['spinsym'][()]
       # Bcast with buffer array
       self.comm.Bcast( [self.orboccun,MPI.DOUBLE] ) 
       self.comm.Bcast( [self.orbsymO3,MPI.INT] ) 

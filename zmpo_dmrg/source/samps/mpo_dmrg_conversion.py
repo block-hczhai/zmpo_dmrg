@@ -42,9 +42,9 @@ def sweep_projection(flmps0,flmps1,ifQt,sval,thresh=1.e-4,Dcut=-1,\
                      ifBlockSingletEmbedding=True,\
                      ifBlockSymScreen=True,\
                      ifpermute=False):
-   nsite = flmps0['nsite'].value
+   nsite = flmps0['nsite'][()]
    # This is the only qnum information used.
-   ne,ms = flmps0['qnum'+str(nsite)].value[0]
+   ne,ms = flmps0['qnum'+str(nsite)][()][0]
    print('\n[mpo_dmrg_samps.sweep_projection] ifQt=',ifQt,\
          ' (nsite,,ne,ms,sval)=',(nsite,ne,ms,sval))
    assert not ifQt

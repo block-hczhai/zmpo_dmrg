@@ -96,7 +96,7 @@ class iface:
       zreleri.ao2mo(self.mf, mo_coeff, erifile)
       if self.ifgaunt: zreleri.ao2mo_gaunt(self.mf, mo_coeff, erifile)
       with h5py.File(erifile) as f1:
-         eri = f1['ericas'].value # [ij|kl]
+         eri = f1['ericas'][()] # [ij|kl]
          eri = eri.reshape(norb,norb,norb,norb)
          eriC = eri[:ncore,:ncore,:ncore,:ncore]
       # 

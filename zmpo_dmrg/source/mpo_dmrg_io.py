@@ -44,7 +44,7 @@ from .qtensor import qtensor_opers1e
 
 # copyMPS from fmps0 to fmps1
 def copyMPS(fmps1,fmps0,ifQt):
-   nsite = fmps0['nsite'].value
+   nsite = fmps0['nsite'][()]
    print('\n[mpo_dmrg_io.copyMPS] ifQt=',ifQt,' nsite=',nsite)
    if 'nsite' in fmps1: del fmps1['nsite']
    fmps1['nsite'] = nsite
@@ -52,13 +52,13 @@ def copyMPS(fmps1,fmps0,ifQt):
    for isite in range(nsite+1):
       key = 'qnum'+str(isite)
       if key in fmps1: del fmps1[key]
-      fmps1[key] = fmps0[key].value
+      fmps1[key] = fmps0[key][()]
    # Store sites   
    if not ifQt:
       for isite in range(nsite):
          key = 'site'+str(isite)
          if key in fmps1: del fmps1[key]
-         fmps1[key] = fmps0[key].value
+         fmps1[key] = fmps0[key][()]
    else:
       for isite in range(nsite):
          key = 'site'+str(isite)
@@ -99,12 +99,12 @@ def dumpMPS(fmps,mpslst,icase=0):
    return 0
 
 def loadMPS(fmps,icase=0):
-   nsite = fmps['nsite'].value 
+   nsite = fmps['nsite'][()] 
    # No symmetry - mpslst as a list
    if icase == 0:
       mpslst = [0]*nsite
       for isite in range(nsite):
-         mpslst[isite] = fmps['site'+str(isite)].value
+         mpslst[isite] = fmps['site'+str(isite)][()]
       result = [mpslst]
    # With qnums and numpy.array
    elif icase == 1:
@@ -113,7 +113,7 @@ def loadMPS(fmps,icase=0):
       for isite in range(nsite):
          sites[isite] = loadSite(fmps,isite,False)
       for isite in range(nsite+1):
-         qnums[isite] = fmps['qnum'+str(isite)].value
+         qnums[isite] = fmps['qnum'+str(isite)][()]
       result = [sites,qnums]
    # With qnums and Qt     
    elif icase == 2:
@@ -122,7 +122,7 @@ def loadMPS(fmps,icase=0):
       for isite in range(nsite):
          sites[isite] = loadSite(fmps,isite,True)
       for isite in range(nsite+1):
-         qnums[isite] = fmps['qnum'+str(isite)].value
+         qnums[isite] = fmps['qnum'+str(isite)][()]
       result = [sites,qnums]
    return result
 
@@ -136,10 +136,10 @@ def saveQnum(fmps,isite,qred):
    return 0
 
 def loadQnums(fmps):
-   nsite = fmps['nsite'].value 
+   nsite = fmps['nsite'][()] 
    qnums = [0]*(nsite+1)
    for isite in range(nsite+1):
-      qnums[isite] = fmps['qnum'+str(isite)].value
+      qnums[isite] = fmps['qnum'+str(isite)][()]
    return qnums
 
 def saveSite(fmps,isite,site):
@@ -157,7 +157,7 @@ def loadSite(fmps,isite,ifQt):
       site = qtensor.qtensor()
       site.load(fmps,key)
    else:
-      site = fmps[key].value
+      site = fmps[key][()]
    return site
 
 #
@@ -395,8 +395,8 @@ def loadInts(dmrg,mol):
       dmrg.int2e = numpy.empty((dmrg.sbas,dmrg.sbas,dmrg.sbas,dmrg.sbas),dtype=dmrg_dtype)
       if rank == 0:
          f = h5py.File(mol.fname, "r")
-         dmrg.int1e= f['int1e'].value
-         dmrg.int2e= f['int2e'].value
+         dmrg.int1e= f['int1e'][()]
+         dmrg.int2e= f['int2e'][()]
       dmrg.comm.Bcast([dmrg.int1e,dmrg_mtype])
       dmrg.comm.Bcast([dmrg.int2e,dmrg_mtype])
    # Distribute different integrals on different nodes

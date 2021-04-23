@@ -38,7 +38,7 @@ def HDiagQt(info,ndim0,prjmap):
    rops = qtensor.Qt()
    cops = qtensor.Qt()
    wops = qtensor.Qt()
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if ncsite == 1:
 
       for iop in range(nop):
@@ -172,7 +172,7 @@ def HVecQt(vec0,info,ndim0,prjmap,ifile=0,ioff=0):
    ista2 = dict([(i,-1) for i in range(ncase2)])
    top1 = dict([(i,qtensor.qtensor()) for i in range(ncase1)])
    top2 = dict([(i,qtensor.qtensor()) for i in range(ncase2)])
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if ncsite == 1:
 
       # Initializaiton
@@ -224,16 +224,16 @@ def HVecQt(vec0,info,ndim0,prjmap,ifile=0,ioff=0):
                top2[icase2].tensordotCAL(top1[icase1],cop)
                top3[icase2].tensordotCAL(top2[icase2],rop)
                rop = None
-               top2[icase2].value = None # jslc
+               top2[icase2][()] = None # jslc
                if dmrg.ifs2proj:
                   # Assuming projectionNMs does not take too much time!
                   tmp = top3[icase2].projectionNMs(dmrg.qtmp.qsyms)
                   hvec += dmrg.hpwts[iop]*tmp.value
                   tmp = None
                else:
-                  hvec += dmrg.hpwts[iop]*top3[icase2].value
-               top3[icase2].value = None # jslc
-            top1[icase1].value = None # islc
+                  hvec += dmrg.hpwts[iop]*top3[icase2][()]
+               top3[icase2][()] = None # jslc
+            top1[icase1][()] = None # islc
 
    elif ncsite == 2:
 
@@ -305,16 +305,16 @@ def HVecQt(vec0,info,ndim0,prjmap,ifile=0,ioff=0):
                   top3[icase3].tensordotCAL(top2[icase2],wop)
                   top4[icase3].tensordotCAL(top3[icase3],rop)
                   rop = None
-                  top3[icase3].value = None # kslc
+                  top3[icase3][()] = None # kslc
                   if dmrg.ifs2proj: 
                      tmp = top4[icase3].projectionNMs(dmrg.qtmp.qsyms)
                      hvec += dmrg.hpwts[iop]*tmp.value
                      tmp = None
                   else:
-                     hvec += dmrg.hpwts[iop]*top4[icase3].value
-                  top4[icase3].value = None # kslc
-               top2[icase2].value = None # jslc
-            top1[icase1].value = None # islc
+                     hvec += dmrg.hpwts[iop]*top4[icase3][()]
+                  top4[icase3][()] = None # kslc
+               top2[icase2][()] = None # jslc
+            top1[icase1][()] = None # islc
 
    return hvec
 
@@ -410,11 +410,11 @@ def SVecQt(vec0,info,ndim0,prjmap):
                ista[icase] = 1
             top1[icase].tensordotCAL(lop,qvec)
             top2[icase].tensordotCAL(top1[icase],cop)
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],rop)
-            top2[icase].value = None
+            top2[icase][()] = None
             tmp = top3[icase].projectionNMs(dmrg.qtmp.qsyms)
-            top3[icase].value = None
+            top3[icase][()] = None
             svec += dmrg.qwts[iop]*tmp.value
             tmp = None
 
@@ -437,13 +437,13 @@ def SVecQt(vec0,info,ndim0,prjmap):
                ista[icase] = 1
             top1[icase].tensordotCAL(lop,qvec)
             top2[icase].tensordotCAL(top1[icase],cop)
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],cop)
-            top2[icase].value = None
+            top2[icase][()] = None
             top4[icase].tensordotCAL(top3[icase],rop)
-            top3[icase].value = None
+            top3[icase][()] = None
             tmp = top4[icase].projectionNMs(dmrg.qtmp.qsyms)
-            top4[icase].value = None
+            top4[icase][()] = None
             svec += dmrg.qwts[iop]*tmp.value
             tmp = None
 
@@ -520,20 +520,20 @@ def pRDMQt(cimat,info):
                         top1[icase].tensordotCAL(lop,qvec)
                         lop = None
                         top2[icase].tensordotCAL(top1[icase],cop)
-                        top1[icase].value = None
+                        top1[icase][()] = None
                         top3[icase].tensordotCAL(top2[icase],top2[icase],ifc2=True)
-                        top2[icase].value = None
+                        top2[icase][()] = None
                         if tmpPRDM is None:
                            icsPRDM = icase
-                           tmpPRDM = top3[icase].value.copy()
+                           tmpPRDM = top3[icase][()].copy()
                         else:
-                           tmpPRDM += top3[icase].value
-                        top3[icase].value = None
+                           tmpPRDM += top3[icase][()]
+                        top3[icase][()] = None
                # Finish operator [iop] loops
-               top3[icsPRDM].value = tmpPRDM.copy()
+               top3[icsPRDM][()] = tmpPRDM.copy()
                tmpPRDM = None
                rdm1 += dmrg.noise*top3[icsPRDM].toDenseTensor(dmrg.idlstPRDM)
-               top3[icsPRDM].value = None
+               top3[icsPRDM][()] = None
       # 5000*5000*4*4*8/1024^3 ~ 3G
       rdm1 = rdm1.reshape(diml*dimc,diml*dimc)
 
@@ -606,20 +606,20 @@ def pRDMQt(cimat,info):
                         top1[icase].tensordotCAL(qvec,rop)
                         rop = None
                         top2[icase].tensordotCAL(cop,top1[icase])
-                        top1[icase].value = None
+                        top1[icase][()] = None
                         top3[icase].tensordotCAL(top2[icase],top2[icase],ifc1=True)
-                        top2[icase].value = None
+                        top2[icase][()] = None
                         if tmpPRDM is None:
                            icsPRDM = icase
-                           tmpPRDM = top3[icase].value.copy()
+                           tmpPRDM = top3[icase][()].copy()
                         else:
-                           tmpPRDM += top3[icase].value
-                        top3[icase].value = None
+                           tmpPRDM += top3[icase][()]
+                        top3[icase][()] = None
                # Finish operator [iop] loops
-               top3[icsPRDM].value = tmpPRDM.copy()
+               top3[icsPRDM][()] = tmpPRDM.copy()
                tmpPRDM = None
                rdm1 += dmrg.noise*top3[icsPRDM].toDenseTensor(dmrg.idlstPRDM)
-               top3[icsPRDM].value = None
+               top3[icsPRDM][()] = None
       # 5000*5000*4*4*8/1024^3 ~ 3G
       rdm1 = rdm1.reshape(dimc*dimr,dimc*dimr)
 
@@ -638,7 +638,7 @@ def renormQt_H00(dmrg,isite,ncsite,flst,flstN,site,status):
       qsite = site.reduceQsymsToN()
    dims = numpy.array([6]+[dmrg.maxslc]*2)
    ncase = numpy.prod(dims)
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if status == 'L':
 
       # Hamiltoinan operators
@@ -679,17 +679,17 @@ def renormQt_H00(dmrg,isite,ncsite,flst,flstN,site,status):
                top1[icase].tensordotCAL(qsite,lop,ifc1=True)
                lop = None
                top2[icase].tensordotCAL(cop,top1[icase])
-               top1[icase].value = None
+               top1[icase][()] = None
                top3[icase].tensordotCAL(top2[icase],qsite)
-               top2[icase].value = None
+               top2[icase][()] = None
                if qops.size[jslc] == 0:
                   qops.dic[jslc].copy(top3[icase])
                   qops.size[jslc] = qops.dic[jslc].size_allowed
                   # We dump the idlst information for operators & MPS
                   qops.dic[jslc].idlst = [cop.idlst[1],qsite.idlst[2],qsite.idlst[2]]
                else:
-                  qops.dic[jslc].value += top3[icase].value  
-               top3[icase].value = None
+                  qops.dic[jslc][()] += top3[icase][()]  
+               top3[icase][()] = None
                lop = None
             if qops.dic[jslc].size > 0: qops.dumpSLC(fN,'opers'+str(iop),jslc)
             qops.dic[jslc] = None
@@ -748,17 +748,17 @@ def renormQt_H00(dmrg,isite,ncsite,flst,flstN,site,status):
                top1[icase].tensordotCAL(qsite,rop,ifc1=True)
                rop = None
                top2[icase].tensordotCAL(cop,top1[icase])
-               top1[icase].value = None
+               top1[icase][()] = None
                top3[icase].tensordotCAL(top2[icase],qsite)
-               top2[icase].value = None
+               top2[icase][()] = None
                if qops.size[jslc] == 0:
                   qops.dic[jslc].copy(top3[icase])
                   qops.size[jslc] = qops.dic[jslc].size_allowed
                   # We dump the idlst information for operators & MPS
                   qops.dic[jslc].idlst = [cop.idlst[0],qsite.idlst[0],qsite.idlst[0]]
                else:
-                  qops.dic[jslc].value += top3[icase].value  
-               top3[icase].value = None
+                  qops.dic[jslc][()] += top3[icase][()]  
+               top3[icase][()] = None
             if qops.dic[jslc].size > 0: qops.dumpSLC(fN,'opers'+str(iop),jslc)
             qops.dic[jslc] = None
          # DUMP information
@@ -804,11 +804,11 @@ def renormQt_S00(dmrg,isite,ncsite,flst,flstN,site,status):
                ista[icase] = 1
             top1[icase].tensordotCAL(qsite,top,ifc1=True)
             top2[icase].tensordotCAL(cop,top1[icase])
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],qsite)
-            top2[icase].value = None
+            top2[icase][()] = None
             top3[icase].dump(fNp,'opers'+str(iop))
-            top3[icase].value = None
+            top3[icase][()] = None
 
    elif status == 'R':
 
@@ -845,11 +845,11 @@ def renormQt_S00(dmrg,isite,ncsite,flst,flstN,site,status):
                ista[icase] = 1
             top1[icase].tensordotCAL(qsite,top,ifc1=True)
             top2[icase].tensordotCAL(cop,top1[icase])
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],qsite)
-            top2[icase].value = None
+            top2[icase][()] = None
             top3[icase].dump(fNp,'opers'+str(iop))
-            top3[icase].value = None
+            top3[icase][()] = None
 
    return 0
 
@@ -908,11 +908,11 @@ def renormQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
                      ista[icase] = 1
                   top1[icase].tensordotCAL(qsite,top,ifc1=True)
                   top2[icase].tensordotCAL(cop,top1[icase])
-                  top1[icase].value = None
+                  top1[icase][()] = None
                   top3[icase].tensordotCAL(top2[icase],qksite)
-                  top2[icase].value = None
+                  top2[icase][()] = None
                   top3[icase].dump(fNp,'opers'+str(iop))
-                  top3[icase].value = None
+                  top3[icase][()] = None
 
    elif status == 'R':
 
@@ -923,7 +923,7 @@ def renormQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
          for iref in range(dmrg.nref):
             fket = dmrg.wfex[iref]
             ksite = mpo_dmrg_io.loadSite(fket,jsite,dmrg.ifQt)
-            qout = fket['qnum'+str(dmrg.nsite)].value[0]
+            qout = fket['qnum'+str(dmrg.nsite)][()][0]
             # L-MPS to R-MPS (convention) by changing qsyms of two bonds
             # Adjust the symmetry for ksite, which also makes the sp-mps case work!
             ksite.qsyms[0] = qout - ksite.qsyms[0]
@@ -971,11 +971,11 @@ def renormQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
                      ista[icase] = 1
                   top1[icase].tensordotCAL(qsite,top,ifc1=True)
                   top2[icase].tensordotCAL(cop,top1[icase])
-                  top1[icase].value = None
+                  top1[icase][()] = None
                   top3[icase].tensordotCAL(top2[icase],qksite)
-                  top2[icase].value = None
+                  top2[icase][()] = None
                   top3[icase].dump(fNp,'opers'+str(iop))
-                  top3[icase].value = None
+                  top3[icase][()] = None
 
    return 0
 
@@ -989,7 +989,7 @@ def renormQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
       qsite = site.reduceQsymsToN()
    dims = numpy.array([6]+[dmrg.maxslc]*2)
    ncase = numpy.prod(dims)
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if status == 'L':
 
       # Hamiltoinan operators for PT.
@@ -1043,9 +1043,9 @@ def renormQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
                      top1[icase].tensordotCAL(qsite,lop,ifc1=True)
                      lop = None
                      top2[icase].tensordotCAL(cop,top1[icase])
-                     top1[icase].value = None
+                     top1[icase][()] = None
                      top3[icase].tensordotCAL(top2[icase],qksite)
-                     top2[icase].value = None
+                     top2[icase][()] = None
                      if qops.size[jslc] == 0:
                         qops.dic[jslc].copy(top3[icase])
                         qops.size[jslc] = qops.dic[jslc].size_allowed
@@ -1053,8 +1053,8 @@ def renormQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
                         ## We dump the idlst information for operators & MPS
                         #qops.dic[jslc].idlst = [cop.idlst[1],qsite.idlst[2],qsite.idlst[2]]
                      else:
-                        qops.dic[jslc].value += top3[icase].value  
-                     top3[icase].value = None
+                        qops.dic[jslc][()] += top3[icase][()]  
+                     top3[icase][()] = None
                      lop = None
                   if qops.dic[jslc].size > 0: qops.dumpSLC(fN,'opers'+str(iop),jslc)
                   qops.dic[jslc] = None
@@ -1076,7 +1076,7 @@ def renormQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
                fN = flstN[3][iref]
             fket = dmrg.wfex[iref]
             ksite = mpo_dmrg_io.loadSite(fket,jsite,dmrg.ifQt)
-            qout = fket['qnum'+str(dmrg.nsite)].value[0]
+            qout = fket['qnum'+str(dmrg.nsite)][()][0]
             # L-MPS to R-MPS (convention) by changing qsyms of two bonds
             # Adjust the symmetry for ksite, which also make the sp-mps case work!
             ksite.qsyms[0] = qout - ksite.qsyms[0]
@@ -1133,9 +1133,9 @@ def renormQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
                      top1[icase].tensordotCAL(qsite,rop,ifc1=True)
                      rop = None
                      top2[icase].tensordotCAL(cop,top1[icase])
-                     top1[icase].value = None
+                     top1[icase][()] = None
                      top3[icase].tensordotCAL(top2[icase],qksite)
-                     top2[icase].value = None
+                     top2[icase][()] = None
                      if qops.size[jslc] == 0:
                         qops.dic[jslc].copy(top3[icase])
                         qops.size[jslc] = qops.dic[jslc].size_allowed
@@ -1143,8 +1143,8 @@ def renormQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
                         ## We dump the idlst information for operators & MPS
                         #qops.dic[jslc].idlst = [cop.idlst[0],qsite.idlst[0],qsite.idlst[0]]
                      else:
-                        qops.dic[jslc].value += top3[icase].value  
-                     top3[icase].value = None
+                        qops.dic[jslc][()] += top3[icase][()]  
+                     top3[icase][()] = None
                   if qops.dic[jslc].size > 0: qops.dumpSLC(fN,'opers'+str(iop),jslc)
                   qops.dic[jslc] = None
                # DUMP information
@@ -1167,7 +1167,7 @@ def PBasSopsQt(info,ndim0,prjmap,nref):
          lop.load(fL,'mat')
          rop.load(fR,'mat')
          fket = dmrg.wfex[iref]
-         qout = fket['qnum'+str(dmrg.nsite)].value[0]
+         qout = fket['qnum'+str(dmrg.nsite)][()][0]
          rop.qsyms[0] = qout - rop.qsyms[0]
          rop.qsyms[1] = qout - rop.qsyms[1]
          ksite1 = mpo_dmrg_io.loadSite(fket,isite,dmrg.ifQt)
@@ -1185,7 +1185,7 @@ def PBasSopsQt(info,ndim0,prjmap,nref):
          lop.load(fL,'mat')
          rop.load(fR,'mat')
          fket = dmrg.wfex[iref]
-         qout = fket['qnum'+str(dmrg.nsite)].value[0]
+         qout = fket['qnum'+str(dmrg.nsite)][()][0]
          rop.qsyms[0] = qout - rop.qsyms[0]
          rop.qsyms[1] = qout - rop.qsyms[1]
          ksite1 = mpo_dmrg_io.loadSite(fket,isite,dmrg.ifQt)
@@ -1240,11 +1240,11 @@ def PBasPopsQt(info,ndim0,prjmap,nref):
                ista[icase] = 1
             top1[icase].tensordotCAL(lop,vtensor)
             top2[icase].tensordotCAL(top1[icase],cop)
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],rop)
-            top2[icase].value = None
+            top2[icase][()] = None
             tmp = top3[icase].projectionNMs(dmrg.qtmp.qsyms)
-            top3[icase].value = None
+            top3[icase][()] = None
             vt[iref] += dmrg.qwts[iop]*tmp.value
             tmp = None
 
@@ -1288,13 +1288,13 @@ def PBasPopsQt(info,ndim0,prjmap,nref):
                ista[icase] = 1
             top1[icase].tensordotCAL(lop,vtensor)
             top2[icase].tensordotCAL(top1[icase],cop)
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],cop)
-            top2[icase].value = None
+            top2[icase][()] = None
             top4[icase].tensordotCAL(top3[icase],rop)
-            top3[icase].value = None
+            top3[icase][()] = None
             tmp = top4[icase].projectionNMs(dmrg.qtmp.qsyms)
-            top4[icase].value = None
+            top4[icase][()] = None
             vt[iref] += dmrg.qwts[iop]*tmp.value
             tmp = None
 
@@ -1384,16 +1384,16 @@ def BVecQt(info,ndim0,prjmap,iHd,thresh=1.e-12):
                   top2[icase2].tensordotCAL(top1[icase1],cop)
                   top3[icase2].tensordotCAL(top2[icase2],rop)
                   rop = None
-                  top2[icase2].value = None # jslc
+                  top2[icase2][()] = None # jslc
                   if dmrg.ifs2proj:
                      # Assuming projectionNMs does not take too much time!
                      tmp = top3[icase2].projectionNMs(dmrg.qtmp.qsyms)
                      hvec += dmrg.hpwts[iop]*tmp.value
                      tmp = None
                   else:
-                     hvec += dmrg.hpwts[iop]*top3[icase2].value
-                  top3[icase2].value = None # jslc
-               top1[icase1].value = None # islc
+                     hvec += dmrg.hpwts[iop]*top3[icase2][()]
+                  top3[icase2][()] = None # jslc
+               top1[icase1][()] = None # islc
 
          if iHd == 0:
             bvec += hvec*dmrg.coef[iref]
@@ -1496,16 +1496,16 @@ def BVecQt(info,ndim0,prjmap,iHd,thresh=1.e-12):
                      top3[icase3].tensordotCAL(top2[icase2],wop)
                      top4[icase3].tensordotCAL(top3[icase3],rop)
                      rop = None
-                     top3[icase3].value = None # kslc
+                     top3[icase3][()] = None # kslc
                      if dmrg.ifs2proj: 
                         tmp = top4[icase3].projectionNMs(dmrg.qtmp.qsyms)
                         hvec += dmrg.hpwts[iop]*tmp.value
                         tmp = None
                      else:
-                        hvec += dmrg.hpwts[iop]*top4[icase3].value
-                     top4[icase3].value = None # kslc
-                  top2[icase2].value = None # jslc
-               top1[icase1].value = None # islc
+                        hvec += dmrg.hpwts[iop]*top4[icase3][()]
+                     top4[icase3][()] = None # kslc
+                  top2[icase2][()] = None # jslc
+               top1[icase1][()] = None # islc
 
          if iHd == 0:
             bvec += hvec*dmrg.coef[iref]

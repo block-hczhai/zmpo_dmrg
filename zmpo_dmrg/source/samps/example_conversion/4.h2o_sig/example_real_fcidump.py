@@ -47,7 +47,7 @@ mf.analyze()
 #==================================================================
 import h5py
 f = h5py.File('mole.h5')
-mo = f['mo_coeff_spatialAll'].value
+mo = f['mo_coeff_spatialAll'][()]
 f.close()
 
 from pyscf import mcscf

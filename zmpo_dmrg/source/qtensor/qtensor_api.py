@@ -6,18 +6,18 @@ from zmpo_dmrg.source import mpo_dmrg_io
 # Reverse the Cast fmps0 to fmps1[Qt form]
 def fmpsQtReverse(fmps0,fmps1,status,isym=2):
    print('\n[qtensor_api.fmpsQtReverse] status=',status)
-   nsite = fmps0['nsite'].value
+   nsite = fmps0['nsite'][()]
    fmps1['nsite'] = nsite
    # Check symmetry
-   lenSym = len(fmps0['qnum0'].value[0])
+   lenSym = len(fmps0['qnum0'][()][0])
    if lenSym != isym:
       print(' error: isym is not consistent!')
-      print(' qnum0:',fmps0['qnum0'].value[0])
+      print(' qnum0:',fmps0['qnum0'][()][0])
       print(' lenSym/isym =',lenSym,isym)
       exit()
    # Save qnums   
    for isite in range(nsite+1):
-      ql = fmps0['qnum'+str(isite)].value
+      ql = fmps0['qnum'+str(isite)][()]
       fmps1['qnum'+str(isite)] = ql
    # Cast into numpy tensor
    for isite in range(nsite):
@@ -30,7 +30,7 @@ def fmpsQtReverse(fmps0,fmps1,status,isym=2):
 # Cast fmps0 to fmps1[Qt form]
 def fmpsQt(fmps0,fmps1,status,isym=2):
    print('\n[qtensor_api.fmpsQt] status=',status)
-   nsite = fmps0['nsite'].value
+   nsite = fmps0['nsite'][()]
    fmps1['nsite'] = nsite
    qphys = mpo_dmrg_qphys.initSpatialOrb(nsite,isym)
    # False = In, True = Out
@@ -39,25 +39,25 @@ def fmpsQt(fmps0,fmps1,status,isym=2):
    elif status == 'R': 
       sta = [True,False,False]
    # Check symmetry
-   lenSym = len(fmps0['qnum0'].value[0])
+   lenSym = len(fmps0['qnum0'][()][0])
    if lenSym != isym:
       print(' error: isym is not consistent!')
-      print(' qnum0:',fmps0['qnum0'].value[0])
+      print(' qnum0:',fmps0['qnum0'][()][0])
       print(' lenSym/isym =',lenSym,isym)
       exit()
    # Cast into Qt tensor
    for isite in range(nsite):
-      ql = fmps0['qnum'+str(isite)].value
+      ql = fmps0['qnum'+str(isite)][()]
       qn = qphys[isite]
-      qr = fmps0['qnum'+str(isite+1)].value
-      site = fmps0['site'+str(isite)].value
+      qr = fmps0['qnum'+str(isite+1)][()]
+      site = fmps0['site'+str(isite)][()]
       print(' isite =',isite,' shape=',site.shape)
       tmps = qtensor.qtensor(sta)
       tmps.fromDenseTensor(site,[ql,qn,qr])    
       tmps.dump(fmps1,'site'+str(isite))     
    # Save qnums   
    for isite in range(nsite+1):
-      ql = fmps0['qnum'+str(isite)].value
+      ql = fmps0['qnum'+str(isite)][()]
       fmps1['qnum'+str(isite)] = ql
    return 0
 

@@ -46,8 +46,8 @@ def diagNQt(dmrg,fbmps,fname,debug=False):
       fL = h5py.File(prefixL+str(isite-1),"r")
       fR = h5py.File(prefixR+str(isite+1),"r")
       bsite = mpo_dmrg_io.loadSite(fbmps,isite,dmrg.ifQt)
-      tmpl = fL['mat'].value
-      tmpr = fR['mat'].value
+      tmpl = fL['mat'][()]
+      tmpr = fR['mat'][()]
       npmat = mpo_dmrg_opers.genNpMat()
       #
       #   i---*---j

@@ -92,8 +92,8 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    t0 = time.time()
    nop = dmrg.nops
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
    prefix = fname+'_site_'
@@ -156,21 +156,21 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
                   top1[icase].tensordotCAL(bsite,lop,ifc1=True)
                   lop = None
                   top2[icase].tensordotCAL(cop,top1[icase])
-                  top1[icase].value = None
+                  top1[icase][()] = None
                   top3[icase].tensordotCAL(top2[icase],ksite)
-                  top2[icase].value = None
+                  top2[icase][()] = None
                   if qops.size[jslc] == 0:
                      qops.dic[jslc].copy(top3[icase])
                      qops.size[jslc] = qops.dic[jslc].size_allowed
                      # We dump the idlst information for operators & MPS
                      qops.dic[jslc].idlst = [cop.idlst[1],bsite.idlst[2],ksite.idlst[2]]
                   else:
-                     qops.dic[jslc].value += top3[icase].value  
-                  top3[icase].value = None
+                     qops.dic[jslc][()] += top3[icase][()]  
+                  top3[icase][()] = None
                if qops.dic[jslc].size > 0: qops.dumpSLC(f1,'opers'+str(iop),jslc)
                # Get the expectation value <psi|Hx|psi> at the right boundary
                # The nice thing is at the boundary, slicing = 1.
-               if isite == nsite-1: exphop[iop] = qops.dic[jslc].value
+               if isite == nsite-1: exphop[iop] = qops.dic[jslc][()]
                qops.dic[jslc] = None
             # DUMP information
             qops.dumpInfo(f1,'opers'+str(iop))
@@ -239,20 +239,20 @@ def genHopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
                   top1[icase].tensordotCAL(bsite,rop,ifc1=True)
                   rop = None
                   top2[icase].tensordotCAL(cop,top1[icase])
-                  top1[icase].value = None
+                  top1[icase][()] = None
                   top3[icase].tensordotCAL(top2[icase],ksite)
-                  top2[icase].value = None
+                  top2[icase][()] = None
                   if qops.size[jslc] == 0:
                      qops.dic[jslc].copy(top3[icase])
                      qops.size[jslc] = qops.dic[jslc].size_allowed
                      # We dump the idlst information for operators & MPS
                      qops.dic[jslc].idlst = [cop.idlst[0],bsite.idlst[0],ksite.idlst[0]]
                   else:
-                     qops.dic[jslc].value += top3[icase].value  
-                  top3[icase].value = None
+                     qops.dic[jslc][()] += top3[icase][()]  
+                  top3[icase][()] = None
                if qops.dic[jslc].size > 0: qops.dumpSLC(f1,'opers'+str(iop),jslc)
                # Get the expectation value <psi|Hx|psi> at the boundary
-               if isite == 0: exphop[iop] = qops.dic[jslc].value
+               if isite == 0: exphop[iop] = qops.dic[jslc][()]
                qops.dic[jslc] = None
             # DUMP information
             qops.dumpInfo(f1,'opers'+str(iop))
@@ -279,8 +279,8 @@ def genSopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       print(' fname = ',fname)
    t0 = time.time()
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
    prefix = fname+'_site_'
@@ -355,8 +355,8 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    nop = dmrg.npts
    odim = 1
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
    prefix = fname+'_site_'
@@ -404,13 +404,13 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
                ista[icase] = 1
             top1[icase].tensordotCAL(bsite,lop,ifc1=True)
             top2[icase].tensordotCAL(cop,top1[icase])
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],ksite)
-            top2[icase].value = None
+            top2[icase][()] = None
             top3[icase].dump(f1,'opers'+str(iop))
             # Get the expectation value <psi|Hx|psi> at the boundary
-            if isite == nsite-1: exppop[iop] = top3[icase].value
-            top3[icase].value = None
+            if isite == nsite-1: exppop[iop] = top3[icase][()]
+            top3[icase][()] = None
 
          f0.close()
          f1.close()
@@ -464,13 +464,13 @@ def genPopsQt(dmrg,fbmps,fkmps,fname,status,debug=False):
                ista[icase] = 1
             top1[icase].tensordotCAL(bsite,rop,ifc1=True)
             top2[icase].tensordotCAL(cop,top1[icase])
-            top1[icase].value = None
+            top1[icase][()] = None
             top3[icase].tensordotCAL(top2[icase],ksite)
-            top2[icase].value = None
+            top2[icase][()] = None
             top3[icase].dump(f1,'opers'+str(iop))
             # Get the expectation value <psi|Hx|psi> at the boundary
-            if isite == 0: exphop[iop] = top3[icase].value
-            top3[icase].value = None
+            if isite == 0: exphop[iop] = top3[icase][()]
+            top3[icase][()] = None
 
          f0.close()
          f1.close()

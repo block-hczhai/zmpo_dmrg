@@ -486,7 +486,7 @@ class mpo_dmrg:
       else:
          fkmps = fbmps
       # bond dimension
-      nsite = fbmps['nsite'].value
+      nsite = fbmps['nsite'][()]
       bdim = [len(x) for x in mpo_dmrg_io.loadQnums(fbmps)]
       kdim = [len(x) for x in mpo_dmrg_io.loadQnums(fkmps)]
       # Quantities to be checked
@@ -498,7 +498,7 @@ class mpo_dmrg:
       fnamep = self.path+'/'+fname0+'_pop'
       # Energy
       exphop = mpo_dmrg_init.genHops(self,fbmps,fkmps,fnameh,status)
-      hpwts = self.fhop['wts'].value
+      hpwts = self.fhop['wts'][()]
       esum = numpy.dot(hpwts,exphop)
       esum = self.comm.reduce(esum,op=MPI.SUM,root=0)
       # S

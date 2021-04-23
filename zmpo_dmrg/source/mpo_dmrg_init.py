@@ -93,10 +93,10 @@ def genHopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       print(' fname = ',fname)
    t0 = time.time()
    opIndices = dmrg.opers
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
    prefix = fname+'_site_'
@@ -120,8 +120,8 @@ def genHopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          if isite == nsite-1: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
             if debug: print('    iop=',iop,' of nop=',nop)
-            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-            tmp = f0['opers'+str(iop)].value
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+            tmp = f0['opers'+str(iop)][()]
             #--- kernel ---
             tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1])) # imj,pia->mjpa
             tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))      # pqmn,mjpa->qnja
@@ -152,8 +152,8 @@ def genHopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          if isite == 0: exphop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
             if debug: print('    iop=',iop,' of nop=',nop)
-            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-            tmp = f0['opers'+str(iop)].value
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+            tmp = f0['opers'+str(iop)][()]
             #--- kernel ---
             tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1])) # imj,qjb->imqb
             tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))      # pqmn,imqb->pnib
@@ -190,8 +190,8 @@ def genSopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
       print(' fname = ',fname)
    t0 = time.time()
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
    prefix = fname+'_site_'
@@ -217,7 +217,7 @@ def genSopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          #  \    |
          #   a-------b
          #
-         tmp = f0['mat'].value
+         tmp = f0['mat'][()]
          #--- kernel ---
          tmp = numpy.tensordot(tmp,bsite.conj(),axes=([0],[0])) # ia,imj->amj
          tmp = numpy.tensordot(tmp,ksite,axes=([0,1],[0,1]))    # amj,amb->jb
@@ -252,7 +252,7 @@ def genSopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          #       |    /
          #   a-------b
          #
-         tmp = f0['mat'].value
+         tmp = f0['mat'][()]
          #--- kenerl ---
          tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[0])) # imj,jb->imb
          tmp = numpy.tensordot(tmp,ksite,axes=([1,2],[1,2]))    # imb,amb->ia
@@ -291,8 +291,8 @@ def genPopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
    nop = dmrg.npts
    odim = 1
    # sites
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite = bnsite
    prefix = fname+'_site_'
@@ -315,8 +315,8 @@ def genPopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          if isite == nsite-1: exppop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
             if debug: print('    iop=',iop,' of nop=',nop)
-            cop = dmrg.fpop['op'+str(iop)].value
-            tmp = f0['opers'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
+            tmp = f0['opers'+str(iop)][()]
             #--- kernel ---
             tmp = numpy.tensordot(bsite.conj(),tmp,axes=([0],[1])) # imj,pia->mjpa
             tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))      # pqmn,mjpa->qnja
@@ -347,8 +347,8 @@ def genPopsNQt(dmrg,fbmps,fkmps,fname,status,debug=False):
          if isite == 0: exppop = numpy.zeros(nop,dtype=dmrg_dtype)
          for iop in range(nop):
             if debug: print('    iop=',iop,' of nop=',nop)
-            cop = dmrg.fpop['op'+str(iop)].value
-            tmp = f0['opers'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
+            tmp = f0['opers'+str(iop)][()]
             #--- kernel --- 
             tmp = numpy.tensordot(bsite.conj(),tmp,axes=([2],[1])) # imj,qjb->imqb
             tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))      # pqmn,imqb->pnib

@@ -12,8 +12,8 @@ ifQt = False
 ifs2proj = False
 
 flmps0 = h5py.File('./lmps0','r')
-nsite = flmps0['nsite'].value
-print("Input qsym=",flmps0['qnum'+str(nsite)].value)
+nsite = flmps0['nsite'][()]
+print("Input qsym=",flmps0['qnum'+str(nsite)][()])
 
 flmps1 = h5py.File('./lmps1','w')
 

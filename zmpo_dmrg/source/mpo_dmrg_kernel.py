@@ -57,18 +57,18 @@ def HDiagNQt(info,ndim0,prjmap):
    if dmrg.iprt > 0: print('[mpo_dmrg_kernel.HDiag] (l,c,r,n,n0)=',(ldim,cdim,rdim,ndim,ndim0)) 
    diag = numpy.zeros((ldim,cdim,rdim),dtype=dmrg_dtype)
    # Loop over operators
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    for iop in range(nop):
-      cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
+      cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
       cdiag = numpy.einsum('abii->abi',cop)
       if ncsite == 2:
          jsite = isite+1
-         wop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)].value
+         wop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)][()]
          wdiag = numpy.einsum('bcjj->bcj',wop)
          cdiag = linkDiag(cdiag,wdiag)
       # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-      lop = fL['opers'+str(iop)].value
-      rop = fR['opers'+str(iop)].value
+      lop = fL['opers'+str(iop)][()]
+      rop = fR['opers'+str(iop)][()]
       ldiag = lop[:,list(range(ldim)),list(range(ldim))]
       rdiag = rop[:,list(range(rdim)),list(range(rdim))]
       # contract bonds
@@ -141,17 +141,17 @@ def HVecNQt(vec0,info,ndim0,prjmap,ifile=0,ioff=0):
    ldim,cdim,rdim,ndim = dmrg.dims
    vtensor = numpy.zeros(ndim,dtype=dmrg_dtype)
    vtensor[prjmap] = vec0
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if ncsite == 1:
 
       vtensor = vtensor.reshape(ldim,cdim,rdim)
       hvec = numpy.zeros(vtensor.shape,dtype=dmrg_dtype)
       # Loop over operators
       for iop in range(nop):
-         cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
+         cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
          # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-         lop = fL['opers'+str(iop)].value
-         rop = fR['opers'+str(iop)].value
+         lop = fL['opers'+str(iop)][()]
+         rop = fR['opers'+str(iop)][()]
          tmp = numpy.tensordot(lop,vtensor,axes=([2],[0])) # L[pia]*B[anb]=>T[pinb]
          tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinb]*W[pqmn]=>T[ibqm]
          tmp = numpy.tensordot(tmp,rop,axes=([1,2],[2,0])) # T[ibqm]*R[qjb]=>T[imj]
@@ -165,11 +165,11 @@ def HVecNQt(vec0,info,ndim0,prjmap,ifile=0,ioff=0):
       jsite = isite+1
       # Loop over operators
       for iop in range(nop):
-         cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-         wop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)].value
+         cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+         wop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)][()]
          # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-         lop = fL['opers'+str(iop)].value
-         rop = fR['opers'+str(iop)].value
+         lop = fL['opers'+str(iop)][()]
+         rop = fR['opers'+str(iop)][()]
          tmp = numpy.tensordot(lop,vtensor,axes=([2],[0])) # L[pia]*B[anmb]=>T[pinmb] (a)
          tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinmb]*W[pqen]=>T[imbqe] (p,n)
          tmp = numpy.tensordot(tmp,wop,axes=([1,3],[3,0])) # T[imbqe]*W[qrfm]=>T[iberf] (m,q)
@@ -199,16 +199,16 @@ def SDiagNQt(info,ndim0,prjmap):
       nop = dmrg.npts
       # Loop over operators
       for iop in range(nop):
-         cop = dmrg.fpop['op'+str(iop)].value
+         cop = dmrg.fpop['op'+str(iop)][()]
          cdiag = numpy.einsum('abii->abi',cop)
          if ncsite == 2:
             jsite = isite+1
-            wop = dmrg.fpop['op'+str(iop)].value
+            wop = dmrg.fpop['op'+str(iop)][()]
             wdiag = numpy.einsum('bcjj->bcj',wop)
             cdiag = linkDiag(cdiag,wdiag)
          # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-         lop = fLp['opers'+str(iop)].value
-         rop = fRp['opers'+str(iop)].value
+         lop = fLp['opers'+str(iop)][()]
+         rop = fRp['opers'+str(iop)][()]
          ldiag = lop[:,list(range(ldim)),list(range(ldim))]
          rdiag = rop[:,list(range(rdim)),list(range(rdim))]
          # contract bonds
@@ -244,10 +244,10 @@ def SVecNQt(vec0,info,ndim0,prjmap):
          vtensor = vtensor.reshape(ldim,cdim,rdim)
          # Loop over operators
          for iop in range(nop):
-            cop = dmrg.fpop['op'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
             # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-            lop = fLp['opers'+str(iop)].value
-            rop = fRp['opers'+str(iop)].value
+            lop = fLp['opers'+str(iop)][()]
+            rop = fRp['opers'+str(iop)][()]
             tmp = numpy.tensordot(lop,vtensor,axes=([2],[0])) # L[pia]*B[anb]=>T[pinb]
             tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinb]*W[pqmn]=>T[ibqm]
             tmp = numpy.tensordot(tmp,rop,axes=([1,2],[2,0])) # T[ibqm]*R[qjb]=>T[imj]
@@ -260,10 +260,10 @@ def SVecNQt(vec0,info,ndim0,prjmap):
          svec = svec.reshape(ldim,4,4,rdim)
          # Loop over operators
          for iop in range(nop):
-            cop = dmrg.fpop['op'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
             # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-            lop = fLp['opers'+str(iop)].value
-            rop = fRp['opers'+str(iop)].value
+            lop = fLp['opers'+str(iop)][()]
+            rop = fRp['opers'+str(iop)][()]
             tmp = numpy.tensordot(lop,vtensor,axes=([2],[0])) # L[pia]*B[anmb]=>T[pinmb] (a)
             tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinmb]*W[pqen]=>T[imbqe] (p,n)
             tmp = numpy.tensordot(tmp,cop,axes=([1,3],[3,0])) # T[imbqe]*W[qrfm]=>T[iberf] (m,q)
@@ -296,8 +296,8 @@ def pRDMNQt(cimat,info):
          # Loop over operators
          nop = dmrg.nops
          for iop in range(nop):
-            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-            lop = fL['opers'+str(iop)].value
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+            lop = fL['opers'+str(iop)][()]
             for ieig in range(neig):     
                # L[pia]*B[anb]=>T[pinb]
                tmp = numpy.tensordot(lop,cimat[ieig],axes=([2],[0]))
@@ -323,8 +323,8 @@ def pRDMNQt(cimat,info):
          # Loop over operators
          nop = dmrg.nops
          for iop in range(nop):
-            cop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)].value
-            rop = fR['opers'+str(iop)].value
+            cop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)][()]
+            rop = fR['opers'+str(iop)][()]
             for ieig in range(neig):     
                # B[anb]*R[qjb]=>T[anqj]
                tmp = numpy.tensordot(cimat[ieig],rop,axes=([2],[2]))
@@ -378,15 +378,15 @@ def renorm(dmrg,isite,ncsite,flst,flstN,site,status):
 
 # Construct renormalized operators for <0|H*R(theta)|0> or <0|H0|0> 
 def renormNQt_H00(dmrg,isite,ncsite,flst,flstN,site,status):
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if status == 'L':
 
       # Hamiltoinan operators
       fL = flst[0][0]
       fN = flstN[0][0]
       for iop in range(nop):
-         cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-         lop = fL['opers'+str(iop)].value
+         cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+         lop = fL['opers'+str(iop)][()]
          tmp = numpy.tensordot(site.conj(),lop,axes=([0],[1]))
          tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
          tmp = numpy.tensordot(tmp,site,axes=([1,3],[1,0]))
@@ -399,8 +399,8 @@ def renormNQt_H00(dmrg,isite,ncsite,flst,flstN,site,status):
       fR = flst[0][1]
       fN = flstN[0][0]
       for iop in range(nop):
-         cop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)].value
-         rop = fR['opers'+str(iop)].value
+         cop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)][()]
+         rop = fR['opers'+str(iop)][()]
          tmp = numpy.tensordot(site.conj(),rop,axes=([2],[1]))
          tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
          tmp = numpy.tensordot(tmp,site,axes=([1,3],[1,2]))
@@ -418,8 +418,8 @@ def renormNQt_S00(dmrg,isite,ncsite,flst,flstN,site,status):
          fNp = flstN[0][1]
          nop = dmrg.npts
          for iop in range(nop):
-            cop = dmrg.fpop['op'+str(iop)].value
-            lop = fLp['opers'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
+            lop = fLp['opers'+str(iop)][()]
             tmp = numpy.tensordot(site.conj(),lop,axes=([0],[1]))
             tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
             tmp = numpy.tensordot(tmp,site,axes=([1,3],[1,0]))
@@ -434,8 +434,8 @@ def renormNQt_S00(dmrg,isite,ncsite,flst,flstN,site,status):
          fNp = flstN[0][1]
          nop = dmrg.npts
          for iop in range(nop):
-            cop = dmrg.fpop['op'+str(iop)].value
-            rop = fRp['opers'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
+            rop = fRp['opers'+str(iop)][()]
             tmp = numpy.tensordot(site.conj(),rop,axes=([2],[1]))
             tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
             tmp = numpy.tensordot(tmp,site,axes=([1,3],[1,2]))
@@ -456,7 +456,7 @@ def renormNQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
                fL = flst[1][2*iref]
                fN = flstN[1][iref]
                # SOP
-               tmp = fL['mat'].value
+               tmp = fL['mat'][()]
                tmp = numpy.tensordot(site.conj(),tmp,axes=([0],[0]))
                tmp = numpy.tensordot(tmp,ksite,axes=([0,2],[1,0]))
                fN['mat'] = tmp
@@ -466,8 +466,8 @@ def renormNQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
                fNp = flstN[1][iref]
                nop = dmrg.npts
                for iop in range(nop):
-                  cop = dmrg.fpop['op'+str(iop)].value
-                  lop = fLp['opers'+str(iop)].value
+                  cop = dmrg.fpop['op'+str(iop)][()]
+                  lop = fLp['opers'+str(iop)][()]
                   tmp = numpy.tensordot(site.conj(),lop,axes=([0],[1]))
                   tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
                   tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))
@@ -485,7 +485,7 @@ def renormNQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
                fR = flst[1][2*iref+1]
                fN = flstN[1][iref]
                # SOP
-               tmp = fR['mat'].value
+               tmp = fR['mat'][()]
                tmp = numpy.tensordot(site.conj(),tmp,axes=([2],[0]))
                tmp = numpy.tensordot(tmp,ksite,axes=([1,2],[1,2]))
                fN['mat'] = tmp
@@ -495,8 +495,8 @@ def renormNQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
                fNp = flstN[1][iref]
                nop = dmrg.npts
                for iop in range(nop):
-                  cop = dmrg.fpop['op'+str(iop)].value
-                  rop = fRp['opers'+str(iop)].value
+                  cop = dmrg.fpop['op'+str(iop)][()]
+                  rop = fRp['opers'+str(iop)][()]
                   tmp = numpy.tensordot(site.conj(),rop,axes=([2],[1]))
                   tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
                   tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))
@@ -507,7 +507,7 @@ def renormNQt_S0I(dmrg,isite,ncsite,flst,flstN,site,status):
 # Construct renormalized operators for PT treatment:
 # RHS = <0|H|I> or <0|H*R(theta)|I> (SP-MPS)
 def renormNQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
-   nop = dmrg.fhop['nops'].value
+   nop = dmrg.fhop['nops'][()]
    if status == 'L':
 
       # Hamiltoinan operators for PT.
@@ -523,8 +523,8 @@ def renormNQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
             fket = dmrg.wfex[iref]
             ksite = mpo_dmrg_io.loadSite(fket,isite,dmrg.ifQt)
             for iop in range(nop):
-               cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-               lop = fL['opers'+str(iop)].value
+               cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+               lop = fL['opers'+str(iop)][()]
                tmp = numpy.tensordot(site.conj(),lop,axes=([0],[1]))
                tmp = numpy.tensordot(cop,tmp,axes=([0,2],[2,0]))
                tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,0]))
@@ -546,8 +546,8 @@ def renormNQt_H0I(dmrg,isite,ncsite,flst,flstN,site,status,iHd=0,thresh=1.e-12):
             fket = dmrg.wfex[iref]
             ksite = mpo_dmrg_io.loadSite(fket,jsite,dmrg.ifQt)
             for iop in range(nop):
-               cop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)].value
-               rop = fR['opers'+str(iop)].value
+               cop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)][()]
+               rop = fR['opers'+str(iop)][()]
                tmp = numpy.tensordot(site.conj(),rop,axes=([2],[1]))
                tmp = numpy.tensordot(cop,tmp,axes=([1,2],[2,1]))
                tmp = numpy.tensordot(tmp,ksite,axes=([1,3],[1,2]))
@@ -596,8 +596,8 @@ def PBasSopsNQt(info,ndim0,prjmap,nref):
       for iref in range(nref):
          fL = flst[1][2*iref]
          fR = flst[1][2*iref+1]
-         lop = fL['mat'].value
-         rop = fR['mat'].value
+         lop = fL['mat'][()]
+         rop = fR['mat'][()]
          fket = dmrg.wfex[iref]
          ksite1 = mpo_dmrg_io.loadSite(fket,isite,dmrg.ifQt)
          # L[u1,b]*A[b,n,c]*R[u2,c] = vec[u1,n,u2]
@@ -611,8 +611,8 @@ def PBasSopsNQt(info,ndim0,prjmap,nref):
       for iref in range(nref):
          fL = flst[1][2*iref]
          fR = flst[1][2*iref+1]
-         lop = fL['mat'].value
-         rop = fR['mat'].value
+         lop = fL['mat'][()]
+         rop = fR['mat'][()]
          fket = dmrg.wfex[iref]
          ksite1 = mpo_dmrg_io.loadSite(fket,isite,dmrg.ifQt)
          ksite2 = mpo_dmrg_io.loadSite(fket,isite+1,dmrg.ifQt)
@@ -644,9 +644,9 @@ def PBasPopsNQt(info,ndim0,prjmap,nref):
             #    \    |    /
             #     ----*----
             #        Ket
-            cop = dmrg.fpop['op'+str(iop)].value
-            lop = fLp['opers'+str(iop)].value
-            rop = fRp['opers'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
+            lop = fLp['opers'+str(iop)][()]
+            rop = fRp['opers'+str(iop)][()]
             tmp = numpy.tensordot(lop,vtensor,axes=([2],[0])) # L[pia]*B[anb]=>T[pinb]
             tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinb]*W[pqmn]=>T[ibqm]
             tmp = numpy.tensordot(tmp,rop,axes=([1,2],[2,0])) # T[ibqm]*R[qjb]=>T[imj]
@@ -664,9 +664,9 @@ def PBasPopsNQt(info,ndim0,prjmap,nref):
          vtensor = numpy.tensordot(ksite1,ksite2,axes=([2],[0]))
          # Loop over operators
          for iop in range(nop):
-            cop = dmrg.fpop['op'+str(iop)].value
-            lop = fLp['opers'+str(iop)].value
-            rop = fRp['opers'+str(iop)].value
+            cop = dmrg.fpop['op'+str(iop)][()]
+            lop = fLp['opers'+str(iop)][()]
+            rop = fRp['opers'+str(iop)][()]
             tmp = numpy.tensordot(lop,vtensor,axes=([2],[0])) # L[pia]*B[anmb]=>T[pinmb] (a)
             tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinmb]*W[pqen]=>T[imbqe] (p,n)
             tmp = numpy.tensordot(tmp,cop,axes=([1,3],[3,0])) # T[imbqe]*W[qrfm]=>T[iberf] (m,q)
@@ -714,10 +714,10 @@ def BVecNQt(info,ndim0,prjmap,iHd,thresh=1.e-12):
          # Loop over operators
          for iop in range(nop):
             porb,ipop = dmrg.opers[iop]
-            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
             # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-            lop = fL['opers'+str(iop)].value
-            rop = fR['opers'+str(iop)].value
+            lop = fL['opers'+str(iop)][()]
+            rop = fR['opers'+str(iop)][()]
             tmp = numpy.tensordot(lop,qvec,axes=([2],[0]))    # L[pia]*B[anb]=>T[pinb]
             tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinb]*W[pqmn]=>T[ibqm]
             tmp = numpy.tensordot(tmp,rop,axes=([1,2],[2,0])) # T[ibqm]*R[qjb]=>T[imj]
@@ -748,11 +748,11 @@ def BVecNQt(info,ndim0,prjmap,iHd,thresh=1.e-12):
          # Loop over operators
          for iop in range(nop):
             porb,ipop = dmrg.opers[iop]
-            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)].value
-            wop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)].value
+            cop = dmrg.fhop['site'+str(isite)+'/op'+str(iop)][()]
+            wop = dmrg.fhop['site'+str(jsite)+'/op'+str(iop)][()]
             # lop[a,bdim1,kdim1]*cop[a,b,ndim,ndim']*rop[b,bdim2,kdim2]
-            lop = fL['opers'+str(iop)].value
-            rop = fR['opers'+str(iop)].value
+            lop = fL['opers'+str(iop)][()]
+            rop = fR['opers'+str(iop)][()]
             tmp = numpy.tensordot(lop,qvec,axes=([2],[0]))    # L[pia]*B[anmb]=>T[pinmb] (a)
             tmp = numpy.tensordot(tmp,cop,axes=([0,2],[0,3])) # T[pinmb]*W[pqen]=>T[imbqe] (p,n)
             tmp = numpy.tensordot(tmp,wop,axes=([1,3],[3,0])) # T[imbqe]*W[qrfm]=>T[iberf] (m,q)

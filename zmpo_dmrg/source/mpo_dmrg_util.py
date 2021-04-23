@@ -374,7 +374,7 @@ def vpt(dmrg):
       fnamer = dmrg.path+'/ref'+str(iref)+'_rhop'
       mpo_dmrg_init.genBops(dmrg,fnamer,dmrg.nops,dmrg.nsite,ifslc=True)
       exphop = mpo_dmrg_init.genHops(dmrg,fbra,fket,fnamel,'L')
-      hpwts = dmrg.fhop['wts'].value
+      hpwts = dmrg.fhop['wts'][()]
       esum = numpy.dot(hpwts,exphop)
       esum = dmrg.comm.reduce(esum,op=MPI.SUM,root=0)
       if rank == 0: v01[iref] = dmrg.n0*esum.real

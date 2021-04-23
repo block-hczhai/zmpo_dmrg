@@ -23,18 +23,18 @@ def dumpMPS(mps,qnum=None,fname='mps.h5'):
 def loadMPS(fname='mps.h5'):
    print('\n[mps_io.loadMPS] fname = ',fname)
    f = h5py.File(fname,'r')
-   nsite = f['nsite'].value
+   nsite = f['nsite'][()]
    mps = [0]*nsite
    # Site
    for isite in range(nsite):
-      mps[isite] = f['mps_'+str(isite)].value
+      mps[isite] = f['mps_'+str(isite)][()]
    # Qnum
    iqnum = f['qnum'].attrs['status']
    qnum = None
    if iqnum != 0:
       qnum = [None]*(nsite+1)
       for isite in range(nsite+1):
-          qnum[isite] = f['qnum_'+str(isite)].value
+          qnum[isite] = f['qnum_'+str(isite)][()]
    f.close()
    return mps,qnum
 

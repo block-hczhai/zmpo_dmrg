@@ -227,24 +227,24 @@ class qtensor:
       self.savings = grp.attrs['savings'] 
       self.status  = numpy.array(grp.attrs['status'])
       # Arrays
-      self.iblks_allowed = grp['iblks_allowed'].value # int32  nsyms
-      self.dims_allowed  = grp['dims_allowed' ].value # int32  nblks
-      self.idx_allowed   = grp['idx_allowed'  ].value # int64  nblks
-      self.ndim_allowed  = grp['ndim_allowed' ].value # int64  nblks
-      self.ioff_allowed  = grp['ioff_allowed' ].value # int64  nblks
+      self.iblks_allowed = grp['iblks_allowed'][()] # int32  nsyms
+      self.dims_allowed  = grp['dims_allowed' ][()] # int32  nblks
+      self.idx_allowed   = grp['idx_allowed'  ][()] # int64  nblks
+      self.ndim_allowed  = grp['ndim_allowed' ][()] # int64  nblks
+      self.ioff_allowed  = grp['ioff_allowed' ][()] # int64  nblks
       # DArrays
-      self.value = grp['value' ].value
+      self.value = grp['value' ][()]
       # Sparsing data
       # > qsyms
       self.qsyms = [0]*self.rank
-      qsyms = grp['qsyms'].value 
+      qsyms = grp['qsyms'][()] 
       ioff = 0
       for irank in range(self.rank):
          self.qsyms[irank] = qsyms[ioff:ioff+self.nsyms[irank]]
          ioff += self.nsyms[irank]
       # > ndims
       self.ndims = [0]*self.rank
-      ndims = grp['ndims'].value 
+      ndims = grp['ndims'][()] 
       ioff = 0
       for irank in range(self.rank):
          self.ndims[irank] = ndims[ioff:ioff+self.nsyms[irank]]
@@ -252,7 +252,7 @@ class qtensor:
       # > idlst
       if 'idlst' in grp:
          self.idlst = [0]*self.rank
-         idlst = grp['idlst'].value 
+         idlst = grp['idlst'][()] 
          ioff = 0
          for irank in range(self.rank):
             self.idlst[irank] = qtensor_idlst.seperate(self.ndims[irank],\

@@ -42,8 +42,8 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
       print('[mpo_dmrg_block.genCAopsNQt] status=',status)
       print(' fname = ',fname)
    t0 = time.time()
-   bnsite = fbmps['nsite'].value
-   knsite = fkmps['nsite'].value
+   bnsite = fbmps['nsite'][()]
+   knsite = fkmps['nsite'][()]
    assert bnsite == knsite
    nsite  = bnsite
    sbas   = 2*nsite
@@ -79,7 +79,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
          
          # 0. Qnums
          porbs = 2*isite
-         nqum = fkmps['qnum'+str(isite)].value[:,0]
+         nqum = fkmps['qnum'+str(isite)][()][:,0]
          sgnl = numpy.power(-1.0,nqum)
          ksite2 = numpy.einsum('l,lnr->lnr',sgnl,ksite)
          
@@ -264,9 +264,9 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
    hdm1 = numpy.zeros((sbas,sbas))
    for i in range(sbas):
       for j in range(sbas):
-         rdm1[i,j] = f['op_CA_'+str(i)+'_'+str(j)].value
-         hdm1[j,i] = f['op_AC_'+str(i)+'_'+str(j)].value
-   sab = f['mat'].value[0,0]
+         rdm1[i,j] = f['op_CA_'+str(i)+'_'+str(j)][()]
+         hdm1[j,i] = f['op_AC_'+str(i)+'_'+str(j)][()]
+   sab = f['mat'][()][0,0]
    #print rdm1+hdm1
    print(' ovlap=',sab)
    print(' P+H-I=',numpy.linalg.norm(rdm1+hdm1-numpy.identity(sbas)*sab)) 
@@ -298,8 +298,8 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 #>    if dmrg.comm.rank == 0: 
 #>       print '[mpo_dmrg_block.genRDMsNQt] norder =',norder
 #>    t0 = time.time()
-#>    bnsite = fbmps['nsite'].value
-#>    knsite = fkmps['nsite'].value
+#>    bnsite = fbmps['nsite'][()]
+#>    knsite = fkmps['nsite'][()]
 #>    assert bnsite == knsite
 #>    nsite  = bnsite
 #>    sbas   = 2*nsite
@@ -336,7 +336,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 #>       
 #>       # 0. Qnums
 #>       porbs = 2*isite
-#>       nqum = fkmps['qnum'+str(isite)].value[:,0]
+#>       nqum = fkmps['qnum'+str(isite)][()][:,0]
 #>       sgnl = numpy.power(-1.0,nqum)
 #>       ksite2 = numpy.einsum('l,lnr->lnr',sgnl,ksite)
 #>       
@@ -423,9 +423,9 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 #>    hdm1 = numpy.zeros((sbas,sbas))
 #>    for i in range(sbas):
 #>       for j in range(sbas):
-#>          rdm1[i,j] = f['op_CA_'+str(i)+'_'+str(j)].value
-#>          hdm1[j,i] = f['op_AC_'+str(i)+'_'+str(j)].value
-#>    sab = f['mat'].value[0,0]
+#>          rdm1[i,j] = f['op_CA_'+str(i)+'_'+str(j)][()]
+#>          hdm1[j,i] = f['op_AC_'+str(i)+'_'+str(j)][()]
+#>    sab = f['mat'][()][0,0]
 #>    #print rdm1+hdm1
 #>    print ' ovlap=',sab
 #>    print ' P+H-I=',numpy.linalg.norm(rdm1+hdm1-numpy.identity(sbas)*sab) 
@@ -446,7 +446,7 @@ def genCAopsNQt(norder,dmrg,fbmps,fkmps,fname,status,debug=False):
 # renorm <l'|l>d[n'n]    
 def renorm_l1(bsite,ksite,f0,f1,oplst=None):
    for op in oplst:
-      tmp = f0[op].value
+      tmp = f0[op][()]
       tmp = numpy.tensordot(tmp,bsite,axes=([0],[0])) # (l',l)*(l',n',r')=>(l,n',r')
       tmp = numpy.tensordot(tmp,ksite,axes=([0,1],[0,1])) # (l,n,r')*(l,n,r)
       f1[op] = tmp
